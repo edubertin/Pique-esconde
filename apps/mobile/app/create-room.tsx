@@ -30,7 +30,7 @@ export default function CreateRoomScreen() {
         paddingBottom: 26,
       }}>
       <Image
-        source={require('@/assets/images/pique-esconde-menu-reference.png')}
+        source={require('@/assets/images/pique-esconde-background.png')}
         contentFit="cover"
         style={{
           height: 1220,

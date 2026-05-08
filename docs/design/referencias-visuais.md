@@ -32,6 +32,20 @@ Adaptação para o app:
 - Usar a linguagem visual como referência para criar botões e painéis reais em React Native.
 - A página de criar sala usa uma versão importada como atmosfera/fundo, com controles reais por cima.
 
+## Background do App
+
+Arquivo:
+
+```txt
+docs/design/referencias/background.png
+```
+
+Uso:
+
+- Background padrão das telas do app.
+- Mantém a atmosfera do jogo sem placares ou botões falsos.
+- Permite sobrepor cards e controles reais com boa legibilidade.
+
 ## Direção Visual
 
 - Estilo: ilustração 3D/cartoon, com aparência de jogo mobile casual.

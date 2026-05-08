@@ -18,3 +18,4 @@ Referências principais atuais:
 - `referencias/pique-esconde-logo.png`
 - `referencias/pique-esconde-store-cover.png`
 - `referencias/image.png`
+- `referencias/background.png`

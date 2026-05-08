@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { Image } from 'expo-image';
 import { ScrollView, Text, View } from 'react-native';
 
 import { colors } from '@/src/theme/colors';
@@ -14,13 +15,36 @@ export function PrototypeScreen({ children, kicker, subtitle, title }: Prototype
   return (
     <ScrollView
       contentInsetAdjustmentBehavior="automatic"
-      style={{ backgroundColor: colors.background }}
+      style={{ backgroundColor: colors.navy }}
       contentContainerStyle={{
         alignItems: 'center',
         gap: 18,
+        minHeight: '100%',
         padding: 20,
         paddingBottom: 40,
       }}>
+      <Image
+        source={require('@/assets/images/pique-esconde-background.png')}
+        contentFit="cover"
+        style={{
+          height: 1220,
+          left: 0,
+          opacity: 0.58,
+          position: 'absolute',
+          right: 0,
+          top: -70,
+        }}
+      />
+      <View
+        style={{
+          backgroundColor: 'rgba(7, 26, 61, 0.30)',
+          bottom: 0,
+          left: 0,
+          position: 'absolute',
+          right: 0,
+          top: 0,
+        }}
+      />
       <View style={{ gap: 8, maxWidth: 520, width: '100%' }}>
         {kicker ? (
           <Text selectable style={{ color: colors.pink, fontSize: 12, fontWeight: '900' }}>
@@ -28,12 +52,12 @@ export function PrototypeScreen({ children, kicker, subtitle, title }: Prototype
           </Text>
         ) : null}
         {title ? (
-          <Text selectable style={{ color: colors.ink, fontSize: 32, fontWeight: '900', lineHeight: 36 }}>
+          <Text selectable style={{ color: colors.surface, fontSize: 32, fontWeight: '900', lineHeight: 36 }}>
             {title}
           </Text>
         ) : null}
         {subtitle ? (
-          <Text selectable style={{ color: colors.muted, fontSize: 16, lineHeight: 23 }}>
+          <Text selectable style={{ color: colors.backgroundDeep, fontSize: 16, lineHeight: 23 }}>
             {subtitle}
           </Text>
         ) : null}

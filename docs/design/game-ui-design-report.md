@@ -36,6 +36,7 @@ Decisões aplicadas:
 - Botões principais com largura alinhada ao logo.
 - Especificações mínimas na home: `2-8 jogadores · sala temporária · GPS só na partida`.
 - Lobby com banner visual usando `pique-esconde-store-cover.png`.
+- Background ilustrado padrão usando `pique-esconde-menu-reference.png` nas telas do app.
 - Páginas com menos texto auxiliar e mais foco na ação principal.
 - Cards, badges, botões e radar padronizados com o pattern Arcade Card UI.
 
@@ -44,10 +45,12 @@ Assets usados no app:
 - `apps/mobile/assets/images/pique-esconde-logo.png`
 - `apps/mobile/assets/images/pique-esconde-store-cover.png`
 - `apps/mobile/assets/images/pique-esconde-menu-reference.png`
+- `apps/mobile/assets/images/pique-esconde-background.png`
 
 Referência adicional:
 
 - `docs/design/referencias/image.png`
+- `docs/design/referencias/background.png`
 
 Referências de qualidade:
 
