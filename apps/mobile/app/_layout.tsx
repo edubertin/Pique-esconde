@@ -12,7 +12,7 @@ export default function RootLayout() {
           headerBackButtonDisplayMode: 'minimal',
           contentStyle: { backgroundColor: '#F7FBFF' },
         }}>
-        <Stack.Screen name="index" options={{ title: 'Pique Esconde' }} />
+        <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="create-room" options={{ title: 'Criar sala' }} />
         <Stack.Screen name="join-room" options={{ title: 'Entrar na sala' }} />
         <Stack.Screen name="location-permission" options={{ title: 'Localização' }} />

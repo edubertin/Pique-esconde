@@ -1,7 +1,5 @@
 import { Image } from 'expo-image';
-import { Text, View } from 'react-native';
-
-import { colors } from '@/src/theme/colors';
+import { View } from 'react-native';
 
 export function BrandLogo() {
   return (
@@ -11,9 +9,9 @@ export function BrandLogo() {
           alignItems: 'center',
           backgroundColor: 'transparent',
           borderRadius: 24,
-          maxWidth: 280,
+          maxWidth: 330,
           overflow: 'hidden',
-          width: '78%',
+          width: '100%',
         }}>
         <Image
           source={require('@/assets/images/pique-esconde-logo.png')}
@@ -21,9 +19,6 @@ export function BrandLogo() {
           style={{ aspectRatio: 1.14, width: '100%' }}
         />
       </View>
-      <Text selectable style={{ color: colors.pink, fontSize: 16, fontWeight: '900' }}>
-        Esconda. Marque. Corra.
-      </Text>
     </View>
   );
 }
