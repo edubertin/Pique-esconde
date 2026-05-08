@@ -8,6 +8,7 @@ This folder contains the product, design and technical planning for Pique Escond
 - `specs/`: behavior specifications for core product areas.
 - `technical/decisions/`: ADRs explaining important technical choices.
 - `design/`: visual references and future wireframes/design artifacts.
+- `agents/`: specialized agent prompts and role briefings.
 
 ## Recommended Reading Order
 
@@ -22,3 +23,4 @@ This folder contains the product, design and technical planning for Pique Escond
 9. `specs/`
 10. `technical/decisions/`
 11. `design/wireframes.md`
+12. `agents/`

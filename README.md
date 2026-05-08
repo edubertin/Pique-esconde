@@ -63,6 +63,7 @@ The project is currently in product/specification phase.
 - [Architecture Decisions](docs/technical/decisions/README.md)
 - [Visual References](docs/design/referencias-visuais.md)
 - [Wireframes](docs/design/wireframes.md)
+- [Agents](docs/agents/README.md)
 
 ## Current Status
 
