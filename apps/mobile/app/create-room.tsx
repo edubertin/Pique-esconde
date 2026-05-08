@@ -33,17 +33,17 @@ export default function CreateRoomScreen() {
         source={require('@/assets/images/pique-esconde-menu-reference.png')}
         contentFit="cover"
         style={{
-          height: 980,
+          height: 1220,
           left: 0,
-          opacity: 0.9,
+          opacity: 0.86,
           position: 'absolute',
           right: 0,
-          top: -96,
+          top: -42,
         }}
       />
       <View
         style={{
-          backgroundColor: 'rgba(7, 26, 61, 0.18)',
+          backgroundColor: 'rgba(7, 26, 61, 0.10)',
           bottom: 0,
           left: 0,
           position: 'absolute',
@@ -70,16 +70,16 @@ export default function CreateRoomScreen() {
           </Pressable>
         </Link>
 
-        <View style={{ height: 260 }} />
+        <View style={{ height: 230 }} />
 
         <View
           style={{
             alignItems: 'center',
-            backgroundColor: 'rgba(255, 255, 255, 0.96)',
+            backgroundColor: 'rgba(255, 255, 255, 0.97)',
             borderColor: colors.pink,
             borderRadius: 28,
             borderWidth: 4,
-            boxShadow: '0 10px 0 rgba(0, 0, 0, 0.22)',
+            boxShadow: '0 12px 0 rgba(7, 26, 61, 0.36)',
             gap: 16,
             padding: 18,
           }}>
