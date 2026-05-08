@@ -57,6 +57,8 @@ The project is currently in product/specification phase.
 
 - [Presentation](docs/apresentacao/README.md)
 - [Specs](docs/specs/README.md)
+- [Data Model](docs/technical/data-model.md)
+- [Realtime Events](docs/technical/realtime-events.md)
 - [Architecture Decisions](docs/technical/decisions/README.md)
 - [Visual References](docs/design/referencias-visuais.md)
 - [Wireframes](docs/design/wireframes.md)
