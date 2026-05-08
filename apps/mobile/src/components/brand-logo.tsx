@@ -11,9 +11,9 @@ export function BrandLogo() {
           alignItems: 'center',
           backgroundColor: 'transparent',
           borderRadius: 24,
-          maxWidth: 300,
+          maxWidth: 280,
           overflow: 'hidden',
-          width: '82%',
+          width: '78%',
         }}>
         <Image
           source={require('@/assets/images/pique-esconde-logo.png')}

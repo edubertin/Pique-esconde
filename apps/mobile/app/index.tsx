@@ -7,15 +7,26 @@ import { colors } from '@/src/theme/colors';
 
 export default function HomeScreen() {
   return (
-    <PrototypeScreen
-      subtitle="Crie uma sala, chame a galera e use o celular para voltar ao mundo físico.">
-      <View style={{ alignItems: 'center', gap: 16, maxWidth: 520, width: '100%' }}>
-        <BrandLogo />
-      </View>
-      <Panel>
+    <PrototypeScreen>
+      <Panel tone="strong">
+        <View
+          style={{
+            alignItems: 'center',
+            backgroundColor: colors.surface,
+            borderColor: colors.pink,
+            borderRadius: 24,
+            borderWidth: 3,
+            gap: 12,
+            padding: 16,
+          }}>
+          <BrandLogo />
+          <Text selectable style={{ color: colors.navy, fontSize: 15, fontWeight: '800', textAlign: 'center' }}>
+            Chame a galera e transforme o celular em brincadeira de rua.
+          </Text>
+        </View>
         <GameButton href="/create-room" label="Criar sala" />
         <GameButton href="/join-room" label="Entrar com código" variant="secondary" />
-        <Text selectable style={{ color: colors.muted, fontSize: 14, fontWeight: '700', textAlign: 'center' }}>
+        <Text selectable style={{ color: colors.backgroundDeep, fontSize: 14, fontWeight: '800', textAlign: 'center' }}>
           2-8 jogadores · sala temporária · GPS só na partida
         </Text>
       </Panel>
