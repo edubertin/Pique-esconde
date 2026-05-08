@@ -55,6 +55,7 @@ The MVP should:
 
 The project is currently in product/specification phase.
 
+- [Mobile App](apps/mobile/README.md)
 - [Presentation](docs/apresentacao/README.md)
 - [Specs](docs/specs/README.md)
 - [Data Model](docs/technical/data-model.md)
