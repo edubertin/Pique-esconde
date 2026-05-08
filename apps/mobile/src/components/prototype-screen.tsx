@@ -7,7 +7,7 @@ type PrototypeScreenProps = {
   children: ReactNode;
   kicker?: string;
   subtitle?: string;
-  title: string;
+  title?: string;
 };
 
 export function PrototypeScreen({ children, kicker, subtitle, title }: PrototypeScreenProps) {
@@ -27,9 +27,11 @@ export function PrototypeScreen({ children, kicker, subtitle, title }: Prototype
             {kicker.toUpperCase()}
           </Text>
         ) : null}
-        <Text selectable style={{ color: colors.ink, fontSize: 32, fontWeight: '900', lineHeight: 36 }}>
-          {title}
-        </Text>
+        {title ? (
+          <Text selectable style={{ color: colors.ink, fontSize: 32, fontWeight: '900', lineHeight: 36 }}>
+            {title}
+          </Text>
+        ) : null}
         {subtitle ? (
           <Text selectable style={{ color: colors.muted, fontSize: 16, lineHeight: 23 }}>
             {subtitle}
