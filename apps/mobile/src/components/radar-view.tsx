@@ -9,10 +9,11 @@ export function RadarView({ rush = false }: { rush?: boolean }) {
         style={{
           alignItems: 'center',
           aspectRatio: 1,
-          backgroundColor: rush ? '#FFF0F7' : '#ECF9FF',
-          borderColor: rush ? colors.pink : colors.blue,
+          backgroundColor: rush ? colors.warningSoft : '#ECF9FF',
+          borderColor: colors.navy,
           borderRadius: 999,
-          borderWidth: 4,
+          borderWidth: 5,
+          boxShadow: rush ? '0 10px 0 rgba(255, 45, 141, 0.18)' : '0 10px 0 rgba(10, 132, 255, 0.14)',
           justifyContent: 'center',
           maxWidth: 280,
           width: '100%',
@@ -21,7 +22,7 @@ export function RadarView({ rush = false }: { rush?: boolean }) {
           style={{
             borderColor: rush ? colors.pink : colors.blue,
             borderRadius: 999,
-            borderWidth: 2,
+            borderWidth: 3,
             height: '68%',
             position: 'absolute',
             width: '68%',
@@ -31,7 +32,7 @@ export function RadarView({ rush = false }: { rush?: boolean }) {
           style={{
             borderColor: colors.lime,
             borderRadius: 999,
-            borderWidth: 2,
+            borderWidth: 3,
             height: '42%',
             position: 'absolute',
             width: '42%',
@@ -40,7 +41,9 @@ export function RadarView({ rush = false }: { rush?: boolean }) {
         <View
           style={{
             backgroundColor: colors.pink,
+            borderColor: colors.surface,
             borderRadius: 999,
+            borderWidth: 3,
             height: 18,
             position: 'absolute',
             right: '28%',

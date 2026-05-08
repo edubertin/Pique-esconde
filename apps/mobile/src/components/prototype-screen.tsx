@@ -16,17 +16,18 @@ export function PrototypeScreen({ children, kicker, subtitle, title }: Prototype
       contentInsetAdjustmentBehavior="automatic"
       style={{ backgroundColor: colors.background }}
       contentContainerStyle={{
-        gap: 20,
+        alignItems: 'center',
+        gap: 18,
         padding: 20,
         paddingBottom: 40,
       }}>
-      <View style={{ gap: 8 }}>
+      <View style={{ gap: 8, maxWidth: 520, width: '100%' }}>
         {kicker ? (
-          <Text selectable style={{ color: colors.pink, fontSize: 13, fontWeight: '900' }}>
+          <Text selectable style={{ color: colors.pink, fontSize: 12, fontWeight: '900' }}>
             {kicker.toUpperCase()}
           </Text>
         ) : null}
-        <Text selectable style={{ color: colors.ink, fontSize: 34, fontWeight: '900' }}>
+        <Text selectable style={{ color: colors.ink, fontSize: 32, fontWeight: '900', lineHeight: 36 }}>
           {title}
         </Text>
         {subtitle ? (
@@ -40,16 +41,27 @@ export function PrototypeScreen({ children, kicker, subtitle, title }: Prototype
   );
 }
 
-export function Panel({ children }: { children: ReactNode }) {
+type PanelProps = {
+  children: ReactNode;
+  tone?: 'default' | 'strong' | 'sunny';
+};
+
+export function Panel({ children, tone = 'default' }: PanelProps) {
+  const isStrong = tone === 'strong';
+  const isSunny = tone === 'sunny';
+
   return (
     <View
       style={{
-        backgroundColor: colors.surface,
-        borderColor: colors.line,
-        borderRadius: 18,
-        borderWidth: 1,
+        backgroundColor: isStrong ? colors.navy : isSunny ? colors.warningSoft : colors.surface,
+        borderColor: isStrong ? colors.pink : isSunny ? colors.yellow : colors.line,
+        borderRadius: 20,
+        borderWidth: isStrong ? 3 : 2,
+        boxShadow: '0 8px 0 rgba(7, 26, 61, 0.10)',
         gap: 14,
+        maxWidth: 520,
         padding: 16,
+        width: '100%',
       }}>
       {children}
     </View>

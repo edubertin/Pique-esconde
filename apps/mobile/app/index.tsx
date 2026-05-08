@@ -11,13 +11,15 @@ export default function HomeScreen() {
       kicker="MVP navegável"
       title="Vamos brincar lá fora"
       subtitle="Crie uma sala, chame a galera e use o celular para voltar ao mundo físico.">
-      <Panel>
-        <View style={{ alignItems: 'center', gap: 16, paddingVertical: 16 }}>
+      <Panel tone="strong">
+        <View style={{ alignItems: 'center', gap: 14, paddingVertical: 10 }}>
           <BrandLogo />
-          <Text selectable style={{ color: colors.muted, fontSize: 15, textAlign: 'center' }}>
-            Protótipo sem GPS real para validar o fluxo antes do realtime.
+          <Text selectable style={{ color: colors.surface, fontSize: 15, lineHeight: 22, textAlign: 'center' }}>
+            Protótipo navegável para validar menu, lobby e radar antes do GPS real.
           </Text>
         </View>
+      </Panel>
+      <Panel>
         <GameButton href="/create-room" label="Criar sala" />
         <GameButton href="/join-room" label="Entrar com código" variant="secondary" />
       </Panel>

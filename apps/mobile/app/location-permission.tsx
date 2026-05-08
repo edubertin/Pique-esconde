@@ -1,5 +1,6 @@
-import { Text } from 'react-native';
+import { Text, View } from 'react-native';
 
+import { Badge } from '@/src/components/badge';
 import { GameButton } from '@/src/components/game-button';
 import { Panel, PrototypeScreen } from '@/src/components/prototype-screen';
 import { colors } from '@/src/theme/colors';
@@ -8,18 +9,19 @@ export default function LocationPermissionScreen() {
   return (
     <PrototypeScreen
       title="Localização da partida"
-      subtitle="Para jogar como participante ativo, precisamos da localização durante esta rodada.">
-      <Panel>
-        <Text selectable style={{ color: colors.ink, fontSize: 17, fontWeight: '800', lineHeight: 24 }}>
-          O Pique Esconde usa sua localização apenas durante a partida para calcular o radar e as
-          capturas.
-        </Text>
-        <Text selectable style={{ color: colors.muted, fontSize: 15, lineHeight: 22 }}>
-          Não mostramos seu ponto exato para outros jogadores e não compartilhamos GPS em redes
-          sociais.
-        </Text>
+      subtitle="Localização é usada como mecânica de jogo, não como monitoramento.">
+      <Panel tone="sunny">
+        <View style={{ alignItems: 'center', gap: 12 }}>
+          <Badge label="Só durante a partida" tone="ready" />
+          <Text selectable style={{ color: colors.ink, fontSize: 18, fontWeight: '900', lineHeight: 25, textAlign: 'center' }}>
+            Usamos sua localização para calcular radar e capturas.
+          </Text>
+          <Text selectable style={{ color: colors.muted, fontSize: 15, lineHeight: 22, textAlign: 'center' }}>
+            Não mostramos seu ponto exato para outros jogadores e não compartilhamos GPS em redes sociais.
+          </Text>
+        </View>
         <GameButton href="/lobby" label="Permitir localização" />
-        <GameButton href="/" label="Agora não" variant="ghost" />
+        <GameButton href="/" label="Agora não" variant="danger" />
       </Panel>
     </PrototypeScreen>
   );

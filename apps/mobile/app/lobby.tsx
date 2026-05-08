@@ -1,5 +1,6 @@
 import { Text, View } from 'react-native';
 
+import { Badge } from '@/src/components/badge';
 import { GameButton } from '@/src/components/game-button';
 import { PlayerList } from '@/src/components/player-list';
 import { Panel, PrototypeScreen } from '@/src/components/prototype-screen';
@@ -8,29 +9,39 @@ import { colors } from '@/src/theme/colors';
 
 export default function LobbyScreen() {
   return (
-    <PrototypeScreen title="Sala ABCD" subtitle="Ate 8 jogadores. Prepare o grupo e inicie a rodada.">
+    <PrototypeScreen title="Sala ABCD" subtitle="Até 8 jogadores. Prepare o grupo e comece quando todo mundo estiver pronto.">
+      <Panel tone="strong">
+        <View style={{ alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between', gap: 12 }}>
+          <View style={{ gap: 4 }}>
+            <Text selectable style={{ color: colors.surface, fontSize: 13, fontWeight: '800' }}>
+              Código da sala
+            </Text>
+            <Text
+              selectable
+              style={{ color: colors.lime, fontSize: 30, fontVariant: ['tabular-nums'], fontWeight: '900' }}>
+              {gameRules.roomCode}
+            </Text>
+          </View>
+          <Badge label={`4/${gameRules.maxPlayers}`} tone="rush" />
+        </View>
+        <GameButton label="Compartilhar link" variant="primary" />
+      </Panel>
+
       <Panel>
         <View style={{ alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }}>
           <Text selectable style={{ color: colors.ink, fontSize: 18, fontWeight: '900' }}>
-            Código {gameRules.roomCode}
+            Jogadores
           </Text>
-          <Text selectable style={{ color: colors.pink, fontSize: 16, fontWeight: '900' }}>
-            4/{gameRules.maxPlayers}
-          </Text>
+          <Badge label="Lobby" tone="neutral" />
         </View>
-        <GameButton label="Compartilhar link" variant="secondary" />
-      </Panel>
-      <Panel>
-        <Text selectable style={{ color: colors.ink, fontSize: 18, fontWeight: '900' }}>
-          Jogadores
-        </Text>
         <PlayerList />
       </Panel>
+
       <Panel>
         <GameButton label="Preparado" />
-        <GameButton href="/rules" label="Regras" variant="secondary" />
-        <GameButton href="/hide-phase" label="Iniciar partida" variant="ghost" />
-        <GameButton href="/" label="Sair da sala" variant="ghost" />
+        <GameButton href="/hide-phase" label="Iniciar partida" variant="secondary" />
+        <GameButton href="/rules" label="Regras" variant="ghost" />
+        <GameButton href="/" label="Sair da sala" variant="danger" />
       </Panel>
     </PrototypeScreen>
   );

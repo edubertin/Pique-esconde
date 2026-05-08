@@ -24,6 +24,7 @@ export function AvatarChoice({ selectedId = 'avatar_01' }: AvatarChoiceProps) {
                 borderColor: selected ? avatar.color : colors.line,
                 borderRadius: 18,
                 borderWidth: selected ? 3 : 1,
+                boxShadow: selected ? '0 5px 0 rgba(7, 26, 61, 0.12)' : '0 3px 0 rgba(7, 26, 61, 0.06)',
                 gap: 8,
                 padding: 10,
                 width: 76,
@@ -32,7 +33,9 @@ export function AvatarChoice({ selectedId = 'avatar_01' }: AvatarChoiceProps) {
                 style={{
                   alignItems: 'center',
                   backgroundColor: avatar.color,
+                  borderColor: colors.surface,
                   borderRadius: 24,
+                  borderWidth: 2,
                   height: 48,
                   justifyContent: 'center',
                   width: 48,

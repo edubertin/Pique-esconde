@@ -1,5 +1,6 @@
 import { Text, View } from 'react-native';
 
+import { Badge } from '@/src/components/badge';
 import { GameButton } from '@/src/components/game-button';
 import { Panel, PrototypeScreen } from '@/src/components/prototype-screen';
 import { colors } from '@/src/theme/colors';
@@ -7,12 +8,13 @@ import { colors } from '@/src/theme/colors';
 export default function HidePhaseScreen() {
   return (
     <PrototypeScreen title="Vá se esconder" subtitle="O botão acelera o jogo, mas o tempo também libera o procurador.">
-      <Panel>
+      <Panel tone="strong">
+        <Badge label="Esconder" tone="rush" />
         <Text
           selectable
           style={{
-            color: colors.ink,
-            fontSize: 56,
+            color: colors.lime,
+            fontSize: 60,
             fontVariant: ['tabular-nums'],
             fontWeight: '900',
             textAlign: 'center',
@@ -24,7 +26,7 @@ export default function HidePhaseScreen() {
       <Panel>
         <View style={{ gap: 8 }}>
           <Text selectable style={{ color: colors.ink, fontSize: 18, fontWeight: '900' }}>
-            Visão do procurador
+            Procurador aguardando
           </Text>
           <Text selectable style={{ color: colors.muted, fontSize: 15, lineHeight: 22 }}>
             3 de 4 escondidos prontos. Quando todos marcarem ou o tempo acabar, a busca começa.
