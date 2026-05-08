@@ -12,3 +12,9 @@ Direção visual, referências e wireframes do Pique Esconde.
 
 Imagens de referência ficam em [`referencias/`](referencias/).
 
+Referências principais atuais:
+
+- `referencias/pique-esconde-referencia.png`
+- `referencias/pique-esconde-logo.png`
+- `referencias/pique-esconde-store-cover.png`
+- `referencias/image.png`

@@ -43,6 +43,11 @@ Assets usados no app:
 
 - `apps/mobile/assets/images/pique-esconde-logo.png`
 - `apps/mobile/assets/images/pique-esconde-store-cover.png`
+- `apps/mobile/assets/images/pique-esconde-menu-reference.png`
+
+Referência adicional:
+
+- `docs/design/referencias/image.png`
 
 Referências de qualidade:
 
@@ -391,6 +396,14 @@ Usar formulário curto:
 - Ação.
 
 Evitar qualquer texto longo.
+
+Atualização aplicada em `Criar sala`:
+
+- Visual inspirado na referência `image.png`.
+- Fundo ilustrado com controles reais por cima.
+- Sem placares/top HUD da referência.
+- Painel central com logo, apelido, avatar, especificações e ações.
+- Botões alinhados no padrão arcade.
 
 ### Permissão de Localização
 

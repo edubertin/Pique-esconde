@@ -10,6 +10,28 @@ Quando o arquivo da imagem estiver salvo no projeto, usar este caminho:
 docs/design/referencias/pique-esconde-referencia.png
 ```
 
+## Referência de Menu Arcade
+
+Arquivo:
+
+```txt
+docs/design/referencias/image.png
+```
+
+Uso:
+
+- Referência para tela inicial/criação de sala com visual de game mobile.
+- Botões grandes, glossy e com alto contraste.
+- Fundo ilustrado com personagens, radar, pins e cenário ao ar livre.
+- Barra de especificações compacta.
+
+Adaptação para o app:
+
+- Não usar placares/top HUD da imagem no MVP.
+- Não usar a imagem inteira como UI clicável.
+- Usar a linguagem visual como referência para criar botões e painéis reais em React Native.
+- A página de criar sala usa uma versão importada como atmosfera/fundo, com controles reais por cima.
+
 ## Direção Visual
 
 - Estilo: ilustração 3D/cartoon, com aparência de jogo mobile casual.
@@ -39,4 +61,3 @@ Frase de apoio da referência:
 - Evitar exposição exata e permanente de localização.
 - Manter a localização como mecânica temporária de jogo.
 - Preservar um tom divertido sem infantilizar demais, caso o público inicial seja adolescente ou jovem adulto.
-
