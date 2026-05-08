@@ -1,10 +1,9 @@
-import { Image } from 'expo-image';
 import { Link } from 'expo-router';
 import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { Image } from 'expo-image';
 
 import { AvatarChoice } from '@/src/components/avatar-choice';
 import { Badge } from '@/src/components/badge';
-import { BrandLogo } from '@/src/components/brand-logo';
 import { GameButton } from '@/src/components/game-button';
 import { colors } from '@/src/theme/colors';
 
@@ -27,24 +26,24 @@ export default function CreateRoomScreen() {
       contentContainerStyle={{
         alignItems: 'center',
         minHeight: '100%',
-        padding: 18,
-        paddingBottom: 34,
+        padding: 14,
+        paddingBottom: 26,
       }}>
       <Image
         source={require('@/assets/images/pique-esconde-menu-reference.png')}
         contentFit="cover"
         style={{
-          height: 760,
+          height: 980,
           left: 0,
-          opacity: 0.34,
+          opacity: 0.9,
           position: 'absolute',
           right: 0,
-          top: -118,
+          top: -96,
         }}
       />
       <View
         style={{
-          backgroundColor: 'rgba(7, 26, 61, 0.46)',
+          backgroundColor: 'rgba(7, 26, 61, 0.18)',
           bottom: 0,
           left: 0,
           position: 'absolute',
@@ -53,7 +52,7 @@ export default function CreateRoomScreen() {
         }}
       />
 
-      <View style={{ gap: 16, maxWidth: 420, paddingTop: 20, width: '100%' }}>
+      <View style={{ gap: 14, maxWidth: 420, paddingTop: 18, width: '100%' }}>
         <Link href="/" asChild>
           <Pressable
             accessibilityLabel="Voltar"
@@ -71,10 +70,12 @@ export default function CreateRoomScreen() {
           </Pressable>
         </Link>
 
+        <View style={{ height: 260 }} />
+
         <View
           style={{
             alignItems: 'center',
-            backgroundColor: 'rgba(255, 255, 255, 0.94)',
+            backgroundColor: 'rgba(255, 255, 255, 0.96)',
             borderColor: colors.pink,
             borderRadius: 28,
             borderWidth: 4,
@@ -82,8 +83,6 @@ export default function CreateRoomScreen() {
             gap: 16,
             padding: 18,
           }}>
-          <BrandLogo />
-
           <View style={{ alignItems: 'center', gap: 8 }}>
             <Badge label="Nova sala" tone="rush" />
             <Text selectable style={{ color: colors.ink, fontSize: 24, fontWeight: '900', textAlign: 'center' }}>
