@@ -40,6 +40,7 @@ O lobby mostra:
 - Botão "preparado".
 - Configuração de regras para o líder.
 - Botão iniciar para o líder.
+- Botão sair da sala.
 
 ## Status
 
@@ -52,6 +53,13 @@ Estados principais:
 - Procurando.
 - Capturado.
 - Desconectado.
+
+## Sair da Sala
+
+- Jogador pode sair da sala pelo lobby.
+- Se um jogador comum sair, a lista do lobby atualiza para todos.
+- Se o líder/procurador sair antes da partida, a liderança passa para o próximo jogador disponível.
+- Se todos saírem, a sala é encerrada.
 
 ## Decisões CEO Pendentes
 

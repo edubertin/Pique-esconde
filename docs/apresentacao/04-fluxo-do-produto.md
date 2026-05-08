@@ -74,6 +74,7 @@ Elementos:
 - Botão "preparado".
 - Botão do criador para configurar regras.
 - Botão do criador para iniciar quando todos estiverem prontos.
+- Botão sair da sala.
 
 ### 5. Configurar Regras
 
@@ -223,6 +224,7 @@ Direção recomendada:
 - Procurador vence se capturar todos antes do fim.
 - Escondidos vencem se ao menos um não for capturado até o fim.
 - Ao jogar novamente, o grupo permanece na mesma sala e uma nova rodada começa com as regras atuais ou ajustadas pelo criador.
+- Jogadores podem sair da sala a qualquer momento antes de uma partida começar.
 - Ao encerrar a partida, dados temporários de localização devem parar de ser usados.
 
 ## Compartilhamento

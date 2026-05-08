@@ -30,6 +30,7 @@ export default function LobbyScreen() {
         <GameButton label="Preparado" />
         <GameButton href="/rules" label="Regras" variant="secondary" />
         <GameButton href="/hide-phase" label="Iniciar partida" variant="ghost" />
+        <GameButton href="/" label="Sair da sala" variant="ghost" />
       </Panel>
     </PrototypeScreen>
   );

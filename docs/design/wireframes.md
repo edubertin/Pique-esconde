@@ -134,6 +134,7 @@ Objetivo: reunir o grupo, mostrar limite e preparar a partida.
 │                              │
 │ Líder:                       │
 │ [ Regras ]  [ Iniciar ]      │
+│ [ Sair da sala ]             │
 └─────────────────────────────┘
 ```
 
@@ -145,6 +146,7 @@ Elementos:
 - Lista com avatar, apelido e status.
 - Botão preparado.
 - Ações do líder: regras e iniciar.
+- Botão sair da sala.
 
 ## 6. Configurar Regras
 
@@ -394,4 +396,3 @@ Regras:
 - Não incluir rota.
 - Não incluir endereço.
 - Não incluir coordenadas.
-
