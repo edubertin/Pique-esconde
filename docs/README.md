@@ -21,4 +21,4 @@ This folder contains the product, design and technical planning for Pique Escond
 8. `apresentacao/08-proximos-passos.md`
 9. `specs/`
 10. `technical/decisions/`
-
+11. `design/wireframes.md`

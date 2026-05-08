@@ -59,8 +59,8 @@ The project is currently in product/specification phase.
 - [Specs](docs/specs/README.md)
 - [Architecture Decisions](docs/technical/decisions/README.md)
 - [Visual References](docs/design/referencias-visuais.md)
+- [Wireframes](docs/design/wireframes.md)
 
 ## Current Status
 
 Product definition, MVP scope, privacy rules, technical direction, specs and ADRs are drafted. The next phase is wireframes for the main app flow.
-
