@@ -1,6 +1,7 @@
 import { Text, View } from 'react-native';
 
 import { Badge } from '@/src/components/badge';
+import { CoverBanner } from '@/src/components/cover-banner';
 import { GameButton } from '@/src/components/game-button';
 import { PlayerList } from '@/src/components/player-list';
 import { Panel, PrototypeScreen } from '@/src/components/prototype-screen';
@@ -9,16 +10,17 @@ import { colors } from '@/src/theme/colors';
 
 export default function LobbyScreen() {
   return (
-    <PrototypeScreen title="Sala ABCD" subtitle="Até 8 jogadores. Prepare o grupo e comece quando todo mundo estiver pronto.">
-      <Panel tone="strong">
+    <PrototypeScreen title="Sala ABCD">
+      <Panel>
+        <CoverBanner />
         <View style={{ alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between', gap: 12 }}>
           <View style={{ gap: 4 }}>
-            <Text selectable style={{ color: colors.surface, fontSize: 13, fontWeight: '800' }}>
-              Código da sala
+            <Text selectable style={{ color: colors.muted, fontSize: 13, fontWeight: '800' }}>
+              Código
             </Text>
             <Text
               selectable
-              style={{ color: colors.lime, fontSize: 30, fontVariant: ['tabular-nums'], fontWeight: '900' }}>
+              style={{ color: colors.ink, fontSize: 30, fontVariant: ['tabular-nums'], fontWeight: '900' }}>
               {gameRules.roomCode}
             </Text>
           </View>
@@ -40,7 +42,7 @@ export default function LobbyScreen() {
       <Panel>
         <GameButton label="Preparado" />
         <GameButton href="/hide-phase" label="Iniciar partida" variant="secondary" />
-        <GameButton href="/rules" label="Regras" variant="ghost" />
+        <GameButton href="/rules" label="Editar regras" variant="ghost" />
         <GameButton href="/" label="Sair da sala" variant="danger" />
       </Panel>
     </PrototypeScreen>

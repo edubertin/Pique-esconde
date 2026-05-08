@@ -7,7 +7,7 @@ import { colors } from '@/src/theme/colors';
 
 export default function HidePhaseScreen() {
   return (
-    <PrototypeScreen title="Vá se esconder" subtitle="O botão acelera o jogo, mas o tempo também libera o procurador.">
+    <PrototypeScreen title="Vá se esconder">
       <Panel tone="strong">
         <Badge label="Esconder" tone="rush" />
         <Text

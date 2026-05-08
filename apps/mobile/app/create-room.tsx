@@ -21,7 +21,7 @@ export default function CreateRoomScreen() {
   return (
     <PrototypeScreen
       title="Criar sala"
-      subtitle="Defina sua identidade na rodada. Quem cria a sala começa como procurador.">
+      subtitle="Quem cria começa como procurador.">
       <Panel>
         <Badge label="Você será o procurador" tone="leader" />
         <Text selectable style={{ color: colors.ink, fontSize: 16, fontWeight: '900' }}>
@@ -29,9 +29,6 @@ export default function CreateRoomScreen() {
         </Text>
         <TextInput placeholder="Seu apelido" placeholderTextColor={colors.muted} value="Dudu" style={inputStyle} />
         <AvatarChoice selectedId="avatar_01" />
-        <Text selectable style={{ color: colors.muted, fontSize: 14, lineHeight: 20 }}>
-          A localização será solicitada antes de entrar como jogador ativo.
-        </Text>
         <GameButton href="/location-permission" label="Criar sala" />
       </Panel>
     </PrototypeScreen>

@@ -7,10 +7,8 @@ import { colors } from '@/src/theme/colors';
 
 export default function LocationPermissionScreen() {
   return (
-    <PrototypeScreen
-      title="Localização da partida"
-      subtitle="Localização é usada como mecânica de jogo, não como monitoramento.">
-      <Panel tone="sunny">
+    <PrototypeScreen title="Localização">
+      <Panel>
         <View style={{ alignItems: 'center', gap: 12 }}>
           <Badge label="Só durante a partida" tone="ready" />
           <Text selectable style={{ color: colors.ink, fontSize: 18, fontWeight: '900', lineHeight: 25, textAlign: 'center' }}>

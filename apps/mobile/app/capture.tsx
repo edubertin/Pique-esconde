@@ -7,7 +7,7 @@ import { colors } from '@/src/theme/colors';
 
 export default function CaptureScreen() {
   return (
-    <PrototypeScreen title="Captura!" subtitle="Feedback automático quando a proximidade é confirmada.">
+    <PrototypeScreen title="Captura!">
       <Panel tone="strong">
         <View style={{ alignItems: 'center', gap: 14 }}>
           <Badge label="Encontrado" tone="rush" />

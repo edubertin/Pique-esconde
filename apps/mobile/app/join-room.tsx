@@ -19,7 +19,7 @@ const inputStyle = {
 
 export default function JoinRoomScreen() {
   return (
-    <PrototypeScreen title="Entrar na sala" subtitle="Use o código do grupo ou abra pelo link de convite.">
+    <PrototypeScreen title="Entrar na sala">
       <Panel>
         <Badge label="Sala temporária" tone="neutral" />
         <Text selectable style={{ color: colors.ink, fontSize: 16, fontWeight: '900' }}>

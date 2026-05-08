@@ -7,7 +7,7 @@ import { colors } from '@/src/theme/colors';
 
 export default function SocialCardScreen() {
   return (
-    <PrototypeScreen title="Card social" subtitle="Divulgação sem GPS, mapa real, rota, endereço ou coordenadas.">
+    <PrototypeScreen title="Card social">
       <Panel tone="strong">
         <View
           style={{

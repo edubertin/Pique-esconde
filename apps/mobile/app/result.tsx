@@ -8,7 +8,7 @@ import { colors } from '@/src/theme/colors';
 
 export default function ResultScreen() {
   return (
-    <PrototypeScreen title="Resultado" subtitle="Feche a rodada e incentive o grupo a jogar de novo.">
+    <PrototypeScreen title="Resultado">
       <Panel>
         <Badge label="Rush final encerrado" tone="rush" />
         <RadarView rush />

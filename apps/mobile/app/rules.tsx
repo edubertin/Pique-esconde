@@ -30,8 +30,8 @@ function RuleRow({ label, value, tone }: { label: string; tone?: 'ready' | 'wait
 
 export default function RulesScreen() {
   return (
-    <PrototypeScreen title="Regras" subtitle="Padrões rápidos para não travar o grupo antes da brincadeira.">
-      <Panel tone="sunny">
+    <PrototypeScreen title="Regras">
+      <Panel>
         <RuleRow label="Tempo para esconder" value={`${gameRules.hideSeconds}s`} tone="waiting" />
         <RuleRow label="Tempo para procurar" value="3min" tone="leader" />
         <RuleRow label="Ambiente" value="Padrão" />

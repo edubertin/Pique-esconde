@@ -8,7 +8,7 @@ import { colors } from '@/src/theme/colors';
 
 export default function SeekerRadarScreen() {
   return (
-    <PrototypeScreen title="Procurando" subtitle="Radar simulado sem mapa exato dos escondidos.">
+    <PrototypeScreen title="Procurando">
       <Panel>
         <View style={{ alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }}>
           <Text selectable style={{ color: colors.ink, fontSize: 24, fontVariant: ['tabular-nums'], fontWeight: '900' }}>

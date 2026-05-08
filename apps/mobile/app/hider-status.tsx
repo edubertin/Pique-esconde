@@ -7,8 +7,8 @@ import { colors } from '@/src/theme/colors';
 
 export default function HiderStatusScreen() {
   return (
-    <PrototypeScreen title="Continue escondido" subtitle="Você recebe alertas da partida, mas não vê o procurador no mapa.">
-      <Panel tone="sunny">
+    <PrototypeScreen title="Continue escondido">
+      <Panel>
         <Badge label="Procurador liberado" tone="waiting" />
         <Text selectable style={{ color: colors.ink, fontSize: 48, fontVariant: ['tabular-nums'], fontWeight: '900' }}>
           02:18
