@@ -8,23 +8,22 @@ Objetivo: iniciar uma partida com pouca fricção.
 
 ```txt
 ┌─────────────────────────────┐
-│        PIQUE ESCONDE         │
-│   Esconda. Marque. Corra.    │
+│      [ LOGO PIQUE ESCONDE ]  │
 │                              │
 │        [ Criar sala ]        │
-│                              │
 │      [ Entrar com código ]   │
 │                              │
-│  Use o digital para voltar   │
-│      para o mundo físico.    │
+│  2-8 jogadores · sala temp.  │
+│       GPS só na partida      │
 └─────────────────────────────┘
 ```
 
 Elementos:
 
-- Logo/nome.
+- Logo.
 - Botão principal: criar sala.
 - Ação secundária: entrar com código.
+- Especificações curtas.
 - Entrada automática por link de convite.
 
 ## 2. Criar Sala
@@ -119,6 +118,8 @@ Objetivo: reunir o grupo, mostrar limite e preparar a partida.
 
 ```txt
 ┌─────────────────────────────┐
+│ [ STORE COVER / BANNER ]     │
+│                              │
 │ Sala ABCD        4/8         │
 │ [ Compartilhar link ]        │
 │                              │
@@ -142,6 +143,7 @@ Elementos:
 
 - Código da sala.
 - Contador `4/8`.
+- Banner visual com store cover.
 - Compartilhar link.
 - Lista com avatar, apelido e status.
 - Botão preparado.

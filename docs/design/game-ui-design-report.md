@@ -25,6 +25,25 @@ Esse pattern combina:
 - Radar como peça central da tela de jogo.
 - Pouca informação por tela.
 
+## Atualização de Implementação
+
+O protótipo mobile já começou a aplicar essa direção em Expo/React Native.
+
+Decisões aplicadas:
+
+- Home limpa, sem header e sem texto institucional longo.
+- Logo maior, centralizado e alinhado com os botões.
+- Botões principais com largura alinhada ao logo.
+- Especificações mínimas na home: `2-8 jogadores · sala temporária · GPS só na partida`.
+- Lobby com banner visual usando `pique-esconde-store-cover.png`.
+- Páginas com menos texto auxiliar e mais foco na ação principal.
+- Cards, badges, botões e radar padronizados com o pattern Arcade Card UI.
+
+Assets usados no app:
+
+- `apps/mobile/assets/images/pique-esconde-logo.png`
+- `apps/mobile/assets/images/pique-esconde-store-cover.png`
+
 Referências de qualidade:
 
 - Clash Royale para botões robustos, hierarquia e acabamento premium.
@@ -347,7 +366,7 @@ Pattern:
 
 ### Home
 
-Usar o logo como sinal principal, mas em tamanho controlado. A home não deve virar store cover.
+Usar o logo como sinal principal, em tamanho médio/forte e alinhado com os botões. A home não deve virar store cover nem landing page.
 
 Ação principal:
 
@@ -356,6 +375,12 @@ Ação principal:
 Ação secundária:
 
 - Entrar com código.
+
+Texto:
+
+- Evitar texto institucional.
+- Manter apenas especificações curtas quando necessário.
+- Não exibir header duplicado com "Pique Esconde" se o logo já está presente.
 
 ### Criar/Entrar Sala
 
@@ -382,6 +407,13 @@ Botão primário:
 ### Lobby
 
 Precisa parecer um menu de jogo, não uma lista administrativa.
+
+Atualização aplicada:
+
+- Incluir banner com a store cover no topo.
+- Manter pouco texto.
+- Destacar código da sala e contador `4/8`.
+- Preservar ações essenciais: compartilhar, preparado, iniciar, editar regras e sair da sala.
 
 Prioridade:
 
@@ -474,4 +506,3 @@ Ordem:
 - Se o botão principal terá sombra/volume forte ou visual mais flat.
 - Como será o QR/link do card social.
 - Nível de animação do radar no MVP.
-

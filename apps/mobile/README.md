@@ -21,7 +21,7 @@ Then scan the QR code with Expo Go.
 
 ## Current Prototype
 
-The first version is a navigable prototype with mocked state:
+The first version is a navigable prototype with mocked state and the initial Arcade Card UI direction:
 
 - Home
 - Create room
@@ -38,6 +38,16 @@ The first version is a navigable prototype with mocked state:
 
 No Supabase, realtime or GPS is wired yet. Those will be added after the flow is validated.
 
+## Current Design Direction
+
+- Clean home menu with logo, aligned actions and short specs.
+- Arcade-style buttons with strong borders and large tap targets.
+- Reusable cards/panels with responsive max width.
+- Badges for player and game status.
+- Store cover banner at the top of the lobby.
+- Radar component as the main gameplay visual.
+- Minimal copy during gameplay screens.
+
 ## Structure
 
 ```txt
@@ -51,4 +61,3 @@ src/
   theme/      Visual tokens
   types/      Shared TypeScript types
 ```
-
