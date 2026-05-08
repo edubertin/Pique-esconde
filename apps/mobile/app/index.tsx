@@ -7,8 +7,8 @@ import { colors } from '@/src/theme/colors';
 
 export default function HomeScreen() {
   return (
-    <PrototypeScreen>
-      <Panel>
+    <PrototypeScreen centered>
+      <Panel tone="glass">
         <View
           style={{
             alignItems: 'center',

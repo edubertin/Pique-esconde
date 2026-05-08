@@ -1,17 +1,22 @@
 import type { ReactNode } from 'react';
 import { Image } from 'expo-image';
-import { ScrollView, Text, View } from 'react-native';
+import { ScrollView, Text, useWindowDimensions, View } from 'react-native';
 
 import { colors } from '@/src/theme/colors';
 
 type PrototypeScreenProps = {
   children: ReactNode;
+  centered?: boolean;
   kicker?: string;
   subtitle?: string;
   title?: string;
 };
 
-export function PrototypeScreen({ children, kicker, subtitle, title }: PrototypeScreenProps) {
+export function PrototypeScreen({ centered = false, children, kicker, subtitle, title }: PrototypeScreenProps) {
+  const { height, width } = useWindowDimensions();
+  const backgroundHeight = Math.max(height * 1.22, 920);
+  const backgroundWidth = Math.max(width, 390);
+
   return (
     <ScrollView
       contentInsetAdjustmentBehavior="automatic"
@@ -19,6 +24,7 @@ export function PrototypeScreen({ children, kicker, subtitle, title }: Prototype
       contentContainerStyle={{
         alignItems: 'center',
         gap: 18,
+        justifyContent: centered ? 'center' : 'flex-start',
         minHeight: '100%',
         padding: 20,
         paddingBottom: 40,
@@ -27,12 +33,13 @@ export function PrototypeScreen({ children, kicker, subtitle, title }: Prototype
         source={require('@/assets/images/pique-esconde-background.png')}
         contentFit="cover"
         style={{
-          height: 1220,
+          height: backgroundHeight,
           left: 0,
           opacity: 0.58,
           position: 'absolute',
           right: 0,
           top: -70,
+          width: backgroundWidth,
         }}
       />
       <View
@@ -69,21 +76,28 @@ export function PrototypeScreen({ children, kicker, subtitle, title }: Prototype
 
 type PanelProps = {
   children: ReactNode;
-  tone?: 'default' | 'strong' | 'sunny';
+  tone?: 'default' | 'strong' | 'sunny' | 'glass';
 };
 
 export function Panel({ children, tone = 'default' }: PanelProps) {
   const isStrong = tone === 'strong';
   const isSunny = tone === 'sunny';
+  const isGlass = tone === 'glass';
 
   return (
     <View
       style={{
-        backgroundColor: isStrong ? colors.navy : isSunny ? colors.warningSoft : colors.surface,
-        borderColor: isStrong ? colors.pink : isSunny ? colors.yellow : colors.line,
+        backgroundColor: isGlass
+          ? 'rgba(255, 255, 255, 0.78)'
+          : isStrong
+            ? colors.navy
+            : isSunny
+              ? colors.warningSoft
+              : colors.surface,
+        borderColor: isGlass ? 'rgba(255, 255, 255, 0.92)' : isStrong ? colors.pink : isSunny ? colors.yellow : colors.line,
         borderRadius: 20,
         borderWidth: isStrong ? 3 : 2,
-        boxShadow: '0 8px 0 rgba(7, 26, 61, 0.10)',
+        boxShadow: isGlass ? '0 12px 0 rgba(7, 26, 61, 0.22)' : '0 8px 0 rgba(7, 26, 61, 0.10)',
         gap: 14,
         maxWidth: 520,
         padding: 16,

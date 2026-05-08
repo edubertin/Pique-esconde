@@ -37,6 +37,8 @@ Decisões aplicadas:
 - Especificações mínimas na home: `2-8 jogadores · sala temporária · GPS só na partida`.
 - Lobby com banner visual usando `pique-esconde-store-cover.png`.
 - Background ilustrado padrão usando `pique-esconde-menu-reference.png` nas telas do app.
+- Background responsivo cobrindo a tela toda, calculado a partir do tamanho da janela.
+- Home com painel central translúcido (`glass`) em vez de card branco sólido.
 - Páginas com menos texto auxiliar e mais foco na ação principal.
 - Cards, badges, botões e radar padronizados com o pattern Arcade Card UI.
 
@@ -375,6 +377,13 @@ Pattern:
 ### Home
 
 Usar o logo como sinal principal, em tamanho médio/forte e alinhado com os botões. A home não deve virar store cover nem landing page.
+
+Atualização aplicada:
+
+- Label/painel central responsivo e translúcido.
+- Background ocupando toda a tela.
+- Logo, botões e especificações alinhados.
+- Sem texto extra além das especificações curtas.
 
 Ação principal:
 

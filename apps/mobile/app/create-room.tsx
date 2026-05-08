@@ -1,5 +1,5 @@
 import { Link } from 'expo-router';
-import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { Pressable, ScrollView, Text, TextInput, useWindowDimensions, View } from 'react-native';
 import { Image } from 'expo-image';
 
 import { AvatarChoice } from '@/src/components/avatar-choice';
@@ -19,6 +19,10 @@ const inputStyle = {
 };
 
 export default function CreateRoomScreen() {
+  const { height, width } = useWindowDimensions();
+  const backgroundHeight = Math.max(height * 1.22, 920);
+  const backgroundWidth = Math.max(width, 390);
+
   return (
     <ScrollView
       contentInsetAdjustmentBehavior="automatic"
@@ -33,12 +37,13 @@ export default function CreateRoomScreen() {
         source={require('@/assets/images/pique-esconde-background.png')}
         contentFit="cover"
         style={{
-          height: 1220,
+          height: backgroundHeight,
           left: 0,
           opacity: 0.86,
           position: 'absolute',
           right: 0,
           top: -42,
+          width: backgroundWidth,
         }}
       />
       <View
