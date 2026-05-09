@@ -12,7 +12,7 @@ import { colors } from '@/src/theme/colors';
 
 export default function LocationPermissionScreen() {
   const router = useRouter();
-  const { room } = useRoom();
+  const { room, updatePlayerLocation } = useRoom();
   const [error, setError] = useState<string>();
   const [isRequesting, setIsRequesting] = useState(false);
 
@@ -22,11 +22,33 @@ export default function LocationPermissionScreen() {
 
     try {
       const permission = await Location.requestForegroundPermissionsAsync();
-      setIsRequesting(false);
 
       if (permission.status !== Location.PermissionStatus.GRANTED) {
+        setIsRequesting(false);
         setError(t('location.denied'));
         return;
+      }
+
+      try {
+        const currentLocation = await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.High,
+        });
+
+        if (room) {
+          await updatePlayerLocation({
+            accuracyMeters: currentLocation.coords.accuracy ?? undefined,
+            headingDegrees: currentLocation.coords.heading ?? undefined,
+            lat: currentLocation.coords.latitude,
+            lng: currentLocation.coords.longitude,
+            speedMetersPerSecond: currentLocation.coords.speed ?? undefined,
+          });
+        }
+      } catch {
+        if (room) {
+          setIsRequesting(false);
+          setError('Permissao aceita. Aguardando primeira leitura do GPS.');
+          return;
+        }
       }
 
       router.push(room ? '/lobby' : '/create-room');
