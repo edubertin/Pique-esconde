@@ -3,7 +3,6 @@ import { useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { Text, View } from 'react-native';
 
-import { Badge } from '@/src/components/badge';
 import { GameButton } from '@/src/components/game-button';
 import { PrototypeScreen } from '@/src/components/prototype-screen';
 import { RadarView } from '@/src/components/radar-view';
@@ -20,8 +19,8 @@ export default function SeekerRadarScreen() {
   const [radarHint, setRadarHint] = useState<RadarHint>();
   const [now, setNow] = useState(Date.now());
   const tickRequestedRef = useRef(false);
-  const remainingHiders =
-    room?.players.filter((player) => !player.isLeader && player.status !== 'Capturado').length ?? 0;
+  const seekerPlayerId = room?.gameSession?.seekerPlayerId ?? room?.players.find((player) => player.isLeader)?.id;
+  const remainingHiders = room?.players.filter((player) => player.id !== seekerPlayerId && player.status !== 'Capturado').length ?? 0;
   const seekEndsAt = room?.gameSession?.seekEndsAt;
   const remainingSeconds = seekEndsAt ? (seekEndsAt - now) / 1000 : 0;
   const timerLabel = seekEndsAt ? formatTimer(remainingSeconds) : t('radar.timerEnded');
@@ -115,12 +114,15 @@ export default function SeekerRadarScreen() {
       <View
         style={{
           alignItems: 'center',
-          gap: 14,
+          backgroundColor: 'rgba(18, 30, 45, 0.22)',
+          borderRadius: 28,
+          gap: 12,
           maxWidth: 430,
           minHeight: '100%',
+          padding: 10,
           width: '100%',
         }}>
-        <View style={{ alignItems: 'center', width: 128 }}>
+        <View style={{ alignItems: 'center', width: 118 }}>
           <Image contentFit="contain" source={require('@/assets/images/pique-esconde-logo.png')} style={{ aspectRatio: 1.14, width: '100%' }} />
         </View>
 
@@ -129,25 +131,31 @@ export default function SeekerRadarScreen() {
             alignItems: 'center',
             flexDirection: 'row',
             gap: 10,
-            justifyContent: 'space-between',
+            justifyContent: 'center',
             width: '100%',
           }}>
-          <Text selectable style={{ color: colors.ink, fontSize: 30, fontVariant: ['tabular-nums'], fontWeight: '900' }}>
-            {timerLabel}
-          </Text>
-          <Badge label={t('radar.remaining', { count: remainingHiders })} tone="rush" />
+          <View style={{ backgroundColor: 'rgba(255,255,255,0.84)', borderRadius: 999, paddingHorizontal: 14, paddingVertical: 7 }}>
+            <Text selectable style={{ color: colors.ink, fontSize: 20, fontVariant: ['tabular-nums'], fontWeight: '900' }}>
+              {timerLabel}
+            </Text>
+          </View>
+          <View style={{ backgroundColor: colors.pink, borderColor: colors.navy, borderRadius: 999, borderWidth: 1, paddingHorizontal: 14, paddingVertical: 7 }}>
+            <Text selectable style={{ color: colors.surface, fontSize: 13, fontWeight: '900' }}>
+              {t('radar.remaining', { count: remainingHiders })}
+            </Text>
+          </View>
         </View>
 
         <RadarView hint={radarHint} />
 
         <View style={{ gap: 10, width: '100%' }}>
-          <GameButton label={isLoading ? 'Capturando...' : t('radar.capture')} onPress={handleSimulateCapture} />
+          <GameButton label={isLoading ? 'Capturando...' : t('radar.capture')} onPress={handleSimulateCapture} variant="capture" />
           <View style={{ flexDirection: 'row', gap: 10 }}>
             <View style={{ flex: 1 }}>
-              <GameButton label={t('radar.finishHiders')} onPress={handleFinishWithHiders} size="compact" variant="secondary" />
+              <GameButton label={t('radar.finishHiders')} onPress={handleFinishWithHiders} size="compact" variant="rush" />
             </View>
             <View style={{ flex: 1 }}>
-              <GameButton label={t('common.exit')} onPress={handleLeaveRoom} size="compact" variant="danger" />
+              <GameButton label={t('common.exit')} onPress={handleLeaveRoom} size="compact" variant="ghost" />
             </View>
           </View>
         </View>

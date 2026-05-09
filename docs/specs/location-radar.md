@@ -110,5 +110,5 @@ Presets de pistas:
 
 ## Pendencias De Design
 
-- Desenhar tela principal do radar com ponteiro instavel, logo no topo e indicadores frio/morno/quente como lampadas.
+- Tela principal do radar deve funcionar como HUD de caca: logo pequeno, timer/restantes em chips, radar escuro/cartoon central e barra termica compacta em vez de caixas flutuantes.
 - Desenhar tela do escondido com coracao/pulso para sinalizar proximidade do procurador.

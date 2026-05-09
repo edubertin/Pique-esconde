@@ -18,9 +18,10 @@ export default function HidePhaseScreen() {
   const tickRequestedRef = useRef(false);
   const isSeeker = Boolean(activePlayer?.isLeader || activePlayer?.id === room?.gameSession?.seekerPlayerId);
   const seekerPlayer = room?.players.find((player) => player.id === room.gameSession?.seekerPlayerId) ?? room?.players.find((player) => player.isLeader);
+  const seekerPlayerId = room?.gameSession?.seekerPlayerId ?? seekerPlayer?.id;
   const seekerName = seekerPlayer?.nickname ?? activePlayer?.nickname ?? t('player.roleLeaderSeeker');
-  const hiddenCount = room?.players.filter((player) => !player.isLeader && player.status === 'Escondido').length ?? 0;
-  const totalHiders = room?.players.filter((player) => !player.isLeader).length ?? 0;
+  const hiddenCount = room?.players.filter((player) => player.id !== seekerPlayerId && player.status === 'Escondido').length ?? 0;
+  const totalHiders = room?.players.filter((player) => player.id !== seekerPlayerId).length ?? 0;
   const hideEndsAt = room?.gameSession?.hideEndsAt;
   const remainingSeconds = hideEndsAt ? (hideEndsAt - now) / 1000 : 0;
   const timerLabel = hideEndsAt ? formatTimer(remainingSeconds) : t('hide.timerEnded');

@@ -13,7 +13,8 @@ export default function CaptureScreen() {
   const router = useRouter();
   const { activePlayer, finishRound, leaveRoom, room } = useRoom();
   const capturedPlayer = room?.players.find((player) => player.status === 'Capturado');
-  const remainingHiders = room?.players.filter((player) => !player.isLeader && player.status !== 'Capturado').length ?? 0;
+  const seekerPlayerId = room?.gameSession?.seekerPlayerId ?? room?.players.find((player) => player.isLeader)?.id;
+  const remainingHiders = room?.players.filter((player) => player.id !== seekerPlayerId && player.status !== 'Capturado').length ?? 0;
   const isSeeker = Boolean(activePlayer?.isLeader || activePlayer?.id === room?.gameSession?.seekerPlayerId);
 
   const handleFinishWithSeeker = async () => {
