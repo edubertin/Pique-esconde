@@ -79,6 +79,16 @@ Regra inicial:
 - 30 segundos sem GPS: remocao da rodada por sinal perdido.
 - A remocao deve voltar o jogador para a tela inicial com aviso especifico.
 
+## Tela Dos Escondidos
+
+O escondido nao ve mapa nem direcao exata. A tela usa um coracao pulsando para comunicar risco:
+
+- Calmo: procurador longe ou sem pista confiavel.
+- Perto: procurador em aproximacao.
+- Perigo: procurador em raio critico, inicialmente 8 metros.
+
+O backend devolve apenas o nivel de perigo derivado da distancia entre procurador e escondido.
+
 ## Progressão de Raio
 
 - Início da busca: raio pequeno.

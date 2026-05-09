@@ -2,7 +2,7 @@ import type { RealtimeChannel } from '@supabase/supabase-js';
 
 import { gameRules } from '@/src/constants/game';
 import { assertSupabase } from '@/src/services/supabase-client';
-import type { GameResult, GameSession, LobbyNotice, PlayerLocationInput, PlayerStatus, RadarHint, RoomPlayer } from '@/src/state/room-store';
+import type { GameResult, GameSession, HiderDangerHint, LobbyNotice, PlayerLocationInput, PlayerStatus, RadarHint, RoomPlayer } from '@/src/state/room-store';
 
 export type RemoteRoomPhase = 'lobby' | 'hiding' | 'seeking' | 'finished';
 
@@ -273,6 +273,18 @@ export const roomService = {
     if (error) throw error;
 
     return data as RadarHint | undefined;
+  },
+  async getHiderDangerHint(roomId: string, activePlayerId: string, activePlayerToken: string) {
+    const client = assertSupabase();
+    const { data, error } = await client.rpc('pe_get_hider_danger_hint', {
+      actor_player_id: activePlayerId,
+      player_session_token: activePlayerToken,
+      target_room_id: roomId,
+    });
+
+    if (error) throw error;
+
+    return data as HiderDangerHint | undefined;
   },
   fetchSnapshot,
   async joinRoom(input: PlayerInput & { code: string }) {

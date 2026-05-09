@@ -59,6 +59,13 @@ export type RadarHint = {
   updatedAt?: string;
 };
 
+export type HiderDangerHint = {
+  distanceMetersApprox?: number;
+  level: 'calm' | 'danger' | 'near';
+  signalStatus: 'fresh' | 'lost' | 'warning';
+  updatedAt?: string;
+};
+
 export type LobbyNotice = {
   createdAt?: number;
   names: string[];
@@ -86,6 +93,7 @@ type RoomStore = {
   createRoom: (input: PlayerInput) => Promise<void>;
   error?: string;
   finishRound: (winner?: GameResult['winner']) => Promise<void>;
+  getHiderDangerHint: () => Promise<HiderDangerHint | undefined>;
   getRadarHint: () => Promise<RadarHint | undefined>;
   isLoading: boolean;
   joinRoom: (input: PlayerInput & { code: string }) => Promise<boolean>;
@@ -244,6 +252,10 @@ export function RoomProvider({ children }: { children: ReactNode }) {
       async getRadarHint() {
         const session = requireSession();
         return roomService.getRadarHint(session.roomId, session.activePlayerId, session.activePlayerToken);
+      },
+      async getHiderDangerHint() {
+        const session = requireSession();
+        return roomService.getHiderDangerHint(session.roomId, session.activePlayerId, session.activePlayerToken);
       },
       async joinRoom(input) {
         await runAction(async () => {

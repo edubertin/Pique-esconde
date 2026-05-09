@@ -1,10 +1,11 @@
+import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { Text, View } from 'react-native';
 
 import { Badge } from '@/src/components/badge';
 import { GameButton } from '@/src/components/game-button';
-import { MenuPanel, PrototypeScreen } from '@/src/components/prototype-screen';
+import { PrototypeScreen } from '@/src/components/prototype-screen';
 import { RadarView } from '@/src/components/radar-view';
 import { usePlayerLocationSync } from '@/src/hooks/use-player-location-sync';
 import { t } from '@/src/i18n';
@@ -111,23 +112,46 @@ export default function SeekerRadarScreen() {
 
   return (
     <PrototypeScreen>
-      <MenuPanel
-        backHref="/hide-phase"
-        title={t('radar.title')}
-        actions={
-          <>
-            <GameButton label={isLoading ? 'Capturando...' : t('radar.capture')} onPress={handleSimulateCapture} />
-            <GameButton label={t('radar.finishHiders')} onPress={handleFinishWithHiders} variant="secondary" />
-            <GameButton label={t('common.exit')} onPress={handleLeaveRoom} variant="danger" />
-          </>
-        }>
-        <View style={{ alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }}>
-          <Text selectable style={{ color: colors.ink, fontSize: 24, fontVariant: ['tabular-nums'], fontWeight: '900' }}>
+      <View
+        style={{
+          alignItems: 'center',
+          gap: 14,
+          maxWidth: 430,
+          minHeight: '100%',
+          width: '100%',
+        }}>
+        <View style={{ alignItems: 'center', width: 128 }}>
+          <Image contentFit="contain" source={require('@/assets/images/pique-esconde-logo.png')} style={{ aspectRatio: 1.14, width: '100%' }} />
+        </View>
+
+        <View
+          style={{
+            alignItems: 'center',
+            flexDirection: 'row',
+            gap: 10,
+            justifyContent: 'space-between',
+            width: '100%',
+          }}>
+          <Text selectable style={{ color: colors.ink, fontSize: 30, fontVariant: ['tabular-nums'], fontWeight: '900' }}>
             {timerLabel}
           </Text>
           <Badge label={t('radar.remaining', { count: remainingHiders })} tone="rush" />
         </View>
+
         <RadarView hint={radarHint} />
+
+        <View style={{ gap: 10, width: '100%' }}>
+          <GameButton label={isLoading ? 'Capturando...' : t('radar.capture')} onPress={handleSimulateCapture} />
+          <View style={{ flexDirection: 'row', gap: 10 }}>
+            <View style={{ flex: 1 }}>
+              <GameButton label={t('radar.finishHiders')} onPress={handleFinishWithHiders} size="compact" variant="secondary" />
+            </View>
+            <View style={{ flex: 1 }}>
+              <GameButton label={t('common.exit')} onPress={handleLeaveRoom} size="compact" variant="danger" />
+            </View>
+          </View>
+        </View>
+
         {captureMessage ? (
           <Text selectable style={{ color: colors.muted, fontSize: 13, fontWeight: '800', textAlign: 'center' }}>
             {captureMessage}
@@ -138,7 +162,7 @@ export default function SeekerRadarScreen() {
             {error}
           </Text>
         ) : null}
-      </MenuPanel>
+      </View>
     </PrototypeScreen>
   );
 }
