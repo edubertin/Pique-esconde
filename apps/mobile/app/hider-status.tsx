@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { Animated, Text, View } from 'react-native';
 
@@ -7,6 +6,7 @@ import { Badge } from '@/src/components/badge';
 import { GameButton } from '@/src/components/game-button';
 import { PrototypeScreen } from '@/src/components/prototype-screen';
 import { usePlayerLocationSync } from '@/src/hooks/use-player-location-sync';
+import { useSafeRouter } from '@/src/hooks/use-safe-router';
 import { t } from '@/src/i18n';
 import { type HiderDangerHint, useRoom } from '@/src/state/room-store';
 import { colors } from '@/src/theme/colors';
@@ -14,7 +14,7 @@ import { surfaces } from '@/src/theme/surfaces';
 import { formatTimer } from '@/src/utils/format-timer';
 
 export default function HiderStatusScreen() {
-  const router = useRouter();
+  const router = useSafeRouter();
   const { activePlayer, getHiderDangerHint, leaveRoom, room, tickGameSession } = useRoom();
   const [dangerHint, setDangerHint] = useState<HiderDangerHint>();
   const [now, setNow] = useState(Date.now());

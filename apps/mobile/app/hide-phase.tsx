@@ -1,4 +1,3 @@
-import { useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { Text, View } from 'react-native';
 
@@ -6,13 +5,14 @@ import { Badge } from '@/src/components/badge';
 import { GameButton } from '@/src/components/game-button';
 import { MenuPanel, PrototypeScreen } from '@/src/components/prototype-screen';
 import { usePlayerLocationSync } from '@/src/hooks/use-player-location-sync';
+import { useSafeRouter } from '@/src/hooks/use-safe-router';
 import { t } from '@/src/i18n';
 import { useRoom } from '@/src/state/room-store';
 import { colors } from '@/src/theme/colors';
 import { formatTimer } from '@/src/utils/format-timer';
 
 export default function HidePhaseScreen() {
-  const router = useRouter();
+  const router = useSafeRouter();
   const { activePlayer, error, isLoading, leaveRoom, markHidden, room, tickGameSession } = useRoom();
   const [now, setNow] = useState(Date.now());
   const tickRequestedRef = useRef(false);

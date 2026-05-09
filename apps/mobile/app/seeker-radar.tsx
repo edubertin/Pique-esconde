@@ -1,5 +1,4 @@
 import { Image } from 'expo-image';
-import { useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { Text, View } from 'react-native';
 
@@ -9,13 +8,14 @@ import { LeaderDebugDrawer } from '@/src/components/leader-debug-drawer';
 import { PrototypeScreen } from '@/src/components/prototype-screen';
 import { RadarView } from '@/src/components/radar-view';
 import { usePlayerLocationSync } from '@/src/hooks/use-player-location-sync';
+import { useSafeRouter } from '@/src/hooks/use-safe-router';
 import { t } from '@/src/i18n';
 import { type RadarHint, useRoom } from '@/src/state/room-store';
 import { colors } from '@/src/theme/colors';
 import { formatTimer } from '@/src/utils/format-timer';
 
 export default function SeekerRadarScreen() {
-  const router = useRouter();
+  const router = useSafeRouter();
   const { error, finishRound, getRadarHint, leaveRoom, room, tickGameSession, tryCaptureNearest } = useRoom();
   const [captureMessage, setCaptureMessage] = useState<string>();
   const [manualCapturePending, setManualCapturePending] = useState(false);

@@ -1,6 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
-import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
@@ -10,13 +9,14 @@ import { CoverBanner } from '@/src/components/cover-banner';
 import { GameButton } from '@/src/components/game-button';
 import { PlayerList } from '@/src/components/player-list';
 import { MenuPanel, PrototypeScreen } from '@/src/components/prototype-screen';
+import { useSafeRouter } from '@/src/hooks/use-safe-router';
 import { t } from '@/src/i18n';
 import { useRoom } from '@/src/state/room-store';
 import { colors } from '@/src/theme/colors';
 import { surfaces } from '@/src/theme/surfaces';
 
 export default function LobbyScreen() {
-  const router = useRouter();
+  const router = useSafeRouter();
   const { activePlayer, addDemoPlayer, error, isLoading, leaveRoom, promoteLeader, removePlayer, room, startRound, toggleReady } = useRoom();
   const [copied, setCopied] = useState(false);
   const players = room?.players ?? [];
