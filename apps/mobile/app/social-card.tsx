@@ -14,27 +14,28 @@ export default function SocialCardScreen() {
   const { room } = useRoom();
   const players = room?.players ?? [];
   const result = room?.result;
+  const hasClosedResult = Boolean(result);
   const seeker =
     players.find((player) => player.id === result?.seekerPlayerId) ??
     players.find((player) => player.id === room?.gameSession?.seekerPlayerId) ??
-    players.find((player) => player.isLeader) ??
-    players[0];
+    (!hasClosedResult ? players.find((player) => player.isLeader) : undefined) ??
+    (!hasClosedResult ? players[0] : undefined);
   const seekerId = result?.seekerPlayerId ?? seeker?.id;
   const hiders = players.filter((player) => player.id !== seekerId);
-  const fallbackHighlight = hiders[0] ?? seeker;
+  const fallbackHighlight = !hasClosedResult ? (hiders[0] ?? seeker) : undefined;
   const highlightPlayer = players.find((player) => player.id === result?.highlightPlayerId) ?? fallbackHighlight;
   const highlightAvatarId = result?.highlightAvatarId ?? highlightPlayer?.avatarId;
   const highlightAvatar = avatars.find((avatar) => avatar.id === highlightAvatarId) ?? avatars[0];
   const highlightName = result?.highlightNickname ?? highlightPlayer?.nickname ?? t('social.placeholder');
   const winner = result?.winner ?? 'hiders';
   const survivorCount = result?.survivorPlayerIds.length ?? Math.max(1, hiders.length - 2);
-  const seekerName = result?.seekerNickname ?? seeker?.nickname ?? t('player.roleLeaderSeeker');
-  const title = winner === 'seeker' ? t('social.titleSeeker', { name: seekerName }) : t('social.titleHiders');
+  const seekerName = result?.seekerNickname ?? seeker?.nickname;
+  const title = winner === 'seeker' ? t('social.titleSeeker', { name: seekerName ?? t('player.roleLeaderSeeker') }) : t('social.titleHiders');
   const highlightLabel = winner === 'seeker' ? t('social.highlightSeeker') : t('social.highlightHiders');
   const time = room?.result?.durationLabel ?? '3min';
   const score =
     winner === 'seeker'
-      ? t('social.scoreSeeker', { name: seekerName, time })
+      ? t('social.scoreSeeker', { name: seekerName ?? t('player.roleLeaderSeeker'), time })
       : t('social.scoreHiders', { count: survivorCount, suffix: survivorCount === 1 ? '' : 's', time });
 
   return (

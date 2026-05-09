@@ -38,26 +38,27 @@ export default function ResultScreen() {
   const { leaveRoom, rematch, room } = useRoom();
   const players = room?.players ?? [];
   const result = room?.result;
+  const hasClosedResult = Boolean(result);
   const seeker =
     players.find((player) => player.id === result?.seekerPlayerId) ??
     players.find((player) => player.id === room?.gameSession?.seekerPlayerId) ??
-    players.find((player) => player.isLeader) ??
-    players[0];
+    (!hasClosedResult ? players.find((player) => player.isLeader) : undefined) ??
+    (!hasClosedResult ? players[0] : undefined);
   const seekerId = result?.seekerPlayerId ?? seeker?.id;
   const hiders = players.filter((player) => player.id !== seekerId);
-  const fallbackHighlight = hiders[0] ?? seeker;
+  const fallbackHighlight = !hasClosedResult ? (hiders[0] ?? seeker) : undefined;
   const highlightPlayer = players.find((player) => player.id === result?.highlightPlayerId) ?? fallbackHighlight;
   const highlightAvatarId = result?.highlightAvatarId ?? highlightPlayer?.avatarId;
   const highlightAvatar = avatars.find((avatar) => avatar.id === highlightAvatarId) ?? avatars[0];
   const highlightName = result?.highlightNickname ?? highlightPlayer?.nickname ?? t('social.placeholder');
   const winner = result?.winner ?? 'hiders';
   const capturedCount = result?.capturedPlayerIds.length ?? Math.min(2, hiders.length);
-  const seekerName = result?.seekerNickname ?? seeker?.nickname ?? t('player.roleLeaderSeeker');
-  const resultTitle = winner === 'seeker' ? t('result.seekerWonBy', { name: seekerName }) : t('result.hidersWon');
+  const seekerName = result?.seekerNickname ?? seeker?.nickname;
+  const resultTitle = winner === 'seeker' && seekerName ? t('result.seekerWonBy', { name: seekerName }) : winner === 'seeker' ? t('result.seekerWon') : t('result.hidersWon');
   const highlightReason = winner === 'seeker' ? t('result.highlightSeeker') : t('result.highlightHiders');
   const summary =
     winner === 'seeker'
-      ? t('result.summarySeeker', { name: seekerName })
+      ? t('result.summarySeeker', { name: seekerName ?? t('player.roleLeaderSeeker') })
       : t('result.summaryHiders', { name: highlightName });
 
   const handleRematch = async () => {
@@ -127,7 +128,7 @@ export default function ResultScreen() {
           <ResultStat label={t('result.captured')} value={`${capturedCount}`} />
           <ResultStat
             label={winner === 'seeker' ? t('result.seeker') : t('result.highlight')}
-            value={winner === 'seeker' ? seekerName : highlightName}
+            value={winner === 'seeker' ? (seekerName ?? t('player.roleLeaderSeeker')) : highlightName}
           />
         </View>
 
