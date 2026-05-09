@@ -27,6 +27,7 @@ export default function SeekerRadarScreen() {
   const seekEndsAt = room?.gameSession?.seekEndsAt;
   const remainingSeconds = seekEndsAt ? (seekEndsAt - now) / 1000 : 0;
   const timerLabel = seekEndsAt ? formatTimer(remainingSeconds) : t('radar.timerEnded');
+  const autoCaptureEnabled = !__DEV__;
   usePlayerLocationSync(room?.phase === 'seeking');
 
   useEffect(() => {
@@ -95,7 +96,7 @@ export default function SeekerRadarScreen() {
   }, [getRadarHint, room?.phase]);
 
   useEffect(() => {
-    if (room?.phase !== 'seeking' || !radarHint?.canCapture || captureRequestedRef.current) return undefined;
+    if (!autoCaptureEnabled || room?.phase !== 'seeking' || !radarHint?.canCapture || captureRequestedRef.current) return undefined;
 
     let cancelled = false;
 
@@ -129,7 +130,7 @@ export default function SeekerRadarScreen() {
       cancelled = true;
       clearInterval(interval);
     };
-  }, [radarHint?.canCapture, room?.phase, router, tryCaptureNearest]);
+  }, [autoCaptureEnabled, radarHint?.canCapture, room?.phase, router, tryCaptureNearest]);
 
   const handleSimulateCapture = async () => {
     try {
