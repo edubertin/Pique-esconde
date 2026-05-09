@@ -17,7 +17,24 @@ export type PlayerLocationSyncState = {
 };
 
 function getLocationErrorMessage(error: unknown) {
-  const message = error instanceof Error ? error.message : undefined;
+  const maybePositionError = error as { code?: unknown; message?: unknown } | null;
+  const message = error instanceof Error
+    ? error.message
+    : typeof maybePositionError?.message === 'string'
+      ? maybePositionError.message
+      : undefined;
+
+  if (maybePositionError?.code === 1) {
+    return 'Permita a localizacao no navegador para jogar.';
+  }
+
+  if (maybePositionError?.code === 2) {
+    return 'GPS indisponivel agora. Verifique permissao, Wi-Fi ou sensor de localizacao.';
+  }
+
+  if (maybePositionError?.code === 3) {
+    return 'GPS demorando para responder. Tente ficar em area aberta.';
+  }
 
   if (message?.toLowerCase().includes('timeout')) {
     return 'GPS demorando para responder. Tente ficar em area aberta.';
@@ -40,6 +57,7 @@ export function usePlayerLocationSync(enabled: boolean): PlayerLocationSyncState
     let isMounted = true;
     let subscription: LocationSubscriptionLike | undefined;
     let webWatchId: number | undefined;
+    let webFallbackWatchId: number | undefined;
 
     const syncCoords = (coords: {
       accuracy?: number | null;
@@ -98,11 +116,44 @@ export function usePlayerLocationSync(enabled: boolean): PlayerLocationSyncState
 
       try {
         if (Platform.OS === 'web' && typeof navigator !== 'undefined' && navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              syncCoords(position.coords);
+            },
+            () => undefined,
+            {
+              enableHighAccuracy: false,
+              maximumAge: 15000,
+              timeout: 8000,
+            },
+          );
+
           webWatchId = navigator.geolocation.watchPosition(
             (position) => {
               syncCoords(position.coords);
             },
             (error) => {
+              if (error.code === error.TIMEOUT && webFallbackWatchId === undefined) {
+                webFallbackWatchId = navigator.geolocation.watchPosition(
+                  (position) => {
+                    syncCoords(position.coords);
+                  },
+                  (fallbackError) => {
+                    if (isMounted) {
+                      setState({
+                        error: getLocationErrorMessage(fallbackError),
+                        status: fallbackError.code === fallbackError.PERMISSION_DENIED ? 'denied' : 'error',
+                      });
+                    }
+                  },
+                  {
+                    enableHighAccuracy: false,
+                    maximumAge: 15000,
+                    timeout: 20000,
+                  },
+                );
+              }
+
               if (isMounted) {
                 setState({
                   error: getLocationErrorMessage(error),
@@ -160,6 +211,9 @@ export function usePlayerLocationSync(enabled: boolean): PlayerLocationSyncState
       isMounted = false;
       if (webWatchId !== undefined && typeof navigator !== 'undefined' && navigator.geolocation) {
         navigator.geolocation.clearWatch(webWatchId);
+        if (webFallbackWatchId !== undefined) {
+          navigator.geolocation.clearWatch(webFallbackWatchId);
+        }
       } else if (typeof subscription?.remove === 'function' && Platform.OS !== 'web') {
         subscription.remove();
       } else if (typeof subscription?.unsubscribe === 'function') {
