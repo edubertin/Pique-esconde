@@ -6,6 +6,7 @@ import { Badge } from '@/src/components/badge';
 import { GameButton } from '@/src/components/game-button';
 import { MenuPanel, PrototypeScreen } from '@/src/components/prototype-screen';
 import { RadarView } from '@/src/components/radar-view';
+import { usePlayerLocationSync } from '@/src/hooks/use-player-location-sync';
 import { t } from '@/src/i18n';
 import { useRoom } from '@/src/state/room-store';
 import { colors } from '@/src/theme/colors';
@@ -21,6 +22,7 @@ export default function SeekerRadarScreen() {
   const seekEndsAt = room?.gameSession?.seekEndsAt;
   const remainingSeconds = seekEndsAt ? (seekEndsAt - now) / 1000 : 0;
   const timerLabel = seekEndsAt ? formatTimer(remainingSeconds) : t('radar.timerEnded');
+  usePlayerLocationSync(room?.phase === 'seeking');
 
   useEffect(() => {
     if (!room) {

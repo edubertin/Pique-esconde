@@ -1,4 +1,6 @@
+import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
+import { useState } from 'react';
 import { Text, View } from 'react-native';
 
 import { Badge } from '@/src/components/badge';
@@ -11,9 +13,27 @@ import { colors } from '@/src/theme/colors';
 export default function LocationPermissionScreen() {
   const router = useRouter();
   const { room } = useRoom();
+  const [error, setError] = useState<string>();
+  const [isRequesting, setIsRequesting] = useState(false);
 
-  const handleAllow = () => {
-    router.push(room ? '/lobby' : '/create-room');
+  const handleAllow = async () => {
+    setError(undefined);
+    setIsRequesting(true);
+
+    try {
+      const permission = await Location.requestForegroundPermissionsAsync();
+      setIsRequesting(false);
+
+      if (permission.status !== Location.PermissionStatus.GRANTED) {
+        setError(t('location.denied'));
+        return;
+      }
+
+      router.push(room ? '/lobby' : '/create-room');
+    } catch {
+      setIsRequesting(false);
+      setError(t('location.denied'));
+    }
   };
 
   return (
@@ -23,7 +43,7 @@ export default function LocationPermissionScreen() {
         title={t('location.title')}
         actions={
           <>
-            <GameButton label={t('location.allow')} onPress={handleAllow} />
+            <GameButton label={isRequesting ? t('location.requesting') : t('location.allow')} onPress={handleAllow} />
             <GameButton href="/" label={t('common.cancel')} variant="danger" />
           </>
         }>
@@ -35,6 +55,11 @@ export default function LocationPermissionScreen() {
           <Text selectable style={{ color: colors.muted, fontSize: 15, lineHeight: 22, textAlign: 'center' }}>
             {t('location.body')}
           </Text>
+          {error ? (
+            <Text selectable style={{ color: colors.danger, fontSize: 13, fontWeight: '800', textAlign: 'center' }}>
+              {error}
+            </Text>
+          ) : null}
         </View>
       </MenuPanel>
     </PrototypeScreen>

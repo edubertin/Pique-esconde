@@ -5,6 +5,7 @@ import { Text } from 'react-native';
 import { Badge } from '@/src/components/badge';
 import { GameButton } from '@/src/components/game-button';
 import { MenuPanel, PrototypeScreen } from '@/src/components/prototype-screen';
+import { usePlayerLocationSync } from '@/src/hooks/use-player-location-sync';
 import { t } from '@/src/i18n';
 import { useRoom } from '@/src/state/room-store';
 import { colors } from '@/src/theme/colors';
@@ -22,6 +23,7 @@ export default function HiderStatusScreen() {
     t('player.roleLeaderSeeker');
   const remainingSeconds = seekEndsAt ? (seekEndsAt - now) / 1000 : 0;
   const timerLabel = seekEndsAt ? formatTimer(remainingSeconds) : t('hiderStatus.timerEnded');
+  usePlayerLocationSync(Boolean(room?.phase === 'seeking' && activePlayer));
 
   useEffect(() => {
     if (!room) {

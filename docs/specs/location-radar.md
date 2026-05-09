@@ -45,10 +45,29 @@ Decisão de produto:
 
 Regra inicial:
 
-- Raio de captura sugerido: 8 metros para testes.
-- Confirmar proximidade por cerca de 3 segundos.
+- Raio de captura: 5 metros.
+- Confirmar proximidade por cerca de 3 segundos antes da captura automatica.
+- O botao de captura deve chamar a mesma validacao de GPS do backend.
 - Evitar captura por uma única leitura instável de GPS.
 - Ao capturar, avisar procurador e escondido com feedback visual, som e vibração.
+
+## Ponto De Esconderijo
+
+Quando o jogador toca em "Estou escondido", o backend salva o ponto GPS atual como ancora do esconderijo.
+
+Regra inicial:
+
+- O escondido pode se mover ate 10 metros do ponto salvo.
+- Se sair desse raio, recebe aviso visual.
+- Se persistir fora do raio, pode ser removido da rodada.
+
+## Perda De Sinal
+
+Regra inicial:
+
+- 15 segundos sem GPS: estado de aviso/sinal instavel.
+- 30 segundos sem GPS: remocao da rodada por sinal perdido.
+- A remocao deve voltar o jogador para a tela inicial com aviso especifico.
 
 ## Progressão de Raio
 
@@ -63,12 +82,13 @@ O app deve recomendar local aberto ou misto.
 
 Não prometer boa experiência em ambiente fechado.
 
-Presets futuros:
+Presets de pistas:
 
-- Aberto.
-- Misto.
-- Menor.
+- Pequeno: quente 8m, morno 14m, frio 30m.
+- Medio: quente 10m, morno 30m, frio 40m.
+- Grande: quente 15m, morno 45m, frio 90m.
 
-## Decisões CEO Pendentes
+## Pendencias De Design
 
-- Confirmar nomes públicos dos estados do radar.
+- Desenhar tela principal do radar com ponteiro instavel, logo no topo e indicadores frio/morno/quente como lampadas.
+- Desenhar tela do escondido com coracao/pulso para sinalizar proximidade do procurador.

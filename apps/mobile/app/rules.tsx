@@ -36,6 +36,8 @@ export default function RulesScreen() {
         <RuleRow label={t('rules.seekTime')} value="3min" tone="leader" />
         <RuleRow label={t('rules.environment')} value={t('rules.standard')} />
         <RuleRow label={t('rules.capture')} value={`${gameRules.captureRadiusMeters}m / ${gameRules.captureConfirmSeconds}s`} tone="ready" />
+        <RuleRow label={t('rules.hiddenAnchor')} value={`${gameRules.hiddenAnchorRadiusMeters}m`} tone="waiting" />
+        <RuleRow label={t('rules.gpsGrace')} value={`${gameRules.locationWarningSeconds}s / ${gameRules.locationEliminationSeconds}s`} />
       </MenuPanel>
     </PrototypeScreen>
   );

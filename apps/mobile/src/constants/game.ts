@@ -56,6 +56,14 @@ export const gameRules = {
   maxPlayers: 8,
   hideSeconds: 60,
   seekSeconds: 180,
-  captureRadiusMeters: 8,
+  captureRadiusMeters: 5,
   captureConfirmSeconds: 3,
+  hiddenAnchorRadiusMeters: 10,
+  locationWarningSeconds: 15,
+  locationEliminationSeconds: 30,
+  clueRanges: {
+    small: { hot: 8, warm: 14, cold: 30 },
+    medium: { hot: 10, warm: 30, cold: 40 },
+    large: { hot: 15, warm: 45, cold: 90 },
+  },
 };

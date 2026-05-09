@@ -2,13 +2,13 @@ import type { RealtimeChannel } from '@supabase/supabase-js';
 
 import { gameRules } from '@/src/constants/game';
 import { assertSupabase } from '@/src/services/supabase-client';
-import type { GameResult, GameSession, LobbyNotice, PlayerStatus, RoomPlayer } from '@/src/state/room-store';
+import type { GameResult, GameSession, LobbyNotice, PlayerLocationInput, PlayerStatus, RoomPlayer } from '@/src/state/room-store';
 
 export type RemoteRoomPhase = 'lobby' | 'hiding' | 'seeking' | 'finished';
 
 export type RemoteRoomSnapshot = {
   activePlayer?: RoomPlayer;
-  activePlayerExitReason?: 'not_hidden_in_time';
+  activePlayerExitReason?: 'left_hide_area' | 'not_hidden_in_time' | 'signal_lost';
   activePlayerToken?: string;
   room: {
     closedReason?: 'not_enough_players' | 'seeker_left';
@@ -57,7 +57,7 @@ type RemoteLobbyNotice = {
 };
 
 type RemotePlayerExitNoticeRow = {
-  reason: 'not_hidden_in_time';
+  reason: 'left_hide_area' | 'not_hidden_in_time' | 'signal_lost';
 };
 
 type RemotePlayerRow = {
@@ -90,6 +90,8 @@ type RoomPayload = {
 
 type CapturePayload = {
   capturedPlayerId?: string;
+  captured?: boolean;
+  reason?: string;
   remainingHiders?: number;
 };
 
@@ -392,6 +394,33 @@ export const roomService = {
     const { error } = await client.rpc('pe_tick_game_session', {
       actor_player_id: activePlayerId,
       player_session_token: activePlayerToken,
+      target_room_id: roomId,
+    });
+
+    if (error) throw error;
+  },
+  async tryCaptureNearest(roomId: string, activePlayerId: string, activePlayerToken: string) {
+    const client = assertSupabase();
+    const { data, error } = await client.rpc('pe_try_capture_nearest', {
+      actor_player_id: activePlayerId,
+      player_session_token: activePlayerToken,
+      target_room_id: roomId,
+    });
+
+    if (error) throw error;
+
+    return data as CapturePayload | null;
+  },
+  async updatePlayerLocation(roomId: string, activePlayerId: string, activePlayerToken: string, input: PlayerLocationInput) {
+    const client = assertSupabase();
+    const { error } = await client.rpc('pe_update_player_location', {
+      accuracy_m: input.accuracyMeters ?? null,
+      actor_player_id: activePlayerId,
+      heading_degrees: input.headingDegrees ?? null,
+      lat: input.lat,
+      lng: input.lng,
+      player_session_token: activePlayerToken,
+      speed_mps: input.speedMetersPerSecond ?? null,
       target_room_id: roomId,
     });
 

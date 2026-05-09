@@ -38,6 +38,14 @@ export type GameSession = {
   status: 'hiding' | 'seeking' | 'finished';
 };
 
+export type PlayerLocationInput = {
+  accuracyMeters?: number;
+  headingDegrees?: number;
+  lat: number;
+  lng: number;
+  speedMetersPerSecond?: number;
+};
+
 export type LobbyNotice = {
   createdAt?: number;
   names: string[];
@@ -74,11 +82,12 @@ type RoomStore = {
   rematch: () => Promise<void>;
   removePlayer: (playerId: string) => Promise<void>;
   room?: Room;
-  roomNotice?: 'left_match' | 'not_hidden_in_time' | 'removed';
+  roomNotice?: 'left_hide_area' | 'left_match' | 'not_hidden_in_time' | 'removed' | 'signal_lost';
   simulateCapture: () => Promise<string | undefined>;
   startRound: () => Promise<boolean>;
   tickGameSession: () => Promise<void>;
   toggleReady: () => Promise<void>;
+  updatePlayerLocation: (input: PlayerLocationInput) => Promise<void>;
 };
 
 type PlayerInput = {
@@ -323,6 +332,10 @@ export function RoomProvider({ children }: { children: ReactNode }) {
           await roomService.toggleReady(session.roomId, session.activePlayerId, session.activePlayerToken);
           await refreshRoom();
         });
+      },
+      async updatePlayerLocation(input) {
+        const session = requireSession();
+        await roomService.updatePlayerLocation(session.roomId, session.activePlayerId, session.activePlayerToken, input);
       },
     };
   }, [activePlayerId, activePlayerToken, applySnapshot, error, isLoading, refreshRoom, room, roomNotice, runAction]);

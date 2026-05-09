@@ -5,6 +5,7 @@ import { Text, View } from 'react-native';
 import { Badge } from '@/src/components/badge';
 import { GameButton } from '@/src/components/game-button';
 import { MenuPanel, PrototypeScreen } from '@/src/components/prototype-screen';
+import { usePlayerLocationSync } from '@/src/hooks/use-player-location-sync';
 import { t } from '@/src/i18n';
 import { useRoom } from '@/src/state/room-store';
 import { colors } from '@/src/theme/colors';
@@ -29,6 +30,7 @@ export default function HidePhaseScreen() {
   const phaseBody = isSeeker
     ? t('hide.seekerStatusText', { hidden: hiddenCount, total: totalHiders })
     : t('hide.statusText', { hidden: hiddenCount, name: seekerName, total: totalHiders });
+  usePlayerLocationSync(Boolean(room?.phase === 'hiding' && activePlayer));
 
   useEffect(() => {
     if (!room) {
