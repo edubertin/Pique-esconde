@@ -38,6 +38,9 @@ export function DevGpsControl({ defaultDistance = 0, label }: { defaultDistance?
     return Number.isFinite(storedDistance) ? storedDistance : defaultDistance;
   });
   const percent = Math.min(100, Math.max(0, (distance / maxDistanceMeters) * 100));
+  const hintText = label === 'procurador'
+    ? 'Para testar: comece 35m e aproxime ate 4m.'
+    : 'Para testar: deixe o escondido fixo em 0m.';
 
   useEffect(() => {
     if (!enabled) return undefined;
@@ -178,7 +181,7 @@ export function DevGpsControl({ defaultDistance = 0, label }: { defaultDistance?
       </View>
 
       <Text style={{ color: colors.muted, fontSize: 11, fontWeight: '800', textAlign: 'center' }}>
-        {active ? `Simulando ${distance}m.` : `Toque em um metro para ligar. Atual: ${distance}m.`} Escondido 0m, procurador 4m.
+        {active ? `Simulando ${distance}m.` : `Toque em um metro para ligar. Atual: ${distance}m.`} {hintText}
       </Text>
     </View>
   );

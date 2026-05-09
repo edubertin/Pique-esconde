@@ -35,7 +35,7 @@ function ResultStat({ label, value }: { label: string; value: string }) {
 
 export default function ResultScreen() {
   const router = useRouter();
-  const { error, leaveRoom, rematch, room } = useRoom();
+  const { leaveRoom, rematch, room } = useRoom();
   const players = room?.players ?? [];
   const result = room?.result;
   const hasClosedResult = Boolean(result);
@@ -132,12 +132,6 @@ export default function ResultScreen() {
             value={winner === 'seeker' ? (seekerName ?? t('player.roleLeaderSeeker')) : highlightName}
           />
         </View>
-
-        {error ? (
-          <Text selectable style={{ color: colors.danger, fontSize: 13, fontWeight: '800', textAlign: 'center' }}>
-            {error}
-          </Text>
-        ) : null}
 
       </MenuPanel>
     </PrototypeScreen>
