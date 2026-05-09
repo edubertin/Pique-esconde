@@ -59,11 +59,12 @@ export default function LocationPermissionScreen() {
 
       if (permission.status !== Location.PermissionStatus.GRANTED) {
         setIsRequesting(false);
-        if (room) {
+        if (permission.status === Location.PermissionStatus.DENIED && !permission.canAskAgain && room) {
           await leaveRoom().catch(() => undefined);
+          router.replace('/');
+          return;
         }
-        setError(t('location.denied'));
-        router.replace('/');
+        setError(permission.canAskAgain ? 'Toque novamente para permitir a localizacao.' : t('location.denied'));
         return;
       }
 
