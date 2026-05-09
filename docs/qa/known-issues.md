@@ -65,63 +65,65 @@ Link para test run:
 
 ## L-002 - Realtime real ainda não implementado
 
-Status: Aceito no MVP atual
+Status: Resolvido
 Severidade: Alta
 Area: Realtime
 Detectado em: 2026-05-08
-Commit/versao: 8bec69f
+Commit/versao: resolvido em 556e944
 
 Descricao:
-- Lobby, jogadores, status e eventos ainda usam dados mockados.
+- Lobby, jogadores, status e eventos usavam dados mockados.
 
 Impacto:
-- Nao e possivel validar multiplos celulares na mesma sala ainda.
+- Resolvido para sala, lobby e rodada sem GPS com Supabase Realtime.
 
 Decisao:
-- Proxima fase deve criar estado de sala e depois plugar Supabase Realtime.
+- Manter como resolvido para sala/lobby/rodada. GPS/radar real seguem em limitacoes separadas.
 
 Link para test run:
-- `docs/qa/test-runs/2026-05-08-lobby-rematch-web.md`
+- `docs/qa/test-runs/2026-05-09-supabase-room-realtime-web.md`
+- `docs/qa/test-runs/2026-05-09-game-session-real-web.md`
+- `docs/qa/test-runs/2026-05-09-leave-match-realtime-web.md`
 
 ## L-003 - Promover líder pelo lobby ainda não é realtime
 
-Status: Parcialmente resolvido localmente
+Status: Resolvido
 Severidade: Media
 Area: Lobby
 Detectado em: 2026-05-08
-Commit/versao: 8bec69f
+Commit/versao: resolvido em ce8496d
 
 Descricao:
-- A regra de promover outro jogador como lider/procurador ja existe no estado local/mock, mas ainda nao esta conectada ao realtime.
+- A regra de promover outro jogador como lider/procurador existia no estado local/mock, mas ainda nao estava conectada ao realtime.
 
 Impacto:
-- O fluxo pode ser validado em um aparelho, mas ainda nao sincroniza entre varios celulares.
+- Resolvido no lobby realtime via RPC `pe_promote_leader`.
 
 Decisao:
-- Validar localmente na fase 3.1 e depois conectar ao Supabase Realtime.
+- Manter regra manual no lobby para o MVP.
 
 Link para test run:
-- `docs/qa/test-runs/2026-05-08-lobby-rematch-web.md`
+- `docs/qa/test-runs/2026-05-09-supabase-room-realtime-web.md`
 
 ## L-004 - Expiração em 6 minutos ainda não é backend
 
-Status: Parcialmente resolvido localmente
+Status: Parcialmente resolvido no backend
 Severidade: Media
 Area: Sala
 Detectado em: 2026-05-08
-Commit/versao: 8bec69f
+Commit/versao: 556e944
 
 Descricao:
-- A regra de expirar sala apos 6 minutos com apenas 1 jogador ativo existe no estado local/mock, mas ainda nao existe backend para executar quando o app fecha.
+- A sala grava `expires_at` no Supabase quando resta apenas 1 jogador, mas ainda nao ha job/rotina de limpeza server-side apagando salas expiradas automaticamente.
 
 Impacto:
-- O comportamento local ajuda testes do fluxo, mas nao substitui expiracao server-side.
+- O app consegue interpretar expiração durante uso, mas salas antigas podem permanecer no banco ate uma limpeza futura.
 
 Decisao:
-- Manter local para prototipo e mover para backend/realtime na fase Supabase.
+- Criar limpeza agendada ou rotina segura antes de piloto/producao.
 
 Link para test run:
-- `docs/qa/test-runs/2026-05-08-lobby-rematch-web.md`
+- `docs/qa/test-runs/2026-05-09-leave-match-realtime-web.md`
 
 ## L-005 - Botão Convidar ainda não abre compartilhamento nativo
 
@@ -132,16 +134,16 @@ Detectado em: 2026-05-08
 Commit/versao: 8bec69f
 
 Descricao:
-- O lobby usa o termo `Convidar`, mas por enquanto adiciona amigos demo no estado local. Ainda nao abre share nativo nem gera link real.
+- O lobby usa o termo `Convidar`, mas por enquanto adiciona amigos demo no Supabase para teste. Ainda nao abre share nativo nem gera link real/deep link.
 
 Impacto:
-- Convite local permite testar lobby, limite e promocao de lider, mas ainda nao convida outro aparelho.
+- O codigo real da sala permite entrada manual em outro aparelho, mas o botao ainda nao aciona compartilhamento nativo.
 
 Decisao:
-- Implementar quando houver criacao real de sala/codigo/link.
+- Implementar share nativo e deep link na etapa de convite.
 
 Link para test run:
-- `docs/qa/test-runs/2026-05-08-fluxo-navegavel-web.md`
+- `docs/qa/test-runs/2026-05-09-supabase-room-realtime-web.md`
 
 ## Riscos do MVP
 

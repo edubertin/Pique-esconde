@@ -68,4 +68,22 @@ The project is currently in product/specification phase.
 
 ## Current Status
 
-Product definition, MVP scope, privacy rules, technical direction, specs and ADRs are drafted. The next phase is wireframes for the main app flow.
+The MVP is now in implementation.
+
+Done:
+
+- Expo app scaffold with navigable game flow.
+- Polished prototype UI for home, room creation, lobby, hiding, seeking, capture, result and social card.
+- Supabase project connected through local environment variables.
+- Realtime temporary rooms with room code, player list, ready state, leader promotion and leader removal.
+- Real game session layer without GPS yet: start round, hide phase, seek phase, simulated capture, result and rematch.
+- Match-exit rules in Supabase:
+  - if a regular hider leaves and at least 2 players remain, the match continues;
+  - if the seeker leaves, the round returns to lobby and a new leader is promoted;
+  - if fewer than 2 players remain, the round returns to lobby with a warning.
+- QA reports and a Playwright web smoke test for the room flow.
+
+Next implementation slice:
+
+- Real match timer stored/synchronized by the backend.
+- Then GPS/location permission, temporary position updates, approximate radar and proximity capture.

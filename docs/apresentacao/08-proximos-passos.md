@@ -4,9 +4,9 @@
 
 - Texto final de permissão de localização.
 - Nome e comportamento dos presets de ambiente.
-- Regra final de expiração da sala.
+- Limpeza automática de salas expiradas no backend.
 - Formato visual final do card social.
-- Critério exato para considerar uma sala abandonada.
+- Critério exato para considerar uma sala abandonada fora do app aberto.
 
 Decisões já encaminhadas:
 
@@ -24,22 +24,38 @@ Decisões já encaminhadas:
 - Se o líder/procurador cair, liderança passa para o próximo jogador disponível.
 - Jogadores podem voltar para a mesma sala após desconexão.
 - Sala temporária deve expirar quando todos saírem ou após limite de inatividade.
+- Se um escondido sai durante a partida e ainda restam pelo menos 2 jogadores, a partida continua.
+- Se o procurador sai durante a partida, a rodada volta ao lobby e outro jogador assume a liderança.
+- Se uma saída deixa menos de 2 jogadores, a rodada volta ao lobby com aviso.
 
 ## Tarefas Imediatas
 
-1. Criar wireframes das telas principais.
-2. Definir guia visual com base na imagem de referência.
-3. Desenhar 4 avatares iniciais.
-4. Definir card social de resultado.
-5. Escrever textos de permissão de localização.
-6. Detalhar modelo de dados.
-7. Detalhar eventos realtime.
-8. Montar projeto Expo.
-9. Configurar Supabase.
-10. Implementar sala, lobby e convite por link.
-11. Implementar fluxo de partida.
-12. Implementar GPS, radar e captura automática.
-13. Testar em celular real com grupo pequeno.
+1. Implementar timer real de esconder/procurar sincronizado pelo backend.
+2. Atualizar UI para consumir tempo real da rodada em vez de textos fixos.
+3. Implementar permissão real de localização no dispositivo.
+4. Criar envio temporário de posição durante a partida.
+5. Implementar radar aproximado por distância, sem mapa exato.
+6. Implementar captura automática por proximidade com tolerância de alguns segundos.
+7. Calibrar som/haptics em celular real.
+8. Implementar convite por link/deep link e compartilhamento nativo.
+9. Testar em dois ou mais celulares no mesmo espaço físico.
+10. Ajustar textos de permissão, aviso de GPS e estados de erro.
+
+Concluído nesta etapa:
+
+- Wireframes e direção visual inicial.
+- Projeto Expo montado.
+- Supabase configurado.
+- Sala real com código.
+- Lobby realtime.
+- Entrada por código.
+- Remoção pelo líder.
+- Promoção de líder/procurador.
+- Rodada real sem GPS.
+- Captura simulada usando jogadores reais.
+- Resultado e rematch na mesma sala.
+- Regras reais de saída durante partida.
+- QA técnico e smoke visual web.
 
 ## Materiais Necessários
 
@@ -57,6 +73,8 @@ Decisões já encaminhadas:
 
 ### Semana 1 - Protótipo
 
+Status: concluída.
+
 - Wireframes.
 - Fluxo navegável.
 - Lobby visual com avatares.
@@ -65,21 +83,35 @@ Decisões já encaminhadas:
 
 ### Semana 2 - Base Técnica
 
+Status: majoritariamente concluída.
+
 - Projeto Expo.
 - Estrutura de rotas.
 - Supabase.
 - Criação/entrada de sala.
 - Lobby realtime.
-- Convite por link/código.
+- Entrada por código.
+- Convite por link/deep link ainda pendente.
 
 ### Semana 3 - Jogo Real
 
+- Status: em andamento.
+
+- Timer real sincronizado.
 - Permissão de localização.
 - Atualização de posição.
 - Radar/proximidade.
 - Captura automática.
 - Rush final.
 - Resultado e jogar novamente.
+
+Já concluído dentro desta fase:
+
+- Rodada real sem GPS.
+- Estados reais de jogadores.
+- Captura simulada em jogadores reais.
+- Resultado e rematch.
+- Regras de saída/encerramento da rodada.
 
 ### Semana 4 - Piloto
 
@@ -119,3 +151,7 @@ Texto para quem negar:
 - Se todos saírem, a sala é encerrada.
 - Se a sala ficar sem atividade por um período definido, ela expira automaticamente.
 - Se restar apenas 1 jogador ativo, a sala expira após 6 minutos sem novos jogadores.
+- Se o líder/procurador sair em lobby, outro jogador assume a liderança.
+- Se o procurador sair durante uma rodada, a rodada é interrompida e a sala volta para o lobby.
+- Se um escondido sair durante a rodada e ainda restarem pelo menos 2 jogadores, a rodada continua.
+- Se qualquer saída deixar menos de 2 jogadores na rodada, a sala volta para o lobby com aviso.

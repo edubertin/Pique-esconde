@@ -17,6 +17,14 @@ Feedback: som, vibração/haptics e animações
 
 Essa escolha favorece velocidade de MVP, familiaridade técnica e capacidade de evoluir para iOS, Android e web com uma base compartilhada.
 
+Status atual em 2026-05-09:
+
+- App Expo e fluxo navegável já existem em `apps/mobile`.
+- Supabase já está conectado para salas temporárias, jogadores, lobby realtime e sessões de rodada.
+- A camada real de sala usa RPCs e Realtime do Supabase, sem login completo.
+- A camada real de rodada já cobre início, esconder, busca, captura simulada, resultado, rematch e regras de saída durante partida.
+- GPS, radar real por distância e captura automática por proximidade ainda não foram implementados.
+
 ## Aplicações
 
 ### App Mobile
@@ -71,6 +79,15 @@ Responsabilidades:
 - Dados temporários de localização durante a partida.
 - Resultado da partida.
 
+Status implementado:
+
+- `pe_rooms`: sala temporária, código, fase, resultado, expiração e motivo de retorno ao lobby.
+- `pe_players`: jogadores da sala, apelido, avatar, líder/procurador, status e sessão temporária.
+- `pe_game_sessions`: rodada ativa, procurador, status, tempos configurados e resultado.
+- RPCs de sala/lobby: criar sala, entrar, sair, remover, promover líder, pronto e adicionar jogador demo.
+- RPCs de rodada: iniciar, marcar escondido, liberar procurador, simular captura, finalizar e jogar novamente.
+- Publicação realtime para salas, jogadores e sessões de partida.
+
 Camada importante:
 
 O app deve conversar com uma camada interna de serviços, como `game-service`, `room-service` e `location-service`, em vez de espalhar chamadas diretas ao Supabase por todas as telas. Assim, se no futuro for necessário migrar para Socket.IO ou um backend próprio de jogo, a troca fica mais controlada.
@@ -81,9 +98,9 @@ Banco inicial: Supabase Postgres.
 
 Entidades prováveis:
 
-- `rooms`: salas temporárias.
-- `players`: jogadores dentro da sala.
-- `game_sessions`: partidas.
+- `pe_rooms`: salas temporárias.
+- `pe_players`: jogadores dentro da sala.
+- `pe_game_sessions`: partidas/rodadas.
 - `game_events`: eventos importantes da partida.
 - `location_snapshots`: posições temporárias durante jogo, se necessário.
 

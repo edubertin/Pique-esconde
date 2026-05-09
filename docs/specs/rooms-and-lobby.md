@@ -65,6 +65,14 @@ Estados principais:
 - Se ainda houver apenas 1 jogador após 6 minutos, a sala expira.
 - Se todos saírem, a sala é encerrada.
 
+## Sair Durante a Rodada
+
+- Se um escondido comum sair e ainda restarem pelo menos 2 jogadores na sala, a rodada continua.
+- Se o procurador sair durante a rodada, a rodada é interrompida, a sala volta para o lobby e outro jogador assume a liderança.
+- Se qualquer saída deixar menos de 2 jogadores, a rodada é interrompida e a sala volta para o lobby com aviso de jogadores insuficientes.
+- Quem saiu da partida volta para a tela inicial com aviso local.
+- Quem permanece na sala vê o estado atualizado via realtime.
+
 ## Decisões CEO Pendentes
 
 - Nenhuma decisão pendente no momento.

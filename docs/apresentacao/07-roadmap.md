@@ -4,6 +4,8 @@
 
 Objetivo: fechar as regras essenciais do jogo antes de codar.
 
+Status: concluída para o MVP atual.
+
 Decisões já tomadas:
 
 - Número mínimo de jogadores: 2.
@@ -31,12 +33,14 @@ Decisões já tomadas:
 Pendências desta fase:
 
 - Refinar textos finais de permissão de localização.
-- Confirmar regra final de sala expirada após testes.
+- Confirmar regra final de expiração automática por limpeza de backend após testes longos.
 - Nenhuma pendência crítica de produto nesta fase.
 
 ## Fase 2 - Protótipo
 
 Objetivo: validar fluxo, telas e linguagem antes da implementação completa de GPS/realtime.
+
+Status: concluída como base navegável e visual. O protótipo evoluiu para o app Expo em implementação.
 
 Decisões:
 
@@ -54,6 +58,8 @@ Critério de avanço:
 ## Fase 3 - MVP
 
 Objetivo: construir uma primeira versão jogável em celular real.
+
+Status: em andamento.
 
 Decisões:
 
@@ -73,13 +79,40 @@ Decisões:
 - Card social entra no MVP por potencial de divulgação.
 - Biblioteca inicial de avatares: 4 opções, com diversidade visual e estilo próximo da referência do projeto.
 
+Já implementado nesta fase:
+
+- Projeto Expo + React Native + Expo Router.
+- Fluxo web/mobile navegável das principais telas.
+- Supabase Postgres e Supabase Realtime conectados.
+- Salas temporárias reais com código de 4 letras.
+- Lobby realtime com jogadores, status, líder/procurador, remoção e promoção.
+- Sessão temporária por jogador, sem login completo.
+- Rodada real sem GPS: iniciar, esconder, liberar busca, captura simulada, resultado e jogar novamente.
+- Regras reais de saída:
+  - escondido comum pode sair e a partida continua se ainda restarem pelo menos 2 jogadores;
+  - se o procurador sair, todos voltam ao lobby e outro jogador assume a liderança;
+  - se restar menos de 2 jogadores, a rodada volta ao lobby com aviso.
+- QA com testes RPC reais no Supabase e smoke visual web em Playwright.
+
+Ainda pendente nesta fase:
+
+- Timer real sincronizado pelo backend.
+- Permissão de localização real no dispositivo.
+- Envio temporário de posição durante a rodada.
+- Radar real por proximidade aproximada.
+- Captura automática por proximidade.
+- Feedback de som/haptics calibrado em celular real.
+- Convite por link/deep link e compartilhamento nativo.
+- Teste em celulares reais no mesmo espaço físico.
+
 Critério de avanço:
 
-- Um grupo de 2 a 8 pessoas consegue jogar uma partida completa.
-- A localização funciona em celular real.
+- Um grupo de 2 a 8 pessoas consegue jogar uma partida completa em celulares reais.
+- A localização funciona em celular real com permissão clara.
 - O radar orienta sem revelar posição exata.
 - A captura automática funciona sem falsos positivos constantes.
 - O grupo consegue jogar novamente sem criar outra sala.
+- A saída de jogadores durante a rodada não quebra a sala nem deixa estados presos.
 
 ## Fase 4 - Piloto
 

@@ -46,6 +46,14 @@ Definir o fluxo jogável principal do Pique Esconde no MVP.
 - O próximo procurador é definido no lobby.
 - Não há botão "trocar procurador" na tela de resultado.
 
+## Saída Durante a Rodada
+
+- Jogador escondido pode sair durante a rodada.
+- Se a saída de um escondido ainda deixar pelo menos 2 jogadores na sala, a rodada continua.
+- Se o procurador sair, a rodada volta para o lobby, outro jogador assume a liderança e a sala exibe aviso de rodada interrompida.
+- Se qualquer saída deixar menos de 2 jogadores, a rodada volta para o lobby com aviso de jogadores insuficientes.
+- O jogador que saiu volta para a tela inicial com mensagem local.
+
 ## Vitória
 
 - Procurador vence se capturar todos antes do fim do tempo.
