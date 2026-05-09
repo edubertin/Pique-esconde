@@ -30,3 +30,5 @@ web-build/
 build/
 coverage/
 
+# Local design imports
+docs/design/imports/

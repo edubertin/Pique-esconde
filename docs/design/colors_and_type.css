@@ -1,0 +1,197 @@
+/* =========================================================
+   Pique Esconde — colors & type tokens
+   Source of truth: apps/mobile/src/theme/colors.ts
+   Visual report: docs/design/game-ui-design-report.md
+   ========================================================= */
+
+@import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap");
+
+:root {
+  /* ---------- Brand colors (canonical) ---------- */
+  --pe-navy:        #071A3D;  /* ink, contour, secondary button, premium frame */
+  --pe-pink:        #FF2D8D;  /* primary action, capture, energy */
+  --pe-pink-dark:   #D5166C;
+  --pe-lime:        #B6F000;  /* victory, strong signal, positive radar */
+  --pe-lime-dark:   #7FB000;
+  --pe-blue:        #0A84FF;  /* sky, technology, radar, links */
+  --pe-sky:         #19B6FF;
+  --pe-green:       #33C759;  /* ready/active status */
+  --pe-yellow:      #FFCC00;  /* alert, rush final, attention */
+  --pe-danger:      #FF453A;
+  --pe-danger-soft: #FFF0F0;
+  --pe-warning-soft:#FFF7D6;
+  --pe-success-soft:#EDFFE8;
+
+  /* ---------- Surfaces ---------- */
+  --pe-bg:          #F7FBFF;  /* default background */
+  --pe-bg-deep:     #DDF4FF;  /* slightly deeper sky tint */
+  --pe-surface:     #FFFFFF;  /* cards, panels */
+  --pe-line:        #D8E6F5;  /* light borders */
+  --pe-soft-line:   #ECF3FA;  /* subtle dividers */
+
+  /* ---------- Text ---------- */
+  --pe-fg:          #071A3D;  /* same as navy — ink */
+  --pe-fg-muted:    #59708F;  /* secondary text */
+  --pe-fg-on-dark:  #FFFFFF;  /* on navy/pink */
+
+  /* ---------- Semantic ---------- */
+  --pe-action-fg:   var(--pe-fg-on-dark);
+  --pe-action-bg:   var(--pe-pink);
+  --pe-action-border: var(--pe-navy);
+
+  --pe-secondary-fg: var(--pe-fg-on-dark);
+  --pe-secondary-bg: var(--pe-navy);
+  --pe-secondary-border: var(--pe-pink);
+
+  --pe-ghost-fg: var(--pe-fg);
+  --pe-ghost-bg: var(--pe-surface);
+  --pe-ghost-border: var(--pe-line);
+
+  --pe-status-ready:   var(--pe-green);
+  --pe-status-waiting: var(--pe-yellow);
+  --pe-status-leader:  var(--pe-navy);
+  --pe-status-rush:    var(--pe-pink);
+  --pe-status-captured: var(--pe-danger);
+
+  /* ---------- Spacing ---------- */
+  --pe-space-1: 4px;
+  --pe-space-2: 8px;
+  --pe-space-3: 12px;
+  --pe-space-4: 16px;
+  --pe-space-5: 20px;
+  --pe-space-6: 24px;
+  --pe-space-8: 32px;
+  --pe-space-10: 40px;
+
+  /* ---------- Radius ---------- */
+  --pe-radius-sm: 12px;
+  --pe-radius-md: 16px;
+  --pe-radius-lg: 18px;   /* cards */
+  --pe-radius-xl: 24px;   /* hero cards */
+  --pe-radius-2xl: 28px;  /* signature modal */
+  --pe-radius-pill: 999px;
+
+  /* ---------- Hard "arcade" shadows (no blur — that's the look) ---------- */
+  --pe-shadow-button:        0 6px 0 rgba(7, 26, 61, 0.18);
+  --pe-shadow-button-soft:   0 4px 0 rgba(7, 26, 61, 0.08);
+  --pe-shadow-card:          0 8px 0 rgba(7, 26, 61, 0.10);
+  --pe-shadow-card-strong:   0 10px 0 rgba(10, 132, 255, 0.14);
+  --pe-shadow-card-rush:     0 10px 0 rgba(255, 45, 141, 0.18);
+  --pe-shadow-glass:         0 12px 0 rgba(7, 26, 61, 0.22);
+  --pe-shadow-hero:          0 12px 0 rgba(7, 26, 61, 0.36);
+
+  /* ---------- Typography ---------- */
+  /* Display = wordmark / promo / hero. Fredoka approximates the logo wordmark. */
+  /* Body = UI copy. Nunito ships peso 900, perfect for botões/títulos. */
+  /* NOTE: app uses system font on device — these are web fallbacks. */
+  --pe-font-display: "Fredoka", "Baloo 2", "Nunito", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --pe-font-body:    "Nunito", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --pe-font-mono:    "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  /* Sizes (px) — see report */
+  --pe-fs-xxs: 11px;
+  --pe-fs-xs:  12px;
+  --pe-fs-sm:  14px;
+  --pe-fs-md:  16px;
+  --pe-fs-lg:  18px;
+  --pe-fs-xl:  22px;
+  --pe-fs-2xl: 28px;
+  --pe-fs-3xl: 34px;
+  --pe-fs-4xl: 48px;
+  --pe-fs-5xl: 64px;
+
+  /* Weights — peso 900 é a personalidade tipográfica do produto */
+  --pe-fw-regular:  400;
+  --pe-fw-medium:   600;
+  --pe-fw-bold:     800;
+  --pe-fw-black:    900;
+
+  /* Line heights */
+  --pe-lh-tight: 1.05;
+  --pe-lh-snug:  1.2;
+  --pe-lh-base:  1.45;
+
+  /* Tabular nums for MM:SS counters */
+  --pe-tabular: tabular-nums;
+}
+
+/* =========================================================
+   Semantic role styles (use as classes or @extend pattern)
+   ========================================================= */
+
+.pe-screen-title {
+  font-family: var(--pe-font-body);
+  font-weight: var(--pe-fw-black);
+  font-size: var(--pe-fs-2xl);
+  line-height: var(--pe-lh-snug);
+  color: var(--pe-fg-on-dark);
+}
+
+.pe-kicker {
+  font-family: var(--pe-font-body);
+  font-weight: var(--pe-fw-black);
+  font-size: var(--pe-fs-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--pe-pink);
+}
+
+.pe-counter {
+  font-family: var(--pe-font-body);
+  font-weight: var(--pe-fw-black);
+  font-size: var(--pe-fs-4xl);
+  font-variant-numeric: var(--pe-tabular);
+  line-height: 1;
+  color: var(--pe-lime); /* on dark; switch to navy on light */
+}
+
+.pe-counter-xl {
+  font-family: var(--pe-font-body);
+  font-weight: var(--pe-fw-black);
+  font-size: var(--pe-fs-5xl);
+  font-variant-numeric: var(--pe-tabular);
+  line-height: 1;
+}
+
+.pe-button-label {
+  font-family: var(--pe-font-body);
+  font-weight: var(--pe-fw-black);
+  font-size: var(--pe-fs-md);
+  letter-spacing: 0.01em;
+}
+
+.pe-badge-label {
+  font-family: var(--pe-font-body);
+  font-weight: var(--pe-fw-black);
+  font-size: var(--pe-fs-xs);
+}
+
+.pe-body {
+  font-family: var(--pe-font-body);
+  font-weight: var(--pe-fw-regular);
+  font-size: var(--pe-fs-md);
+  line-height: var(--pe-lh-base);
+  color: var(--pe-fg);
+}
+
+.pe-body-muted {
+  font-family: var(--pe-font-body);
+  font-weight: var(--pe-fw-medium);
+  font-size: var(--pe-fs-sm);
+  line-height: var(--pe-lh-base);
+  color: var(--pe-fg-muted);
+}
+
+.pe-microcopy {
+  font-family: var(--pe-font-body);
+  font-weight: var(--pe-fw-bold);
+  font-size: var(--pe-fs-xs);
+  color: var(--pe-fg-muted);
+}
+
+.pe-wordmark {
+  font-family: var(--pe-font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
