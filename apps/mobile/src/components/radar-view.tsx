@@ -6,7 +6,7 @@ import { colors } from '@/src/theme/colors';
 const bandMeta: Record<RadarHint['band'], { color: string; label: string; markerLeft: `${number}%` }> = {
   cold: { color: '#5AB8FF', label: 'Frio', markerLeft: '17%' },
   hot: { color: '#FF5A4E', label: 'Quente!', markerLeft: '83%' },
-  none: { color: 'rgba(255,255,255,0.72)', label: 'Sinal instavel', markerLeft: '50%' },
+  none: { color: 'rgba(255,255,255,0.72)', label: 'Buscando sinal', markerLeft: '50%' },
   warm: { color: '#FFD35A', label: 'Morno', markerLeft: '50%' },
 };
 
@@ -32,11 +32,16 @@ export function RadarView({ hint, rush = false }: { hint?: RadarHint; rush?: boo
   const band = hint?.signalStatus === 'fresh' ? (hint.band ?? 'none') : 'none';
   const meta = bandMeta[band];
   const confidence = Math.round((hint?.confidence ?? 0) * 100);
+  const freshOutOfRange = hint?.signalStatus === 'fresh' && band === 'none' && typeof hint.distanceMetersApprox === 'number';
   const angle = hint?.angleDegrees ?? (rush ? 42 : 28);
   const radarSize = Math.min(Math.max(width * 0.76, 258), 348);
   const targetColor = band === 'none' ? 'rgba(255,255,255,0.55)' : meta.color;
-  const statusLabel = hasNoTarget ? 'Sem alvo ativo' : seekerSignalLost ? 'GPS sem sinal' : meta.label;
-  const statusBody = hasNoTarget ? 'Nenhum escondido ativo na rodada' : hint?.targetNickname ? `${hint.targetNickname} no alvo` : 'Buscando sinal';
+  const statusLabel = hasNoTarget ? 'Sem alvo ativo' : seekerSignalLost ? 'GPS sem sinal' : freshOutOfRange ? 'Fora de alcance' : meta.label;
+  const statusBody = hasNoTarget
+    ? 'Nenhum escondido ativo na rodada'
+    : freshOutOfRange
+      ? `${hint.distanceMetersApprox}m do alvo`
+      : hint?.targetNickname ? `${hint.targetNickname} no alvo` : 'Aguardando leitura';
 
   return (
     <View style={{ alignItems: 'center', gap: 12, width: '100%' }}>

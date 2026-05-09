@@ -18,6 +18,7 @@ export type PlayerLocationSyncState = {
 
 export function usePlayerLocationSync(enabled: boolean): PlayerLocationSyncState {
   const { updatePlayerLocation } = useRoom();
+  const lastSyncAttemptAtRef = useRef(0);
   const updatePlayerLocationRef = useRef(updatePlayerLocation);
   const [state, setState] = useState<PlayerLocationSyncState>({ status: 'idle' });
 
@@ -37,9 +38,21 @@ export function usePlayerLocationSync(enabled: boolean): PlayerLocationSyncState
       longitude: number;
       speed?: number | null;
     }) => {
-      if (Platform.OS === 'web' && typeof window !== 'undefined' && window.sessionStorage.getItem('pe-dev-gps-active') === 'true') {
+      if (
+        Platform.OS === 'web'
+        && typeof window !== 'undefined'
+        && (
+          window.sessionStorage.getItem('pe-dev-gps-v3-active') === 'true'
+          || window.sessionStorage.getItem('pe-dev-gps-v2-active') === 'true'
+          || window.sessionStorage.getItem('pe-dev-gps-active') === 'true'
+        )
+      ) {
         return;
       }
+
+      const now = Date.now();
+      if (now - lastSyncAttemptAtRef.current < 2500) return;
+      lastSyncAttemptAtRef.current = now;
 
       const { accuracy, heading, latitude, longitude, speed } = coords;
 

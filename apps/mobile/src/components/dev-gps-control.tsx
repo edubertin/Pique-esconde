@@ -4,10 +4,10 @@ import { Platform, Pressable, Text, View } from 'react-native';
 import { useRoom } from '@/src/state/room-store';
 import { colors } from '@/src/theme/colors';
 
-const maxDistanceMeters = 60;
-const devGpsStorageKey = 'pe-dev-gps-v2-active';
-const devGpsDistanceStorageKey = 'pe-dev-gps-v2-distance';
-const presets = [0, 4, 8, 15, 35, 60];
+const maxDistanceMeters = 40;
+const devGpsStorageKey = 'pe-dev-gps-v3-active';
+const devGpsDistanceStorageKey = 'pe-dev-gps-v3-distance';
+const presets = [0, 4, 8, 15, 30, 40];
 type SyncStatus = 'idle' | 'active' | 'error';
 
 export function DevGpsControl({ defaultDistance = 0 }: { defaultDistance?: number }) {
@@ -21,9 +21,9 @@ export function DevGpsControl({ defaultDistance = 0 }: { defaultDistance?: numbe
     if (!enabled || typeof window === 'undefined') return defaultDistance;
 
     const storedDistance = Number(window.sessionStorage.getItem(devGpsDistanceStorageKey));
-    return Number.isFinite(storedDistance) ? storedDistance : defaultDistance;
+    return Number.isFinite(storedDistance) ? Math.min(Math.max(storedDistance, 0), maxDistanceMeters) : defaultDistance;
   });
-  const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle');
+  const [, setSyncStatus] = useState<SyncStatus>('idle');
   const percent = Math.min(100, Math.max(0, (distance / maxDistanceMeters) * 100));
 
   useEffect(() => {
@@ -71,11 +71,13 @@ export function DevGpsControl({ defaultDistance = 0 }: { defaultDistance?: numbe
   if (!enabled) return null;
 
   const setPreset = async (nextDistance: number) => {
-    setDistance(nextDistance);
+    const safeDistance = Math.min(Math.max(nextDistance, 0), maxDistanceMeters);
+
+    setDistance(safeDistance);
     setActive(true);
 
     try {
-      await updateDevTestDistanceRef.current(nextDistance);
+      await updateDevTestDistanceRef.current(safeDistance);
       setSyncStatus('active');
     } catch {
       setSyncStatus('error');
@@ -188,17 +190,6 @@ export function DevGpsControl({ defaultDistance = 0 }: { defaultDistance?: numbe
       <Text style={{ color: colors.muted, fontSize: 11, fontWeight: '800', textAlign: 'center' }}>
         {active ? `Simulando ${distance}m.` : `Toque em um metro para ligar. Atual: ${distance}m.`} O escondido fica ancorado no teste.
       </Text>
-      {active && syncStatus === 'error' ? (
-        <Text
-          style={{
-            color: colors.danger,
-            fontSize: 11,
-            fontWeight: '900',
-            textAlign: 'center',
-          }}>
-          GPS teste aguardando rede
-        </Text>
-      ) : null}
     </View>
   );
 }

@@ -21,6 +21,7 @@ export default function SeekerRadarScreen() {
   const [radarHint, setRadarHint] = useState<RadarHint>();
   const [now, setNow] = useState(Date.now());
   const captureRequestedRef = useRef(false);
+  const lastStableHintAtRef = useRef(0);
   const tickRequestedRef = useRef(false);
   const seekerPlayerId = room?.gameSession?.seekerPlayerId ?? room?.players.find((player) => player.isLeader)?.id;
   const remainingHiders = room?.players.filter((player) => player.id !== seekerPlayerId && player.status !== 'Capturado').length ?? 0;
@@ -77,17 +78,29 @@ export default function SeekerRadarScreen() {
     if (room?.phase !== 'seeking' || remainingHiders <= 0) return undefined;
 
     let cancelled = false;
+    const stableHintGraceMs = 8000;
 
     const refreshHint = () => {
       getRadarHint()
         .then((hint) => {
-          if (!cancelled && hint) setRadarHint(hint);
+          if (cancelled || !hint) return;
+
+          const isFreshHint = hint.signalStatus === 'fresh';
+          if (isFreshHint) {
+            lastStableHintAtRef.current = Date.now();
+            setRadarHint(hint);
+            return;
+          }
+
+          if (!lastStableHintAtRef.current || Date.now() - lastStableHintAtRef.current > stableHintGraceMs) {
+            setRadarHint(hint);
+          }
         })
         .catch(() => undefined);
     };
 
     refreshHint();
-    const interval = setInterval(refreshHint, 1500);
+    const interval = setInterval(refreshHint, 3000);
 
     return () => {
       cancelled = true;
@@ -209,7 +222,7 @@ export default function SeekerRadarScreen() {
 
         <RadarView hint={radarHint} />
 
-        <DevGpsControl defaultDistance={60} />
+        <DevGpsControl defaultDistance={40} />
 
         <View style={{ gap: 10, width: '100%' }}>
           <GameButton label={manualCapturePending ? 'Capturando...' : t('radar.capture')} onPress={handleSimulateCapture} variant="capture" />
