@@ -16,6 +16,16 @@ export type PlayerLocationSyncState = {
   status: LocationSyncStatus;
 };
 
+function getLocationErrorMessage(error: unknown) {
+  const message = error instanceof Error ? error.message : undefined;
+
+  if (message?.toLowerCase().includes('timeout')) {
+    return 'GPS demorando para responder. Tente ficar em area aberta.';
+  }
+
+  return message || 'Nao foi possivel iniciar o GPS.';
+}
+
 export function usePlayerLocationSync(enabled: boolean): PlayerLocationSyncState {
   const { updatePlayerLocation } = useRoom();
   const lastSyncAttemptAtRef = useRef(0);
@@ -95,7 +105,7 @@ export function usePlayerLocationSync(enabled: boolean): PlayerLocationSyncState
             (error) => {
               if (isMounted) {
                 setState({
-                  error: error.message || 'Nao foi possivel iniciar o GPS.',
+                  error: getLocationErrorMessage(error),
                   status: error.code === error.PERMISSION_DENIED ? 'denied' : 'error',
                 });
               }
@@ -137,7 +147,7 @@ export function usePlayerLocationSync(enabled: boolean): PlayerLocationSyncState
       } catch (error) {
         if (isMounted) {
           setState({
-            error: error instanceof Error ? error.message : 'Nao foi possivel iniciar o GPS.',
+            error: getLocationErrorMessage(error),
             status: 'error',
           });
         }

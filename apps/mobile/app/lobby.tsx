@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
@@ -88,6 +89,12 @@ export default function LobbyScreen() {
     if (!canLeaderStart) return;
 
     try {
+      const permission = await Location.getForegroundPermissionsAsync();
+      if (permission.status !== Location.PermissionStatus.GRANTED) {
+        router.push('/location-permission');
+        return;
+      }
+
       const started = await startRound();
       if (started) {
         router.push('/hide-phase');
