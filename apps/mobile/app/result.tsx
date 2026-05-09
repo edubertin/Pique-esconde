@@ -99,11 +99,11 @@ export default function ResultScreen() {
           <View
             style={{
               alignItems: 'center',
-              height: 156,
+              height: 176,
               justifyContent: 'center',
-              width: 156,
+              width: 176,
             }}>
-            <Image contentFit="contain" source={highlightAvatar.celebrateImage} style={{ height: 154, width: 154 }} />
+            <Image contentFit="contain" source={highlightAvatar.celebrateImage} style={{ height: 174, width: 174 }} />
           </View>
           <Text selectable style={{ color: colors.ink, fontSize: 30, fontWeight: '900', textAlign: 'center' }}>
             {resultTitle}
@@ -124,16 +124,6 @@ export default function ResultScreen() {
           />
         </View>
 
-        <View
-          style={{
-            ...surfaces.warningTile,
-            borderRadius: 16,
-            padding: 14,
-          }}>
-          <Text selectable style={{ color: colors.ink, fontSize: 15, fontWeight: '800', lineHeight: 21, textAlign: 'center' }}>
-            {t('result.summary', { summary })}
-          </Text>
-        </View>
       </MenuPanel>
     </PrototypeScreen>
   );
