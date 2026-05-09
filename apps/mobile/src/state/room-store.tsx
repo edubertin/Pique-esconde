@@ -71,7 +71,7 @@ export type CaptureAttempt = {
   capturedPlayerId?: string;
   confirmRemainingSeconds?: number;
   distanceMeters?: number;
-  reason?: 'confirming' | 'no_target_in_range' | 'seeker_signal_unstable';
+  reason?: 'confirming' | 'no_target_in_range' | 'no_target_signal' | 'seeker_signal_unstable';
   remainingHiders?: number;
   targetPlayerId?: string;
 };
@@ -132,6 +132,15 @@ const RoomContext = createContext<RoomStore | undefined>(undefined);
 
 function getErrorMessage(error: unknown) {
   if (error instanceof Error) return error.message;
+  if (typeof error === 'object' && error) {
+    const supabaseError = error as { code?: unknown; details?: unknown; hint?: unknown; message?: unknown };
+    const parts = [supabaseError.message, supabaseError.details, supabaseError.hint]
+      .filter((value): value is string => typeof value === 'string' && value.trim().length > 0);
+
+    if (parts.length > 0) return parts.join(' ');
+    if (typeof supabaseError.code === 'string') return `Erro Supabase: ${supabaseError.code}`;
+  }
+
   return 'Nao foi possivel sincronizar a sala agora.';
 }
 
