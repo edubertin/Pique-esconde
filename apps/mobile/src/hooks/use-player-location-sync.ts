@@ -4,6 +4,10 @@ import { useEffect, useRef, useState } from 'react';
 import { useRoom } from '@/src/state/room-store';
 
 type LocationSyncStatus = 'idle' | 'requesting' | 'active' | 'denied' | 'unavailable' | 'error';
+type LocationSubscriptionLike = {
+  remove?: () => void;
+  unsubscribe?: () => void;
+};
 
 export type PlayerLocationSyncState = {
   error?: string;
@@ -22,7 +26,7 @@ export function usePlayerLocationSync(enabled: boolean): PlayerLocationSyncState
 
   useEffect(() => {
     let isMounted = true;
-    let subscription: Location.LocationSubscription | undefined;
+    let subscription: LocationSubscriptionLike | undefined;
 
     async function startLocationSync() {
       if (!enabled) {
@@ -93,7 +97,11 @@ export function usePlayerLocationSync(enabled: boolean): PlayerLocationSyncState
 
     return () => {
       isMounted = false;
-      subscription?.remove();
+      if (typeof subscription?.remove === 'function') {
+        subscription.remove();
+      } else if (typeof subscription?.unsubscribe === 'function') {
+        subscription.unsubscribe();
+      }
     };
   }, [enabled]);
 
