@@ -18,6 +18,7 @@ export type GameResult = {
   highlightAvatarId?: string;
   highlightPlayerId: string;
   highlightNickname?: string;
+  playerCount?: number;
   seekerAvatarId?: string;
   seekerNickname?: string;
   seekerPlayerId?: string;

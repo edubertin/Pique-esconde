@@ -74,6 +74,7 @@ type RemoteResult = {
   highlightAvatarId?: string;
   highlightPlayerId: string;
   highlightNickname?: string;
+  playerCount?: number;
   seekerAvatarId?: string;
   seekerNickname?: string;
   seekerPlayerId?: string;
@@ -129,6 +130,7 @@ function mapResult(result: RemoteResult | null): GameResult | undefined {
     highlightAvatarId: result.highlightAvatarId,
     highlightPlayerId: result.highlightPlayerId ?? '',
     highlightNickname: result.highlightNickname,
+    playerCount: result.playerCount,
     seekerAvatarId: result.seekerAvatarId,
     seekerNickname: result.seekerNickname,
     seekerPlayerId: result.seekerPlayerId,

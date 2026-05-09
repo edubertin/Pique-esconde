@@ -53,6 +53,7 @@ export default function ResultScreen() {
   const highlightName = result?.highlightNickname ?? highlightPlayer?.nickname ?? t('social.placeholder');
   const winner = result?.winner ?? 'hiders';
   const capturedCount = result?.capturedPlayerIds.length ?? Math.min(2, hiders.length);
+  const playerCount = result?.playerCount ?? players.length;
   const seekerName = result?.seekerNickname ?? seeker?.nickname;
   const resultTitle = winner === 'seeker' && seekerName ? t('result.seekerWonBy', { name: seekerName }) : winner === 'seeker' ? t('result.seekerWon') : t('result.hidersWon');
   const highlightReason = winner === 'seeker' ? t('result.highlightSeeker') : t('result.highlightHiders');
@@ -124,7 +125,7 @@ export default function ResultScreen() {
 
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
           <ResultStat label={t('result.time')} value={result?.durationLabel ?? '3min'} />
-          <ResultStat label={t('result.players')} value={`${players.length || 4}`} />
+          <ResultStat label={t('result.players')} value={`${playerCount || 4}`} />
           <ResultStat label={t('result.captured')} value={`${capturedCount}`} />
           <ResultStat
             label={winner === 'seeker' ? t('result.seeker') : t('result.highlight')}
