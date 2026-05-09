@@ -1,7 +1,7 @@
 import { Text, View } from 'react-native';
 
 import { BrandLogo } from '@/src/components/brand-logo';
-import { GameButton } from '@/src/components/game-button';
+import { GameLinkButton } from '@/src/components/game-button';
 import { Panel, PrototypeScreen } from '@/src/components/prototype-screen';
 import { t } from '@/src/i18n';
 import { useRoom } from '@/src/state/room-store';
@@ -36,8 +36,8 @@ export default function HomeScreen() {
           }}>
           <BrandLogo />
           <View style={{ gap: 12, width: '100%' }}>
-            <GameButton href="/create-room" label={t('home.createRoom')} />
-            <GameButton href="/join-room" label={t('home.joinWithCode')} variant="secondary" />
+            <GameLinkButton href="/create-room" label={t('home.createRoom')} />
+            <GameLinkButton href="/join-room" label={t('home.joinWithCode')} variant="secondary" />
           </View>
           <Text selectable style={{ color: colors.muted, fontSize: 13, fontWeight: '800', textAlign: 'center' }}>
             {t('common.playersRange')}

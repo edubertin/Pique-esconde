@@ -1,5 +1,5 @@
 import { Image } from 'expo-image';
-import { useRouter } from 'expo-router';
+import { useRef, useState } from 'react';
 import { Text, View } from 'react-native';
 
 import { ActionGrid } from '@/src/components/action-grid';
@@ -34,10 +34,12 @@ function ResultStat({ label, value }: { label: string; value: string }) {
 }
 
 export default function ResultScreen() {
-  const router = useRouter();
-  const { leaveRoom, rematch, room } = useRoom();
-  const players = room?.players ?? [];
-  const result = room?.result;
+  const { error, finalResultSnapshot, leaveRoom, rematch, room } = useRoom();
+  const [pendingAction, setPendingAction] = useState<'leave' | 'rematch'>();
+  const rematchStartedRef = useRef(false);
+  const leaveStartedRef = useRef(false);
+  const players = finalResultSnapshot?.players ?? room?.players ?? [];
+  const result = finalResultSnapshot?.result ?? room?.result;
   const hasClosedResult = Boolean(result);
   const seeker =
     players.find((player) => player.id === result?.seekerPlayerId) ??
@@ -62,23 +64,51 @@ export default function ResultScreen() {
       ? t('result.summarySeeker', { name: seekerName ?? t('player.roleLeaderSeeker') })
       : t('result.summaryHiders', { name: highlightName });
 
-  const handleRematch = async () => {
-    try {
-      await rematch();
-      router.replace('/lobby');
-    } catch {
-      // Keep result visible if the room cannot sync.
-    }
+  if ((!room || room.phase !== 'finished') && !finalResultSnapshot) {
+    return null;
+  }
+
+  if (!result) {
+    return (
+      <PrototypeScreen>
+        <MenuPanel showBack={false} title={t('result.title')}>
+          <Text selectable style={{ color: colors.muted, fontSize: 16, fontWeight: '900', textAlign: 'center' }}>
+            Fechando resultado...
+          </Text>
+        </MenuPanel>
+      </PrototypeScreen>
+    );
+  }
+
+  const handleRematch = () => {
+    if (rematchStartedRef.current) return;
+
+    rematchStartedRef.current = true;
+    setPendingAction('rematch');
+    rematch()
+      .catch(() => {
+        // The room store surfaces the error if cleanup fails.
+      })
+      .finally(() => {
+        rematchStartedRef.current = false;
+        setPendingAction(undefined);
+      });
   };
 
-  const handleLeaveRoom = async () => {
-    try {
-      await leaveRoom();
-      router.replace('/');
-    } catch {
-      // Keep result visible if the room cannot sync.
-    }
-  };
+  const handleLeaveRoom = () => {
+    if (leaveStartedRef.current) return;
+
+    leaveStartedRef.current = true;
+    setPendingAction('leave');
+    leaveRoom()
+      .catch(() => {
+        // The room store surfaces the error if cleanup fails.
+      })
+      .finally(() => {
+        leaveStartedRef.current = false;
+        setPendingAction(undefined);
+      });
+  }
 
   return (
     <PrototypeScreen>
@@ -87,11 +117,20 @@ export default function ResultScreen() {
         title={t('result.title')}
         actions={
           <>
-            <GameButton label={t('result.playAgain')} onPress={handleRematch} />
+            <GameButton
+              disabled={Boolean(pendingAction)}
+              label={pendingAction === 'rematch' ? 'Sincronizando...' : t('result.playAgain')}
+              onPress={handleRematch}
+            />
             <ActionGrid
               actions={[
-                { label: t('common.exit'), onPress: handleLeaveRoom, variant: 'danger' },
-                { href: '/social-card', label: t('common.share'), variant: 'ghost' },
+                {
+                  disabled: Boolean(pendingAction),
+                  label: pendingAction === 'leave' ? 'Saindo...' : t('common.exit'),
+                  onPress: handleLeaveRoom,
+                  variant: 'danger',
+                },
+                { disabled: Boolean(pendingAction), href: '/social-card', label: t('common.share'), variant: 'ghost' },
               ]}
             />
           </>
@@ -108,13 +147,13 @@ export default function ResultScreen() {
           <View
             style={{
               alignItems: 'center',
-              height: 176,
+              height: 144,
               justifyContent: 'center',
-              width: 176,
+              width: 144,
             }}>
-            <Image contentFit="contain" source={highlightAvatar.celebrateImage} style={{ height: 174, width: 174 }} />
+            <Image contentFit="contain" source={highlightAvatar.celebrateImage} style={{ height: 142, width: 142 }} />
           </View>
-          <Text selectable style={{ color: colors.ink, fontSize: 30, fontWeight: '900', textAlign: 'center' }}>
+          <Text selectable style={{ color: colors.ink, fontSize: 28, fontWeight: '900', textAlign: 'center' }}>
             {resultTitle}
           </Text>
           <Badge label={highlightReason} tone="ready" />
@@ -133,6 +172,11 @@ export default function ResultScreen() {
           />
         </View>
 
+        {error ? (
+          <Text selectable style={{ color: colors.danger, fontSize: 13, fontWeight: '900', textAlign: 'center' }}>
+            {error}
+          </Text>
+        ) : null}
       </MenuPanel>
     </PrototypeScreen>
   );

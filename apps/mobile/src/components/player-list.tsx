@@ -56,29 +56,8 @@ export function PlayerList({ activePlayerId, canRemove, onPromote, onRemove, pla
           const avatar = getAvatar(player.avatarId);
           const canRemovePlayer = canRemove && player.id !== activePlayerId;
           const canPromotePlayer = Boolean(onPromote && player.id !== activePlayerId && !player.isLeader);
-
-          return (
-            <Pressable
-              accessibilityLabel={`${player.nickname} - ${player.isLeader ? t('player.leader') : player.status}`}
-              accessibilityRole={canPromotePlayer ? 'button' : 'text'}
-              key={player.id}
-              disabled={!canPromotePlayer}
-              onPress={() => {
-                if (canPromotePlayer) {
-                  onPromote?.(player.id);
-                }
-              }}
-              style={{
-                alignItems: 'center',
-                ...(player.isLeader ? surfaces.highlightTile : surfaces.glassTile),
-                borderRadius: 18,
-                borderWidth: player.isLeader ? 2 : surfaces.glassTile.borderWidth,
-                boxShadow: player.isLeader ? '0 5px 0 rgba(255, 45, 141, 0.16)' : surfaces.glassTile.boxShadow,
-                flexDirection: 'row',
-                gap: 10,
-                height: 66,
-                padding: 10,
-              }}>
+          const content = (
+            <>
               <View
                 style={{
                   alignItems: 'center',
@@ -102,12 +81,58 @@ export function PlayerList({ activePlayerId, canRemove, onPromote, onRemove, pla
                 </Text>
               </View>
               <Badge label={player.isLeader ? t('player.leader') : player.status} tone={getTone(player)} />
+            </>
+          );
+
+          return (
+            <View
+              key={player.id}
+              style={{
+                alignItems: 'center',
+                ...(player.isLeader ? surfaces.highlightTile : surfaces.glassTile),
+                borderRadius: 18,
+                borderWidth: player.isLeader ? 2 : surfaces.glassTile.borderWidth,
+                boxShadow: player.isLeader ? '0 5px 0 rgba(255, 45, 141, 0.16)' : surfaces.glassTile.boxShadow,
+                flexDirection: 'row',
+                gap: 10,
+                height: 66,
+                padding: 10,
+              }}>
+              {canPromotePlayer ? (
+                <Pressable
+                  accessibilityLabel={`${player.nickname} - ${player.status}`}
+                  accessibilityRole="button"
+                  onPress={() => {
+                    onPromote?.(player.id);
+                  }}
+                  style={{
+                    alignItems: 'center',
+                    flex: 1,
+                    flexDirection: 'row',
+                    gap: 10,
+                    minWidth: 0,
+                  }}>
+                  {content}
+                </Pressable>
+              ) : (
+                <View
+                  accessibilityLabel={`${player.nickname} - ${player.isLeader ? t('player.leader') : player.status}`}
+                  accessibilityRole="text"
+                  style={{
+                    alignItems: 'center',
+                    flex: 1,
+                    flexDirection: 'row',
+                    gap: 10,
+                    minWidth: 0,
+                  }}>
+                  {content}
+                </View>
+              )}
               {canRemovePlayer ? (
                 <Pressable
                   accessibilityLabel={t('player.remove', { name: player.nickname })}
                   accessibilityRole="button"
-                  onPress={(event) => {
-                    event.stopPropagation();
+                  onPress={() => {
                     onRemove?.(player.id);
                   }}
                   style={{
@@ -123,7 +148,7 @@ export function PlayerList({ activePlayerId, canRemove, onPromote, onRemove, pla
                   <Ionicons color={colors.danger} name="person-remove-outline" size={18} />
                 </Pressable>
               ) : null}
-            </Pressable>
+            </View>
           );
         })}
       </ScrollView>

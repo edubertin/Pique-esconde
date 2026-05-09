@@ -4,11 +4,12 @@ import { useState } from 'react';
 import { Text, View } from 'react-native';
 
 import { Badge } from '@/src/components/badge';
-import { GameButton } from '@/src/components/game-button';
+import { GameButton, GameLinkButton } from '@/src/components/game-button';
 import { MenuPanel, PrototypeScreen } from '@/src/components/prototype-screen';
 import { t } from '@/src/i18n';
 import { useRoom } from '@/src/state/room-store';
 import { colors } from '@/src/theme/colors';
+import { enableDevGps, isDevGpsAvailable } from '@/src/utils/dev-gps';
 
 type InitialCoords = {
   accuracy?: number | null;
@@ -46,9 +47,11 @@ async function getInitialCoords(): Promise<InitialCoords> {
 
 export default function LocationPermissionScreen() {
   const router = useRouter();
-  const { leaveRoom, room, updatePlayerLocation } = useRoom();
+  const { activePlayer, addDevTargetPlayer, leaveRoom, room, updatePlayerLocation } = useRoom();
   const [error, setError] = useState<string>();
+  const [isDevRequesting, setIsDevRequesting] = useState(false);
   const [isRequesting, setIsRequesting] = useState(false);
+  const canUseDevGps = isDevGpsAvailable();
 
   const handleAllow = async () => {
     setError(undefined);
@@ -93,6 +96,25 @@ export default function LocationPermissionScreen() {
     }
   };
 
+  const handleUseDevGps = async () => {
+    setError(undefined);
+    setIsDevRequesting(true);
+
+    try {
+      enableDevGps();
+
+      if (room && activePlayer?.isLeader && room.players.length < 2) {
+        await addDevTargetPlayer();
+      }
+
+      router.push(room ? '/lobby' : '/create-room');
+    } catch {
+      setError('Nao foi possivel preparar o ambiente DEV GPS.');
+    } finally {
+      setIsDevRequesting(false);
+    }
+  };
+
   return (
     <PrototypeScreen>
       <MenuPanel
@@ -101,7 +123,15 @@ export default function LocationPermissionScreen() {
         actions={
           <>
             <GameButton label={isRequesting ? t('location.requesting') : t('location.allow')} onPress={handleAllow} />
-            <GameButton href="/" label={t('common.cancel')} variant="danger" />
+            {canUseDevGps ? (
+              <GameButton
+                disabled={isDevRequesting}
+                label={isDevRequesting ? 'Preparando DEV...' : 'Usar GPS DEV'}
+                onPress={handleUseDevGps}
+                variant="secondary"
+              />
+            ) : null}
+            <GameLinkButton href="/" label={t('common.cancel')} variant="danger" />
           </>
         }>
         <View style={{ alignItems: 'center', gap: 12 }}>
@@ -112,6 +142,11 @@ export default function LocationPermissionScreen() {
           <Text selectable style={{ color: colors.muted, fontSize: 15, lineHeight: 22, textAlign: 'center' }}>
             {t('location.body')}
           </Text>
+          {canUseDevGps ? (
+            <Text selectable style={{ color: colors.muted, fontSize: 13, fontWeight: '800', lineHeight: 18, textAlign: 'center' }}>
+              DEV: libera o lobby sem GPS real e cria um alvo pronto para calibrar radar/captura.
+            </Text>
+          ) : null}
           {error ? (
             <Text selectable style={{ color: colors.danger, fontSize: 13, fontWeight: '800', textAlign: 'center' }}>
               {error}

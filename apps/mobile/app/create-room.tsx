@@ -4,7 +4,7 @@ import { Text, TextInput, View } from 'react-native';
 
 import { AvatarChoice } from '@/src/components/avatar-choice';
 import { Badge } from '@/src/components/badge';
-import { GameButton } from '@/src/components/game-button';
+import { GameButton, GameLinkButton } from '@/src/components/game-button';
 import { MenuPanel, PrototypeScreen } from '@/src/components/prototype-screen';
 import { t } from '@/src/i18n';
 import { useRoom } from '@/src/state/room-store';
@@ -49,7 +49,7 @@ export default function CreateRoomScreen() {
         actions={
           <>
             <GameButton label={isLoading ? 'Criando...' : t('create.createRoom')} onPress={handleCreateRoom} />
-            <GameButton href="/join-room" label={t('create.joinWithCode')} variant="secondary" />
+            <GameLinkButton href="/join-room" label={t('create.joinWithCode')} variant="secondary" />
           </>
         }>
         <View style={{ alignItems: 'center', gap: 8 }}>

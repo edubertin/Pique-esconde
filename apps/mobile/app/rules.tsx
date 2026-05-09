@@ -1,7 +1,7 @@
 import { Text, View } from 'react-native';
 
 import { Badge } from '@/src/components/badge';
-import { GameButton } from '@/src/components/game-button';
+import { GameLinkButton } from '@/src/components/game-button';
 import { MenuPanel, PrototypeScreen } from '@/src/components/prototype-screen';
 import { gameRules } from '@/src/constants/game';
 import { t } from '@/src/i18n';
@@ -31,7 +31,7 @@ function RuleRow({ label, value, tone }: { label: string; tone?: 'ready' | 'wait
 export default function RulesScreen() {
   return (
     <PrototypeScreen>
-      <MenuPanel backHref="/lobby" title={t('rules.title')} actions={<GameButton href="/lobby" label={t('common.save')} />}>
+      <MenuPanel backHref="/lobby" title={t('rules.title')} actions={<GameLinkButton href="/lobby" label={t('common.save')} />}>
         <RuleRow label={t('rules.hideTime')} value={`${gameRules.hideSeconds}s`} tone="waiting" />
         <RuleRow label={t('rules.seekTime')} value="3min" tone="leader" />
         <RuleRow label={t('rules.environment')} value={t('rules.standard')} />

@@ -9,11 +9,12 @@ import { useSafeRouter } from '@/src/hooks/use-safe-router';
 import { t } from '@/src/i18n';
 import { useRoom } from '@/src/state/room-store';
 import { colors } from '@/src/theme/colors';
+import { isDevGpsEnabled } from '@/src/utils/dev-gps';
 import { formatTimer } from '@/src/utils/format-timer';
 
 export default function HidePhaseScreen() {
   const router = useSafeRouter();
-  const { activePlayer, error, isLoading, leaveRoom, markHidden, room, tickGameSession } = useRoom();
+  const { activePlayer, error, isLoading, leaveRoom, markHidden, releaseSeeker, room, tickGameSession } = useRoom();
   const [now, setNow] = useState(Date.now());
   const tickRequestedRef = useRef(false);
   const isSeeker = Boolean(activePlayer?.isLeader || activePlayer?.id === room?.gameSession?.seekerPlayerId);
@@ -32,36 +33,18 @@ export default function HidePhaseScreen() {
     ? t('hide.seekerStatusText', { hidden: hiddenCount, total: totalHiders })
     : t('hide.statusText', { hidden: hiddenCount, name: seekerName, total: totalHiders });
   const locationSync = usePlayerLocationSync(Boolean(room?.phase === 'hiding' && activePlayer));
-  const canMarkHidden = isSeeker || locationSync.status === 'active';
+  const devGpsActive = isDevGpsEnabled();
+  const canMarkHidden = isSeeker || devGpsActive || locationSync.status === 'active';
   const gpsStatusText =
-    locationSync.status === 'active'
+    devGpsActive
+      ? 'DEV GPS ativo. O alvo sintetico pode seguir sem GPS real.'
+      : locationSync.status === 'active'
       ? 'GPS pronto para salvar seu esconderijo.'
       : locationSync.status === 'denied'
         ? 'Permita a localizacao para salvar seu esconderijo.'
         : locationSync.status === 'error'
           ? locationSync.error ?? 'Nao foi possivel iniciar o GPS.'
           : 'Buscando GPS para salvar seu esconderijo...';
-
-  useEffect(() => {
-    if (!room) {
-      router.replace('/');
-      return;
-    }
-
-    if (room.players.length < 2) {
-      router.replace('/lobby');
-      return;
-    }
-
-    if (room.phase === 'seeking') {
-      router.replace(isSeeker ? '/seeker-radar' : '/hider-status');
-      return;
-    }
-
-    if (room.phase === 'finished') {
-      router.replace('/result');
-    }
-  }, [isSeeker, room, router]);
 
   useEffect(() => {
     const interval = setInterval(() => setNow(Date.now()), 500);
@@ -95,6 +78,15 @@ export default function HidePhaseScreen() {
     }
   };
 
+  const handleDevReleaseSeeker = async () => {
+    try {
+      await releaseSeeker();
+      router.push('/seeker-radar');
+    } catch {
+      // Error is shown from room store state.
+    }
+  };
+
   return (
     <PrototypeScreen>
       <MenuPanel
@@ -108,6 +100,9 @@ export default function HidePhaseScreen() {
                 label={isLoading ? 'Marcando...' : canMarkHidden ? t('hide.ready') : 'Aguardando GPS'}
                 onPress={handleMarkHidden}
               />
+            ) : null}
+            {isSeeker && devGpsActive ? (
+              <GameButton label="DEV liberar busca" onPress={handleDevReleaseSeeker} variant="secondary" />
             ) : null}
             <GameButton label={t('common.exit')} onPress={handleLeaveRoom} variant="danger" />
           </>
@@ -136,7 +131,7 @@ export default function HidePhaseScreen() {
           <Text
             selectable
             style={{
-              color: locationSync.status === 'active' ? colors.green : colors.danger,
+              color: devGpsActive || locationSync.status === 'active' ? colors.green : colors.danger,
               fontSize: 13,
               fontWeight: '900',
               textAlign: 'center',

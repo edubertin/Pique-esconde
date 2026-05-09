@@ -2,7 +2,7 @@ import { Image } from 'expo-image';
 import { Text, View } from 'react-native';
 
 import { BrandLogo } from '@/src/components/brand-logo';
-import { GameButton } from '@/src/components/game-button';
+import { GameLinkButton } from '@/src/components/game-button';
 import { MenuPanel, PrototypeScreen } from '@/src/components/prototype-screen';
 import { avatars } from '@/src/constants/game';
 import { t } from '@/src/i18n';
@@ -40,7 +40,7 @@ export default function SocialCardScreen() {
 
   return (
     <PrototypeScreen>
-      <MenuPanel backHref="/result" title={t('social.title')} actions={<GameButton href="/lobby" label={t('social.backToRoom')} />}>
+      <MenuPanel backHref="/result" title={t('social.title')} actions={<GameLinkButton href="/lobby" label={t('social.backToRoom')} />}>
         <View
           style={{
             alignItems: 'center',

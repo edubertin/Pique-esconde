@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
 import { ActionGrid } from '@/src/components/action-grid';
@@ -14,10 +14,11 @@ import { t } from '@/src/i18n';
 import { useRoom } from '@/src/state/room-store';
 import { colors } from '@/src/theme/colors';
 import { surfaces } from '@/src/theme/surfaces';
+import { isDevGpsEnabled } from '@/src/utils/dev-gps';
 
 export default function LobbyScreen() {
   const router = useSafeRouter();
-  const { activePlayer, addDemoPlayer, error, isLoading, leaveRoom, promoteLeader, removePlayer, room, startRound, toggleReady } = useRoom();
+  const { activePlayer, addDemoPlayer, addDevTargetPlayer, error, isLoading, leaveRoom, promoteLeader, removePlayer, room, startRound, toggleReady } = useRoom();
   const [copied, setCopied] = useState(false);
   const players = room?.players ?? [];
   const isLeader = Boolean(activePlayer?.isLeader);
@@ -44,27 +45,6 @@ export default function LobbyScreen() {
         ? { body: t('lobby.notEnoughPlayersBody'), title: t('lobby.roundInterruptedTitle') }
         : undefined;
 
-  useEffect(() => {
-    if (!room) {
-      router.replace('/');
-      return;
-    }
-
-    if (room.phase === 'hiding') {
-      router.replace('/hide-phase');
-      return;
-    }
-
-    if (room.phase === 'seeking') {
-      router.replace(activePlayer?.isLeader ? '/seeker-radar' : '/hider-status');
-      return;
-    }
-
-    if (room.phase === 'finished') {
-      router.replace('/result');
-    }
-  }, [activePlayer?.isLeader, room, router]);
-
   const handleCopyCode = async () => {
     if (!room?.code) return;
 
@@ -86,6 +66,8 @@ export default function LobbyScreen() {
   };
 
   const ensureLocationPermission = async () => {
+    if (isDevGpsEnabled()) return true;
+
     const permission = await Location.getForegroundPermissionsAsync();
     if (permission.status === Location.PermissionStatus.GRANTED) return true;
 
@@ -109,6 +91,11 @@ export default function LobbyScreen() {
   };
 
   const handleAddDemoPlayer = () => {
+    if (isDevGpsEnabled() && isLeader) {
+      addDevTargetPlayer().catch(() => undefined);
+      return;
+    }
+
     addDemoPlayer().catch(() => undefined);
   };
 

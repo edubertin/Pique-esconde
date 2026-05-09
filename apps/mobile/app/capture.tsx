@@ -1,16 +1,16 @@
-import { useRouter } from 'expo-router';
 import { Text, View } from 'react-native';
 
 import { Badge } from '@/src/components/badge';
 import { GameButton } from '@/src/components/game-button';
 import { MenuPanel, PrototypeScreen } from '@/src/components/prototype-screen';
+import { useSafeRouter } from '@/src/hooks/use-safe-router';
 import { t } from '@/src/i18n';
 import { useRoom } from '@/src/state/room-store';
 import { colors } from '@/src/theme/colors';
 import { surfaces } from '@/src/theme/surfaces';
 
 export default function CaptureScreen() {
-  const router = useRouter();
+  const router = useSafeRouter();
   const { activePlayer, finishRound, leaveRoom, room } = useRoom();
   const capturedPlayer = room?.players.find((player) => player.status === 'Capturado');
   const seekerPlayerId = room?.gameSession?.seekerPlayerId ?? room?.players.find((player) => player.isLeader)?.id;

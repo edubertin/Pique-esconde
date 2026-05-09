@@ -189,3 +189,20 @@ Decisao operacional:
 - Continuar usando ferramenta DEV para aproximar/afastar distancia no radar.
 - Usar celular real para permissao e sensor.
 - Nao abrir nova grande camada ate estabilizar a pagina de jogo.
+
+## Atualizacao 2026-05-09 - Resultado e Backend
+
+Base atual:
+
+- Fluxos `Resultado -> Jogar novamente -> Lobby` e `Resultado -> Sair -> Home` foram estabilizados no cliente.
+- O app usa guard central de rota e snapshot terminal do resultado para evitar piscadas causadas por eventos realtime atrasados.
+- `Sair -> Home -> Criar sala` foi validado apos uma rodada completa.
+- A tela de Resultado ainda pode aguardar o `room.result` final chegar pelo Supabase Realtime antes de preencher vencedor/estatisticas.
+
+Proxima atualizacao recomendada:
+
+- Evoluir `pe_finish_round`, `pe_try_capture_nearest` e caminhos de timeout/tick para retornar o snapshot final completo da rodada no mesmo retorno da acao.
+- Fazer a finalizacao ser idempotente: se a rodada ja estiver encerrada, a RPC retorna o mesmo resultado existente sem recalcular.
+- Adicionar `gameSessionId` e `finishedAt` ao payload de `result`.
+- Aplicar o snapshot final imediatamente no `room-store`; usar Realtime posterior apenas como confirmacao.
+- Manter uma tela contextual de "apurando resultado" apenas como fallback de rede, sem popup modal.

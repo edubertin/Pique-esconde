@@ -12,6 +12,7 @@ import { useSafeRouter } from '@/src/hooks/use-safe-router';
 import { t } from '@/src/i18n';
 import { type RadarHint, useRoom } from '@/src/state/room-store';
 import { colors } from '@/src/theme/colors';
+import { getStoredDevGpsDistance, isDevGpsEnabled } from '@/src/utils/dev-gps';
 import { formatTimer } from '@/src/utils/format-timer';
 
 export default function SeekerRadarScreen() {
@@ -31,18 +32,6 @@ export default function SeekerRadarScreen() {
   const timerLabel = seekEndsAt ? formatTimer(remainingSeconds) : t('radar.timerEnded');
   const autoCaptureEnabled = !__DEV__;
   usePlayerLocationSync(room?.phase === 'seeking');
-
-  useEffect(() => {
-    if (!room) {
-      router.replace('/');
-      return;
-    }
-
-    if (room.phase === 'finished') {
-      router.replace('/result');
-      return;
-    }
-  }, [room, router]);
 
   useEffect(() => {
     if (room?.phase !== 'seeking' || remainingHiders > 0 || tickRequestedRef.current) return;
@@ -150,7 +139,20 @@ export default function SeekerRadarScreen() {
     try {
       setCaptureMessage(undefined);
       setManualCapturePending(true);
-      const payload = await tryCaptureNearest();
+
+      if (isDevGpsEnabled() && getStoredDevGpsDistance() > 5) {
+        const hint = await getRadarHint();
+        if (hint) setRadarHint(hint);
+        setCaptureMessage(t('radar.noCaptureSignal'));
+        return;
+      }
+
+      let payload = await tryCaptureNearest();
+      if (isDevGpsEnabled() && payload?.reason === 'confirming') {
+        await new Promise((resolve) => setTimeout(resolve, 120));
+        payload = await tryCaptureNearest();
+      }
+
       if (payload?.capturedPlayerId) {
         router.push('/capture');
         return;

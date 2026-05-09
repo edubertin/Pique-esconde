@@ -25,6 +25,45 @@ function RadarRing({ size }: { size: `${number}%` }) {
   );
 }
 
+function RadarArrow({ angle, color }: { angle: number; color: string }) {
+  return (
+    <View
+      style={{
+        alignItems: 'center',
+        height: '72%',
+        justifyContent: 'flex-start',
+        pointerEvents: 'none',
+        position: 'absolute',
+        transform: [{ rotate: `${angle}deg` }],
+        width: 44,
+      }}>
+      <View
+        style={{
+          borderBottomColor: color,
+          borderBottomWidth: 34,
+          borderLeftColor: 'transparent',
+          borderLeftWidth: 18,
+          borderRightColor: 'transparent',
+          borderRightWidth: 18,
+          height: 0,
+          width: 0,
+        }}
+      />
+      <View
+        style={{
+          backgroundColor: color,
+          borderBottomLeftRadius: 999,
+          borderBottomRightRadius: 999,
+          boxShadow: `0 0 18px ${color}`,
+          height: '42%',
+          marginTop: -2,
+          width: 14,
+        }}
+      />
+    </View>
+  );
+}
+
 export function RadarView({ hint, rush = false }: { hint?: RadarHint; rush?: boolean }) {
   const { width } = useWindowDimensions();
   const hasNoTarget = hint?.reason === 'no_target_signal';
@@ -36,6 +75,7 @@ export function RadarView({ hint, rush = false }: { hint?: RadarHint; rush?: boo
   const angle = hint?.angleDegrees ?? (rush ? 42 : 28);
   const radarSize = Math.min(Math.max(width * 0.76, 258), 348);
   const targetColor = band === 'none' ? 'rgba(255,255,255,0.55)' : meta.color;
+  const arrowColor = band === 'none' ? 'rgba(142, 246, 193, 0.42)' : meta.color;
   const statusLabel = hasNoTarget ? 'Sem alvo ativo' : seekerSignalLost ? 'GPS sem sinal' : freshOutOfRange ? 'Fora de alcance' : meta.label;
   const statusBody = hasNoTarget
     ? 'Nenhum escondido ativo na rodada'
@@ -65,39 +105,17 @@ export function RadarView({ hint, rush = false }: { hint?: RadarHint; rush?: boo
         <View style={{ backgroundColor: 'rgba(142, 246, 193, 0.18)', height: 2, position: 'absolute', width: '88%' }} />
         <View style={{ backgroundColor: 'rgba(142, 246, 193, 0.18)', height: '88%', position: 'absolute', width: 2 }} />
 
-        <View
-          style={{
-            backgroundColor: 'rgba(100, 255, 190, 0.20)',
-            height: 12,
-            position: 'absolute',
-            transform: [{ rotate: `${angle}deg` }],
-            width: '48%',
-          }}
-        />
-
-        <View
-          style={{
-            backgroundColor: targetColor,
-            borderColor: colors.surface,
-            borderRadius: 999,
-            borderWidth: 3,
-            boxShadow: `0 0 18px ${targetColor}`,
-            height: 22,
-            position: 'absolute',
-            right: '28%',
-            top: band === 'hot' ? '20%' : '29%',
-            width: 22,
-          }}
-        />
+        <RadarArrow angle={angle} color={arrowColor} />
 
         <View
           style={{
             backgroundColor: colors.surface,
             borderColor: '#8EF6C1',
             borderRadius: 999,
-            borderWidth: 4,
-            height: 28,
-            width: 28,
+            borderWidth: 3,
+            boxShadow: `0 0 14px ${targetColor}`,
+            height: 32,
+            width: 32,
           }}
         />
 

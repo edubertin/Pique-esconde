@@ -230,3 +230,19 @@ Riscos ainda abertos:
 - Radar/direcao precisam de calibracao em campo.
 - Navegador desktop nao e fonte confiavel para GPS real.
 - Captura automatica precisa de mais testes com dois ou mais celulares reais.
+
+## Atualizacao 2026-05-09 - Contrato de Resultado
+
+Estado atual:
+
+- O Resultado e tratado no app como tela terminal da rodada.
+- O cliente congela um snapshot final quando recebe `room.phase = finished` com `room.result`.
+- O guard de rotas evita que snapshots realtime atrasados tirem o jogador de `/result` ou `/social-card`.
+- Refreshes concorrentes do realtime sao descartados quando uma resposta antiga chega depois de uma mais nova.
+
+Contrato desejado para a proxima etapa:
+
+- Mutacoes que encerram rodada devem retornar um snapshot autoritativo da sala junto com a resposta da RPC.
+- `pe_finish_round`, `pe_try_capture_nearest` e caminhos de timeout/tick devem gravar e retornar o mesmo resultado final quando a rodada ja estiver encerrada.
+- O payload de `result` deve incluir `gameSessionId` e `finishedAt`.
+- O Realtime deve continuar sincronizando outros clientes, mas o cliente que encerrou a rodada nao deve depender do proximo evento realtime para preencher a tela de Resultado.

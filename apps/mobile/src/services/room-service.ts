@@ -2,7 +2,7 @@ import type { RealtimeChannel } from '@supabase/supabase-js';
 
 import { gameRules } from '@/src/constants/game';
 import { assertSupabase } from '@/src/services/supabase-client';
-import type { CaptureAttempt, GameResult, GameSession, HiderDangerHint, LobbyNotice, PlayerLocationInput, PlayerStatus, RadarHint, RoomDebugSnapshot, RoomPlayer } from '@/src/state/room-store';
+import type { CaptureAttempt, DevGpsDirection, GameResult, GameSession, HiderDangerHint, LobbyNotice, PlayerLocationInput, PlayerStatus, RadarHint, RoomDebugSnapshot, RoomPlayer } from '@/src/state/room-store';
 
 export type RemoteRoomPhase = 'lobby' | 'hiding' | 'seeking' | 'finished';
 
@@ -198,7 +198,9 @@ async function fetchSnapshot(roomId: string, activePlayerId?: string, activePlay
   if (exitNoticeError) throw exitNoticeError;
 
   const mappedPlayers = ((players ?? []) as RemotePlayerRow[]).map(mapPlayer);
-  const gameSession = mapGameSession(((gameSessions ?? []) as RemoteGameSessionRow[])[0]);
+  const roomRow = room as RemoteRoomRow;
+  const latestGameSession = mapGameSession(((gameSessions ?? []) as RemoteGameSessionRow[])[0]);
+  const gameSession = roomRow.phase === 'lobby' ? undefined : latestGameSession;
   const exitNotice = ((exitNotices ?? []) as RemotePlayerExitNoticeRow[])[0];
 
   return {
@@ -206,16 +208,16 @@ async function fetchSnapshot(roomId: string, activePlayerId?: string, activePlay
     activePlayerExitReason: exitNotice?.reason,
     activePlayerToken,
     room: {
-      closedReason: (room as RemoteRoomRow).closed_reason ?? undefined,
-      code: (room as RemoteRoomRow).code,
-      expiresAt: (room as RemoteRoomRow).expires_at ? new Date((room as RemoteRoomRow).expires_at as string).getTime() : undefined,
+      closedReason: roomRow.closed_reason ?? undefined,
+      code: roomRow.code,
+      expiresAt: roomRow.expires_at ? new Date(roomRow.expires_at).getTime() : undefined,
       gameSession,
-      id: (room as RemoteRoomRow).id,
-      lobbyNotice: mapLobbyNotice((room as RemoteRoomRow).lobby_notice),
-      maxPlayers: (room as RemoteRoomRow).max_players,
-      phase: (room as RemoteRoomRow).phase,
+      id: roomRow.id,
+      lobbyNotice: mapLobbyNotice(roomRow.lobby_notice),
+      maxPlayers: roomRow.max_players,
+      phase: roomRow.phase,
       players: mappedPlayers,
-      result: mapResult((room as RemoteRoomRow).result),
+      result: mapResult(roomRow.result),
     },
   };
 }
@@ -226,6 +228,16 @@ export const roomService = {
     const { error } = await client.rpc('pe_add_demo_player', {
       actor_player_id: activePlayerId,
       max_players: gameRules.maxPlayers,
+      player_session_token: activePlayerToken,
+      target_room_id: roomId,
+    });
+
+    if (error) throw error;
+  },
+  async addDevTargetPlayer(roomId: string, activePlayerId: string, activePlayerToken: string) {
+    const client = assertSupabase();
+    const { error } = await client.rpc('pe_dev_add_target_player', {
+      actor_player_id: activePlayerId,
       player_session_token: activePlayerToken,
       target_room_id: roomId,
     });
@@ -453,10 +465,19 @@ export const roomService = {
 
     return data as CapturePayload | null;
   },
-  async updateDevTestDistance(roomId: string, activePlayerId: string, activePlayerToken: string, distanceMeters: number) {
+  async updateDevTestDistance(
+    roomId: string,
+    activePlayerId: string,
+    activePlayerToken: string,
+    distanceMeters: number,
+    bearingDegrees = 0,
+    cardinal: DevGpsDirection = 'N',
+  ) {
     const client = assertSupabase();
     const { error } = await client.rpc('pe_dev_set_test_distance', {
       actor_player_id: activePlayerId,
+      bearing_degrees: bearingDegrees,
+      cardinal,
       distance_meters: distanceMeters,
       player_session_token: activePlayerToken,
       target_room_id: roomId,

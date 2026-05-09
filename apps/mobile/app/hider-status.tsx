@@ -33,27 +33,6 @@ export default function HiderStatusScreen() {
   usePlayerLocationSync(Boolean(room?.phase === 'seeking' && activePlayer));
 
   useEffect(() => {
-    if (!room) {
-      router.replace('/');
-      return;
-    }
-
-    if (activePlayer?.status === 'Capturado') {
-      router.replace('/capture');
-      return;
-    }
-
-    if (room.phase === 'finished') {
-      router.replace('/result');
-      return;
-    }
-
-    if (activePlayer?.isLeader) {
-      router.replace('/seeker-radar');
-    }
-  }, [activePlayer?.isLeader, activePlayer?.status, room, router]);
-
-  useEffect(() => {
     const interval = setInterval(() => setNow(Date.now()), 500);
     return () => clearInterval(interval);
   }, []);

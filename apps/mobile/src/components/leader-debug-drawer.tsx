@@ -94,7 +94,7 @@ export function LeaderDebugDrawer({ radarHint }: { radarHint?: RadarHint }) {
   };
 
   return (
-    <View pointerEvents="box-none" style={{ left: -14, position: 'absolute', top: 112, zIndex: 30 }}>
+    <View style={{ left: -14, pointerEvents: 'box-none', position: 'absolute', top: 112, zIndex: 30 }}>
       <Pressable
         accessibilityLabel={isOpen ? 'Fechar debug' : 'Abrir debug'}
         accessibilityRole="button"

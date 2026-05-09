@@ -1,6 +1,7 @@
-import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
 import { roomService } from '@/src/services/room-service';
+import { disableDevGps, isDevGpsEnabled } from '@/src/utils/dev-gps';
 
 export type PlayerStatus = 'Entrou' | 'Preparado' | 'Aguardando' | 'Escondendo' | 'Escondido' | 'Procurando' | 'Capturado';
 
@@ -26,6 +27,15 @@ export type GameResult = {
   winner: 'seeker' | 'hiders';
 };
 
+export type FinalResultSnapshot = {
+  capturedAtClient: number;
+  gameSessionId?: string;
+  players: RoomPlayer[];
+  result: GameResult;
+  roomCode: string;
+  roomId: string;
+};
+
 export type GameSession = {
   hideDurationSeconds: number;
   hideEndsAt: number;
@@ -45,6 +55,8 @@ export type PlayerLocationInput = {
   lng: number;
   speedMetersPerSecond?: number;
 };
+
+export type DevGpsDirection = 'E' | 'N' | 'S' | 'W';
 
 export type RadarHint = {
   angleDegrees?: number;
@@ -140,11 +152,13 @@ type Room = {
 type RoomStore = {
   activePlayer?: RoomPlayer;
   addDemoPlayer: () => Promise<void>;
+  addDevTargetPlayer: () => Promise<void>;
   clearDevTestDistance: () => Promise<void>;
   clearError: () => void;
   clearNotice: () => void;
   createRoom: (input: PlayerInput) => Promise<void>;
   error?: string;
+  finalResultSnapshot?: FinalResultSnapshot;
   finishRound: (winner?: GameResult['winner']) => Promise<void>;
   getHiderDangerHint: () => Promise<HiderDangerHint | undefined>;
   getRadarHint: () => Promise<RadarHint | undefined>;
@@ -164,7 +178,7 @@ type RoomStore = {
   tickGameSession: () => Promise<void>;
   toggleReady: () => Promise<void>;
   tryCaptureNearest: () => Promise<CaptureAttempt | undefined>;
-  updateDevTestDistance: (distanceMeters: number) => Promise<void>;
+  updateDevTestDistance: (distanceMeters: number, bearingDegrees?: number, cardinal?: DevGpsDirection) => Promise<void>;
   updatePlayerLocation: (input: PlayerLocationInput) => Promise<void>;
 };
 
@@ -206,31 +220,78 @@ export function RoomProvider({ children }: { children: ReactNode }) {
   const [activePlayerToken, setActivePlayerToken] = useState<string>();
   const [error, setError] = useState<string>();
   const [isLoading, setIsLoading] = useState(false);
+  const [finalResultSnapshot, setFinalResultSnapshot] = useState<FinalResultSnapshot>();
   const [room, setRoom] = useState<Room>();
   const [roomNotice, setRoomNotice] = useState<RoomStore['roomNotice']>();
+  const finalResultSnapshotRef = useRef<FinalResultSnapshot | undefined>(undefined);
+  const ignoredRoomIdsRef = useRef(new Set<string>());
+  const leavingRoomRef = useRef(false);
+  const refreshSeqRef = useRef(0);
+  const suppressRemovalNoticeRef = useRef(false);
+
+  const clearFinalResultSnapshot = useCallback(() => {
+    finalResultSnapshotRef.current = undefined;
+    setFinalResultSnapshot(undefined);
+  }, []);
 
   const applySnapshot = useCallback(
     (snapshot: Awaited<ReturnType<typeof roomService.fetchSnapshot>>) => {
+      if (ignoredRoomIdsRef.current.has(snapshot.room.id)) {
+        return;
+      }
+
       if (activePlayerId && !snapshot.activePlayer) {
         setActivePlayerId(undefined);
         setActivePlayerToken(undefined);
         setError(undefined);
-        setRoomNotice(snapshot.activePlayerExitReason ?? 'removed');
+        setRoomNotice(leavingRoomRef.current || suppressRemovalNoticeRef.current ? undefined : snapshot.activePlayerExitReason ?? 'removed');
         setRoom(undefined);
+        clearFinalResultSnapshot();
         return;
+      }
+
+      const currentFinalResult = finalResultSnapshotRef.current;
+      const snapshotGameSessionId = snapshot.room.gameSession?.id;
+      const isSameFinishedRound =
+        currentFinalResult?.roomId === snapshot.room.id &&
+        (!currentFinalResult.gameSessionId || !snapshotGameSessionId || currentFinalResult.gameSessionId === snapshotGameSessionId);
+
+      if (currentFinalResult && isSameFinishedRound && snapshot.room.phase !== 'finished' && snapshot.room.phase !== 'lobby') {
+        return;
+      }
+
+      if (snapshot.room.phase === 'finished' && snapshot.room.result) {
+        if (!currentFinalResult || !isSameFinishedRound) {
+          const nextFinalResult: FinalResultSnapshot = {
+            capturedAtClient: Date.now(),
+            gameSessionId: snapshotGameSessionId,
+            players: snapshot.room.players,
+            result: snapshot.room.result,
+            roomCode: snapshot.room.code,
+            roomId: snapshot.room.id,
+          };
+
+          finalResultSnapshotRef.current = nextFinalResult;
+          setFinalResultSnapshot(nextFinalResult);
+        }
+      } else if (snapshot.room.phase === 'lobby') {
+        clearFinalResultSnapshot();
       }
 
       setRoom(snapshot.room);
       setActivePlayerId(snapshot.activePlayer?.id ?? activePlayerId);
       setActivePlayerToken(snapshot.activePlayerToken ?? activePlayerToken);
     },
-    [activePlayerId, activePlayerToken],
+    [activePlayerId, activePlayerToken, clearFinalResultSnapshot],
   );
 
   const refreshRoom = useCallback(async () => {
     if (!room?.id) return;
 
+    const refreshSeq = ++refreshSeqRef.current;
     const snapshot = await roomService.fetchSnapshot(room.id, activePlayerId, activePlayerToken);
+    if (refreshSeq !== refreshSeqRef.current) return;
+
     applySnapshot(snapshot);
   }, [activePlayerId, activePlayerToken, applySnapshot, room?.id]);
 
@@ -285,12 +346,13 @@ export function RoomProvider({ children }: { children: ReactNode }) {
 
         setActivePlayerId(undefined);
         setActivePlayerToken(undefined);
+        clearFinalResultSnapshot();
         return undefined;
       });
     }, 1000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [clearFinalResultSnapshot]);
 
   const store = useMemo<RoomStore>(() => {
     const activePlayer = room?.players.find((player) => player.id === activePlayerId);
@@ -311,6 +373,7 @@ export function RoomProvider({ children }: { children: ReactNode }) {
         setRoomNotice(undefined);
       },
       error,
+      finalResultSnapshot,
       isLoading,
       room,
       roomNotice,
@@ -321,9 +384,20 @@ export function RoomProvider({ children }: { children: ReactNode }) {
           await refreshRoom();
         });
       },
+      async addDevTargetPlayer() {
+        const session = requireSession();
+        await runAction(async () => {
+          await roomService.addDevTargetPlayer(session.roomId, session.activePlayerId, session.activePlayerToken);
+          await refreshRoom();
+        });
+      },
       async createRoom(input) {
         await runAction(async () => {
+          leavingRoomRef.current = false;
+          suppressRemovalNoticeRef.current = false;
+          clearFinalResultSnapshot();
           const snapshot = await roomService.createRoom(input);
+          ignoredRoomIdsRef.current.delete(snapshot.room.id);
           applySnapshot(snapshot);
         });
       },
@@ -354,7 +428,11 @@ export function RoomProvider({ children }: { children: ReactNode }) {
       },
       async joinRoom(input) {
         await runAction(async () => {
+          leavingRoomRef.current = false;
+          suppressRemovalNoticeRef.current = false;
+          clearFinalResultSnapshot();
           const snapshot = await roomService.joinRoom(input);
+          ignoredRoomIdsRef.current.delete(snapshot.room.id);
           applySnapshot(snapshot);
         });
 
@@ -362,9 +440,13 @@ export function RoomProvider({ children }: { children: ReactNode }) {
       },
       async leaveRoom() {
         if (!room?.id || !activePlayerId || !activePlayerToken) {
+          disableDevGps();
+          leavingRoomRef.current = false;
+          suppressRemovalNoticeRef.current = false;
           setActivePlayerId(undefined);
           setActivePlayerToken(undefined);
           setRoom(undefined);
+          clearFinalResultSnapshot();
           return;
         }
 
@@ -374,11 +456,22 @@ export function RoomProvider({ children }: { children: ReactNode }) {
               ? 'left_match'
               : undefined;
 
-          await roomService.leaveRoom(room.id, activePlayerId, activePlayerToken);
+          const previousRoom = room;
+          ignoredRoomIdsRef.current.add(previousRoom.id);
+          leavingRoomRef.current = true;
+          suppressRemovalNoticeRef.current = true;
           setActivePlayerId(undefined);
           setActivePlayerToken(undefined);
           setRoomNotice(notice);
           setRoom(undefined);
+          clearFinalResultSnapshot();
+
+          if (isDevGpsEnabled()) {
+            await roomService.clearDevTestDistance(previousRoom.id, activePlayerId, activePlayerToken).catch(() => undefined);
+            disableDevGps();
+          }
+
+          await roomService.leaveRoom(previousRoom.id, activePlayerId, activePlayerToken);
         });
       },
       async markHidden() {
@@ -416,19 +509,12 @@ export function RoomProvider({ children }: { children: ReactNode }) {
       async rematch() {
         const session = requireSession();
         await runAction(async () => {
+          if (isDevGpsEnabled()) {
+            await roomService.clearDevTestDistance(session.roomId, session.activePlayerId, session.activePlayerToken).catch(() => undefined);
+          }
+
           await roomService.rematch(session.roomId, session.activePlayerId, session.activePlayerToken);
-          setRoom((currentRoom) => currentRoom
-            ? {
-                ...currentRoom,
-                closedReason: undefined,
-                phase: 'lobby',
-                result: undefined,
-                players: currentRoom.players.map((player) => ({
-                  ...player,
-                  status: player.isLeader ? 'Entrou' : 'Aguardando',
-                })),
-              }
-            : currentRoom);
+          clearFinalResultSnapshot();
           await refreshRoom();
         });
       },
@@ -482,16 +568,16 @@ export function RoomProvider({ children }: { children: ReactNode }) {
 
         return payload;
       },
-      async updateDevTestDistance(distanceMeters) {
+      async updateDevTestDistance(distanceMeters, bearingDegrees, cardinal) {
         const session = requireSession();
-        await roomService.updateDevTestDistance(session.roomId, session.activePlayerId, session.activePlayerToken, distanceMeters);
+        await roomService.updateDevTestDistance(session.roomId, session.activePlayerId, session.activePlayerToken, distanceMeters, bearingDegrees, cardinal);
       },
       async updatePlayerLocation(input) {
         const session = requireSession();
         await roomService.updatePlayerLocation(session.roomId, session.activePlayerId, session.activePlayerToken, input);
       },
     };
-  }, [activePlayerId, activePlayerToken, applySnapshot, error, isLoading, refreshRoom, refreshRoomSoft, room, roomNotice, runAction]);
+  }, [activePlayerId, activePlayerToken, applySnapshot, clearFinalResultSnapshot, error, finalResultSnapshot, isLoading, refreshRoom, refreshRoomSoft, room, roomNotice, runAction]);
 
   return <RoomContext.Provider value={store}>{children}</RoomContext.Provider>;
 }

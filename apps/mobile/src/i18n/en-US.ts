@@ -92,7 +92,7 @@ export const enUS = {
   'player.roleYou': 'You',
   'radar.capture': 'Capture',
   'radar.captureSimulation': 'Simulate capture',
-  'radar.confirmingCapture': 'Keep the target close for 3 seconds to confirm.',
+  'radar.confirmingCapture': 'Keep the target close to confirm.',
   'radar.finishHiders': 'Go to final rush',
   'radar.noCaptureSignal': 'Get closer to capture.',
   'radar.remaining': '{count} left',

@@ -39,7 +39,43 @@ Link para test run:
 
 ## Bugs Conhecidos
 
-Nenhum bug conhecido registrado ainda.
+## KI-001 - Navegacao de resultado duplicada entre botao, tela e estado
+
+Status: Resolvido em QA web
+Severidade: Alta
+Area: Navegacao / Estado / Realtime
+Detectado em: 2026-05-09
+Commit/versao: worktree local
+
+Descricao:
+- O fluxo `Resultado -> Jogar novamente -> Lobby` e `Resultado -> Sair -> Home` apresentou piscadas, voltas temporarias para `Resultado` e telas intermediarias.
+- A causa provavel e duplicidade de responsabilidade: botao com `href`, handlers com `router.replace`, effects por fase e reset otimista no `room-store` competindo com o snapshot real do Supabase.
+
+Impacto:
+- UX instavel no fim da partida.
+- Risco de regressao diferente entre Expo Web e mobile nativo.
+- Dificulta garantir que `pe_rematch` e `pe_leave_room` sejam a fonte de verdade.
+
+Passos para reproduzir:
+1. Criar sala em ambiente DEV GPS.
+2. Iniciar partida, capturar alvo e chegar em Resultado.
+3. Clicar `Jogar novamente` ou `Sair`.
+4. Observar se a tela pisca ou volta para resultado antes do destino final.
+
+Comportamento esperado:
+- `Jogar novamente` executa uma unica acao de rematch e o snapshot com `phase=lobby` leva ao lobby.
+- `Sair` executa uma unica acao de saida e o app volta para Home.
+- Botao visual, link de navegacao e mutacao de estado nao devem estar misturados.
+
+Comportamento atual:
+- Corrigido em QA web: botao visual foi separado de link, rematch deixou de fazer reset otimista estrutural e a navegacao por fase passou a ter guard central.
+
+Decisao:
+- Tratar como bug arquitetural antes de novas features de gameplay.
+- Supabase/RPC/snapshot deve ser a fonte de verdade das transicoes de sala.
+
+Link para test run:
+- `docs/qa/test-runs/2026-05-09-result-route-guard-web.md`
 
 ## Limitações Aceitas Nesta Fase
 
@@ -282,3 +318,32 @@ Impacto:
 
 Decisao:
 - Rodar QA pesado com pelo menos dois celulares reais antes de seguir para novas features grandes.
+
+## L-009 - Resultado final ainda depende de confirmacao realtime para preencher instantaneamente
+
+Status: Aberto / Proxima atualizacao
+Severidade: Media
+Area: Resultado / Backend / Realtime
+Detectado em: 2026-05-09
+Commit/versao: worktree local
+
+Descricao:
+- O Resultado foi estabilizado no cliente com snapshot terminal congelado, evitando piscadas e regressao de rota.
+- Ainda existe uma janela em que a tela pode entrar antes do payload final estar preenchido, aguardando o snapshot do Supabase Realtime confirmar `room.result`.
+- A experiencia ideal de game e a tela de Resultado abrir ja com vencedor, destaque e estatisticas prontos.
+
+Impacto:
+- UX pode parecer lenta no encerramento da rodada, mesmo sem bug de navegacao.
+- Em rede ruim, o jogador pode ver estado de fechamento por alguns segundos antes do resultado completo.
+
+Comportamento esperado:
+- A RPC que encerra a rodada deve gravar e retornar o snapshot final completo no mesmo contrato da acao.
+- O app deve aplicar esse snapshot imediatamente no store, usando o Realtime posterior apenas como confirmacao.
+
+Decisao:
+- Proxima atualizacao tecnica: evoluir backend/RPCs de finalizacao para retornar resultado completo e idempotente.
+- Incluir `gameSessionId` e `finishedAt` no payload de `result` para blindar rematch, card social e snapshots atrasados.
+- Manter o loading contextual de Resultado como fallback, nao como solucao principal.
+
+Link para test run:
+- `docs/qa/test-runs/2026-05-09-result-route-guard-web.md`

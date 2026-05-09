@@ -3,17 +3,20 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 
+import { RoomRouteGuard } from '@/src/components/room-route-guard';
 import { RoomProvider } from '@/src/state/room-store';
 
 export default function RootLayout() {
   return (
     <ThemeProvider value={DefaultTheme}>
       <RoomProvider>
+        <RoomRouteGuard />
         <Stack
           screenOptions={{
             headerShown: false,
             headerShadowVisible: false,
             headerBackButtonDisplayMode: 'minimal',
+            animation: 'none',
             contentStyle: { backgroundColor: '#F7FBFF' },
           }}>
           <Stack.Screen name="index" />

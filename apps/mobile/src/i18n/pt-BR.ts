@@ -88,7 +88,7 @@ export const ptBR = {
   'player.roleYou': 'Você',
   'radar.capture': 'Capturar',
   'radar.captureSimulation': 'Simular captura',
-  'radar.confirmingCapture': 'Mantenha o alvo perto por 3 segundos para confirmar.',
+  'radar.confirmingCapture': 'Mantenha o alvo perto para confirmar.',
   'radar.finishHiders': 'Ir para rush final',
   'radar.noCaptureSignal': 'Chegue mais perto para capturar.',
   'radar.remaining': 'Restam {count}',
