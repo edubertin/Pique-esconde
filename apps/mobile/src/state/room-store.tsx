@@ -132,9 +132,10 @@ const RoomContext = createContext<RoomStore | undefined>(undefined);
 
 function getErrorMessage(error: unknown) {
   const cleanMessage = (message: string) => message.split('\n')[0]?.trim() || 'Nao foi possivel sincronizar a sala agora.';
+  const isFetchFailure = (message: string) => message.toLowerCase().includes('failed to fetch');
 
   if (error instanceof Error) {
-    if (error.message === 'Failed to fetch') return 'Conexao instavel. Tente novamente em alguns segundos.';
+    if (isFetchFailure(error.message)) return 'Conexao instavel. Tente novamente em alguns segundos.';
     return cleanMessage(error.message);
   }
 
@@ -143,7 +144,11 @@ function getErrorMessage(error: unknown) {
     const parts = [supabaseError.message, supabaseError.details, supabaseError.hint]
       .filter((value): value is string => typeof value === 'string' && value.trim().length > 0);
 
-    if (parts.length > 0) return cleanMessage(parts.join(' '));
+    if (parts.length > 0) {
+      const message = parts.join(' ');
+      if (isFetchFailure(message)) return 'Conexao instavel. Tente novamente em alguns segundos.';
+      return cleanMessage(message);
+    }
     if (typeof supabaseError.code === 'string') return `Erro Supabase: ${supabaseError.code}`;
   }
 

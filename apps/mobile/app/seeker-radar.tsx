@@ -228,7 +228,7 @@ export default function SeekerRadarScreen() {
             {captureMessage}
           </Text>
         ) : null}
-        {error && error !== 'Conexao instavel. Tente novamente em alguns segundos.' ? (
+        {error && error !== 'Conexao instavel. Tente novamente em alguns segundos.' && !error.toLowerCase().includes('failed to fetch') ? (
           <Text selectable style={{ color: colors.danger, fontSize: 13, fontWeight: '800', textAlign: 'center' }}>
             {error}
           </Text>

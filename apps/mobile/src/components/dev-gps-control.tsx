@@ -14,6 +14,7 @@ const metersPerDegreeLatitude = 111_320;
 const devGpsStorageKey = 'pe-dev-gps-v2-active';
 const devGpsDistanceStorageKey = 'pe-dev-gps-v2-distance';
 const presets = [0, 4, 8, 15, 35, 60];
+type SyncStatus = 'idle' | 'syncing' | 'synced' | 'error';
 
 function offsetLocation(distanceMeters: number) {
   return {
@@ -37,6 +38,7 @@ export function DevGpsControl({ defaultDistance = 0, label }: { defaultDistance?
     const storedDistance = Number(window.sessionStorage.getItem(devGpsDistanceStorageKey));
     return Number.isFinite(storedDistance) ? storedDistance : defaultDistance;
   });
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle');
   const percent = Math.min(100, Math.max(0, (distance / maxDistanceMeters) * 100));
   const hintText = label === 'procurador'
     ? 'Para testar: comece 60m e aproxime ate 4m.'
@@ -60,14 +62,21 @@ export function DevGpsControl({ defaultDistance = 0, label }: { defaultDistance?
     if (!active) return undefined;
 
     let cancelled = false;
-    const sync = () => {
-      updatePlayerLocation(offsetLocation(distance)).catch(() => undefined);
+    const sync = async () => {
+      setSyncStatus('syncing');
+
+      try {
+        await updatePlayerLocation(offsetLocation(distance));
+        if (!cancelled) setSyncStatus('synced');
+      } catch {
+        if (!cancelled) setSyncStatus('error');
+      }
     };
 
     sync();
     const interval = setInterval(() => {
       if (!cancelled) sync();
-    }, 900);
+    }, 3000);
 
     return () => {
       cancelled = true;
@@ -77,9 +86,17 @@ export function DevGpsControl({ defaultDistance = 0, label }: { defaultDistance?
 
   if (!enabled) return null;
 
-  const setPreset = (nextDistance: number) => {
+  const setPreset = async (nextDistance: number) => {
     setDistance(nextDistance);
     setActive(true);
+    setSyncStatus('syncing');
+
+    try {
+      await updatePlayerLocation(offsetLocation(nextDistance));
+      setSyncStatus('synced');
+    } catch {
+      setSyncStatus('error');
+    }
   };
 
   return (
@@ -145,7 +162,9 @@ export function DevGpsControl({ defaultDistance = 0, label }: { defaultDistance?
           <Pressable
             key={preset}
             hitSlop={6}
-            onPress={() => setPreset(preset)}
+            onPress={() => {
+              setPreset(preset).catch(() => undefined);
+            }}
             style={{
               backgroundColor: distance === preset ? colors.navy : colors.surface,
               borderColor: colors.navy,
@@ -163,7 +182,10 @@ export function DevGpsControl({ defaultDistance = 0, label }: { defaultDistance?
         ))}
         <Pressable
           hitSlop={6}
-          onPress={() => setActive(false)}
+          onPress={() => {
+            setActive(false);
+            setSyncStatus('idle');
+          }}
           style={{
             backgroundColor: active ? colors.surface : colors.navy,
             borderColor: colors.navy,
@@ -183,6 +205,17 @@ export function DevGpsControl({ defaultDistance = 0, label }: { defaultDistance?
       <Text style={{ color: colors.muted, fontSize: 11, fontWeight: '800', textAlign: 'center' }}>
         {active ? `Simulando ${distance}m.` : `Toque em um metro para ligar. Atual: ${distance}m.`} {hintText}
       </Text>
+      {active ? (
+        <Text
+          style={{
+            color: syncStatus === 'error' ? colors.danger : syncStatus === 'synced' ? colors.green : colors.muted,
+            fontSize: 11,
+            fontWeight: '900',
+            textAlign: 'center',
+          }}>
+          {syncStatus === 'synced' ? 'GPS teste sincronizado' : syncStatus === 'error' ? 'GPS teste aguardando rede' : 'Sincronizando GPS teste...'}
+        </Text>
+      ) : null}
     </View>
   );
 }
