@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react';
 import { Animated, Text, View } from 'react-native';
 
 import { Badge } from '@/src/components/badge';
-import { DevGpsControl } from '@/src/components/dev-gps-control';
 import { GameButton } from '@/src/components/game-button';
 import { PrototypeScreen } from '@/src/components/prototype-screen';
 import { usePlayerLocationSync } from '@/src/hooks/use-player-location-sync';
@@ -155,7 +154,6 @@ export default function HiderStatusScreen() {
         </View>
 
         <Badge label={t('hiderStatus.released', { name: seekerName })} tone="waiting" />
-        <DevGpsControl defaultDistance={0} label="escondido" />
         <GameButton label={t('common.exit')} onPress={handleLeaveRoom} variant="danger" />
       </View>
     </PrototypeScreen>

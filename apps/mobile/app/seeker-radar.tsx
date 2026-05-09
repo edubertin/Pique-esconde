@@ -209,7 +209,7 @@ export default function SeekerRadarScreen() {
 
         <RadarView hint={radarHint} />
 
-        <DevGpsControl defaultDistance={60} label="procurador" />
+        <DevGpsControl defaultDistance={60} />
 
         <View style={{ gap: 10, width: '100%' }}>
           <GameButton label={manualCapturePending ? 'Capturando...' : t('radar.capture')} onPress={handleSimulateCapture} variant="capture" />

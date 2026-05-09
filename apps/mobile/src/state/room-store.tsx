@@ -121,6 +121,7 @@ type RoomStore = {
   tickGameSession: () => Promise<void>;
   toggleReady: () => Promise<void>;
   tryCaptureNearest: () => Promise<CaptureAttempt | undefined>;
+  updateDevTestDistance: (distanceMeters: number) => Promise<void>;
   updatePlayerLocation: (input: PlayerLocationInput) => Promise<void>;
 };
 
@@ -427,6 +428,10 @@ export function RoomProvider({ children }: { children: ReactNode }) {
         });
 
         return payload;
+      },
+      async updateDevTestDistance(distanceMeters) {
+        const session = requireSession();
+        await roomService.updateDevTestDistance(session.roomId, session.activePlayerId, session.activePlayerToken, distanceMeters);
       },
       async updatePlayerLocation(input) {
         const session = requireSession();

@@ -4,31 +4,15 @@ import { Platform, Pressable, Text, View } from 'react-native';
 import { useRoom } from '@/src/state/room-store';
 import { colors } from '@/src/theme/colors';
 
-const baseLocation = {
-  lat: -23.55052,
-  lng: -46.633308,
-};
-
 const maxDistanceMeters = 60;
-const metersPerDegreeLatitude = 111_320;
 const devGpsStorageKey = 'pe-dev-gps-v2-active';
 const devGpsDistanceStorageKey = 'pe-dev-gps-v2-distance';
 const presets = [0, 4, 8, 15, 35, 60];
 type SyncStatus = 'idle' | 'active' | 'error';
 
-function offsetLocation(distanceMeters: number) {
-  return {
-    accuracyMeters: 1,
-    headingDegrees: 0,
-    lat: baseLocation.lat + distanceMeters / metersPerDegreeLatitude,
-    lng: baseLocation.lng,
-    speedMetersPerSecond: 0,
-  };
-}
-
-export function DevGpsControl({ defaultDistance = 0, label }: { defaultDistance?: number; label: string }) {
-  const { updatePlayerLocation } = useRoom();
-  const updatePlayerLocationRef = useRef(updatePlayerLocation);
+export function DevGpsControl({ defaultDistance = 0 }: { defaultDistance?: number }) {
+  const { updateDevTestDistance } = useRoom();
+  const updateDevTestDistanceRef = useRef(updateDevTestDistance);
   const enabled = __DEV__ && Platform.OS === 'web';
   const [active, setActive] = useState(() => (
     enabled && typeof window !== 'undefined' && window.sessionStorage.getItem(devGpsStorageKey) === 'true'
@@ -41,13 +25,10 @@ export function DevGpsControl({ defaultDistance = 0, label }: { defaultDistance?
   });
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle');
   const percent = Math.min(100, Math.max(0, (distance / maxDistanceMeters) * 100));
-  const hintText = label === 'procurador'
-    ? 'Para testar: comece 60m e aproxime ate 4m.'
-    : 'Para testar: deixe o escondido fixo em 0m.';
 
   useEffect(() => {
-    updatePlayerLocationRef.current = updatePlayerLocation;
-  }, [updatePlayerLocation]);
+    updateDevTestDistanceRef.current = updateDevTestDistance;
+  }, [updateDevTestDistance]);
 
   useEffect(() => {
     if (!enabled) return undefined;
@@ -69,7 +50,7 @@ export function DevGpsControl({ defaultDistance = 0, label }: { defaultDistance?
     let cancelled = false;
     const sync = async (showError = false) => {
       try {
-        await updatePlayerLocationRef.current(offsetLocation(distance));
+        await updateDevTestDistanceRef.current(distance);
         if (!cancelled) setSyncStatus('active');
       } catch {
         if (!cancelled && showError) setSyncStatus('error');
@@ -94,7 +75,7 @@ export function DevGpsControl({ defaultDistance = 0, label }: { defaultDistance?
     setActive(true);
 
     try {
-      await updatePlayerLocationRef.current(offsetLocation(nextDistance));
+      await updateDevTestDistanceRef.current(nextDistance);
       setSyncStatus('active');
     } catch {
       setSyncStatus('error');
@@ -114,7 +95,7 @@ export function DevGpsControl({ defaultDistance = 0, label }: { defaultDistance?
       }}>
       <View style={{ alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between', gap: 8 }}>
         <Text style={{ color: colors.ink, flex: 1, fontSize: 12, fontWeight: '900' }}>
-          DEV GPS: {label}
+          DEV GPS: distancia ate o escondido
         </Text>
         <View
           style={{
@@ -205,7 +186,7 @@ export function DevGpsControl({ defaultDistance = 0, label }: { defaultDistance?
       </View>
 
       <Text style={{ color: colors.muted, fontSize: 11, fontWeight: '800', textAlign: 'center' }}>
-        {active ? `Simulando ${distance}m.` : `Toque em um metro para ligar. Atual: ${distance}m.`} {hintText}
+        {active ? `Simulando ${distance}m.` : `Toque em um metro para ligar. Atual: ${distance}m.`} O escondido fica ancorado no teste.
       </Text>
       {active && syncStatus === 'error' ? (
         <Text

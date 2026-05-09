@@ -431,6 +431,17 @@ export const roomService = {
 
     return data as CapturePayload | null;
   },
+  async updateDevTestDistance(roomId: string, activePlayerId: string, activePlayerToken: string, distanceMeters: number) {
+    const client = assertSupabase();
+    const { error } = await client.rpc('pe_dev_set_test_distance', {
+      actor_player_id: activePlayerId,
+      distance_meters: distanceMeters,
+      player_session_token: activePlayerToken,
+      target_room_id: roomId,
+    });
+
+    if (error) throw error;
+  },
   async updatePlayerLocation(roomId: string, activePlayerId: string, activePlayerToken: string, input: PlayerLocationInput) {
     const client = assertSupabase();
     const { error } = await client.rpc('pe_update_player_location', {
