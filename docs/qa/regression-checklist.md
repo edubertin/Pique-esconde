@@ -37,8 +37,8 @@ Observacoes:
 - [ ] Jogador consegue sair da sala.
 - [ ] Lobby mostra jogadores e status.
 - [ ] Estado "preparado" aparece corretamente.
-- [ ] Criador aparece como lider/procurador inicial.
-- [ ] Mudanca de lider/procurador nao quebra a sala.
+- [ ] Criador aparece como lider/quem vai procurar inicialmente.
+- [ ] Mudanca de lider/quem vai procurar nao quebra a sala.
 - [ ] Reconexao ou volta para sala nao cria jogador duplicado.
 
 ## Regras e Fluxo da Partida
@@ -47,8 +47,8 @@ Observacoes:
 - [ ] App bloqueia partida sem jogadores suficientes.
 - [ ] Tempo de esconder aparece corretamente.
 - [ ] Botao "estou escondido" atualiza estado.
-- [ ] Procurador e liberado quando todos escondem.
-- [ ] Procurador e liberado quando o tempo acaba.
+- [ ] Quem vai procurar e liberado quando todos escondem.
+- [ ] Quem vai procurar e liberado quando o tempo acaba.
 - [ ] Tempo de busca aparece corretamente.
 - [ ] Rush final fica perceptivel.
 - [ ] Partida encerra quando todos sao capturados.
@@ -56,7 +56,7 @@ Observacoes:
 - [ ] Jogar novamente reaproveita a sala.
 - [ ] Jogar novamente volta para o lobby.
 - [ ] Resultado possui acao de sair da sala.
-- [ ] Troca de procurador nao aparece no resultado.
+- [ ] Troca de quem vai procurar nao aparece no resultado.
 - [ ] Lider pode promover outro jogador pelo lobby.
 
 ## Localizacao e Privacidade
@@ -74,7 +74,7 @@ Observacoes:
 
 - [ ] Radar comunica proximidade.
 - [ ] Radar usa direcao aproximada, nao posicao exata.
-- [ ] Procurador recebe feedback de aproximacao.
+- [ ] Quem vai procurar recebe feedback de aproximacao.
 - [ ] Escondido nao ve localizacao do procurador.
 - [ ] Captura automatica muda estado para capturado.
 - [ ] Captura nao exige botao manual no MVP.

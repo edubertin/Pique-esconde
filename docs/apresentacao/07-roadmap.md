@@ -86,6 +86,7 @@ Já implementado nesta fase:
 - Supabase Postgres e Supabase Realtime conectados.
 - Salas temporárias reais com código de 4 letras.
 - Lobby realtime com jogadores, status, líder/procurador, remoção e promoção.
+- Linguagem de interface ajustada para mostrar o nickname de quem vai procurar, evitando tratar "procurador" como identidade fixa.
 - Sessão temporária por jogador, sem login completo.
 - Rodada real sem GPS: iniciar, esconder, liberar busca, captura simulada, resultado e jogar novamente.
 - Timer real sincronizado para esconder/procurar.
@@ -94,7 +95,10 @@ Já implementado nesta fase:
   - escondido comum pode sair e a partida continua se ainda restarem pelo menos 2 jogadores;
   - se o procurador sair, todos voltam ao lobby e outro jogador assume a liderança;
   - se restar menos de 2 jogadores, a rodada volta ao lobby com aviso.
+- Resultado polido: estado terminal sem voltar no topo, avatar de destaque maior, resumo sem repetição e rematch voltando para o lobby.
+- Proteção visual para não deixar jogador preso em tela de partida quando a sala fica com menos de 2 pessoas.
 - QA com testes RPC reais no Supabase e smoke visual web em Playwright.
+- QA manual assistido pelo usuário confirmou os fluxos principais de sala, lobby, partida, saída e resultado no app web local.
 
 Ainda pendente nesta fase:
 

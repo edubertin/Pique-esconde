@@ -151,7 +151,7 @@ Status: Aceito no MVP atual
 Severidade: Media
 Area: Timer/Regras
 Detectado em: 2026-05-09
-Commit/versao: worktree local
+Commit/versao: e7accf0
 
 Descricao:
 - O timer real de rodada existe no Supabase, mas a transição é acordada por chamada do app para `pe_tick_game_session`.
@@ -167,6 +167,7 @@ Decisao:
 
 Link para test run:
 - `docs/qa/test-runs/2026-05-09-round-timers-web.md`
+- `docs/qa/test-runs/2026-05-09-room-round-polish-manual-web.md`
 
 ## Riscos do MVP
 

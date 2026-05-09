@@ -30,17 +30,17 @@ Decisões já encaminhadas:
 - Se um escondido sai durante a partida e ainda restam pelo menos 2 jogadores, a partida continua.
 - Se o procurador sai durante a partida, a rodada volta ao lobby e outro jogador assume a liderança.
 - Se uma saída deixa menos de 2 jogadores, a rodada volta ao lobby com aviso.
+- A interface usa o nickname de quem vai procurar sempre que possível; "escondidos" permanece como nome do grupo vencedor.
+- Resultado é uma tela terminal: sem voltar no topo, com ações de jogar novamente, sair e compartilhar.
 
 ## Tarefas Imediatas
 
-1. Implementar permissão real de localização no dispositivo.
-2. Criar envio temporário de posição durante a partida.
-3. Implementar radar aproximado por distância, sem mapa exato.
-4. Implementar captura automática por proximidade com tolerância de alguns segundos.
-5. Calibrar som/haptics em celular real.
-6. Implementar convite por link/deep link e compartilhamento nativo.
-7. Testar em dois ou mais celulares no mesmo espaço físico.
-8. Ajustar textos de permissão, aviso de GPS e estados de erro.
+Pausa atual: não avançar para a próxima grande camada até fechar documentação, QA e revisão do fluxo já implementado.
+
+1. Revisar documentação e QA do fluxo atual de salas/rodada sem GPS.
+2. Repetir smoke manual curto em duas abas quando houver alteração de UI ou regra.
+3. Manter as migrations aplicadas no Supabase alinhadas com o repositório.
+4. Só depois iniciar a próxima camada grande: localização, radar real e captura automática por proximidade.
 
 Concluído nesta etapa:
 
@@ -60,6 +60,10 @@ Concluído nesta etapa:
 - Captura simulada usando jogadores reais.
 - Resultado e rematch na mesma sala.
 - Regras reais de saída durante partida.
+- Proteção para voltar ao lobby quando a partida fica com menos de 2 jogadores.
+- Resultado visualmente simplificado, sem voltar no topo e sem resumo duplicado.
+- Linguagem do fluxo atualizada para destacar o nickname de quem vai procurar.
+- Validação manual assistida confirmou os fluxos principais funcionando.
 - QA técnico e smoke visual web.
 
 ## Materiais Necessários
@@ -102,12 +106,12 @@ Status: majoritariamente concluída.
 
 - Status: em andamento.
 
-- Permissão de localização.
-- Atualização de posição.
-- Radar/proximidade.
-- Captura automática.
-- Rush final.
-- Resultado e jogar novamente.
+- Próximo bloco grande, ainda não iniciado nesta pausa:
+  - Permissão de localização.
+  - Atualização de posição.
+  - Radar/proximidade.
+  - Captura automática.
+  - Rush final.
 
 Já concluído dentro desta fase:
 
@@ -117,6 +121,7 @@ Já concluído dentro desta fase:
 - Captura simulada em jogadores reais.
 - Resultado e rematch.
 - Regras de saída/encerramento da rodada.
+- Fluxo visual validado manualmente no app web local.
 
 ### Semana 4 - Piloto
 
