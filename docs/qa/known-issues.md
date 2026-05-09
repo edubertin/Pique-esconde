@@ -321,29 +321,31 @@ Decisao:
 
 ## L-009 - Resultado final ainda depende de confirmacao realtime para preencher instantaneamente
 
-Status: Aberto / Proxima atualizacao
+Status: Resolvido em backend dev
 Severidade: Media
 Area: Resultado / Backend / Realtime
 Detectado em: 2026-05-09
-Commit/versao: worktree local
+Commit/versao: worktree local / migration `202605090027_final_snapshot_capture_cleanup`
 
 Descricao:
 - O Resultado foi estabilizado no cliente com snapshot terminal congelado, evitando piscadas e regressao de rota.
-- Ainda existe uma janela em que a tela pode entrar antes do payload final estar preenchido, aguardando o snapshot do Supabase Realtime confirmar `room.result`.
-- A experiencia ideal de game e a tela de Resultado abrir ja com vencedor, destaque e estatisticas prontos.
+- O backend dev agora retorna o snapshot final completo nas RPCs terminais, sem depender do Supabase Realtime para preencher vencedor/estatisticas.
+- O snapshot inclui `result`, `players`, `gameSessionId`, `finishedAt`, `roomCode` e `expiresAt`.
 
 Impacto:
-- UX pode parecer lenta no encerramento da rodada, mesmo sem bug de navegacao.
-- Em rede ruim, o jogador pode ver estado de fechamento por alguns segundos antes do resultado completo.
+- Reduz janela de Resultado vazio/lento.
+- Mantem Resultado e Card Social estaveis mesmo com eventos realtime atrasados.
 
 Comportamento esperado:
 - A RPC que encerra a rodada deve gravar e retornar o snapshot final completo no mesmo contrato da acao.
 - O app deve aplicar esse snapshot imediatamente no store, usando o Realtime posterior apenas como confirmacao.
 
 Decisao:
-- Proxima atualizacao tecnica: evoluir backend/RPCs de finalizacao para retornar resultado completo e idempotente.
-- Incluir `gameSessionId` e `finishedAt` no payload de `result` para blindar rematch, card social e snapshots atrasados.
+- Manter Resultado/Card Social usando snapshot congelado como fonte primaria.
+- Manter Realtime posterior apenas como confirmacao.
+- Rodar validacao UI em dois clientes e celular real antes de marcar pronto para piloto.
 - Manter o loading contextual de Resultado como fallback, nao como solucao principal.
 
 Link para test run:
 - `docs/qa/test-runs/2026-05-09-result-route-guard-web.md`
+- `docs/qa/test-runs/2026-05-09-final-snapshot-backend.md`

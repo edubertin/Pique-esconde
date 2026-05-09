@@ -285,6 +285,14 @@ Razões:
 - `time_finished`
 - `leader_ended`
 
+Implementacao atual:
+
+- As telas ainda sincronizam sala por Supabase `postgres_changes` em `pe_rooms`, `pe_players` e `pe_game_sessions`.
+- As RPCs terminais (`pe_finish_round`, `pe_try_capture_nearest`, `pe_tick_game_session` e `pe_simulate_capture`) tambem retornam um `finalSnapshot` completo no mesmo retorno da acao.
+- `finalSnapshot` contem `roomId`, `roomCode`, `gameSessionId`, `finishedAt`, `expiresAt`, `result` e `players`.
+- O cliente aplica esse snapshot imediatamente e usa Realtime posterior apenas como confirmacao.
+- A sala finalizada expira em 2 minutos; dados brutos de GPS, esconderijo, confirmacao de captura e DEV GPS sao limpos no encerramento/cleanup.
+
 ### `game.rematch_requested`
 
 Emitido quando grupo decide jogar novamente. A sala é mantida e o grupo volta para o lobby.

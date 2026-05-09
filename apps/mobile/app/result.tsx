@@ -56,6 +56,7 @@ export default function ResultScreen() {
   const winner = result?.winner ?? 'hiders';
   const capturedCount = result?.capturedPlayerIds.length ?? Math.min(2, hiders.length);
   const playerCount = result?.playerCount ?? players.length;
+  const resultExpiresAt = finalResultSnapshot?.expiresAt ?? room?.expiresAt;
   const seekerName = result?.seekerNickname ?? seeker?.nickname;
   const resultTitle = winner === 'seeker' && seekerName ? t('result.seekerWonBy', { name: seekerName }) : winner === 'seeker' ? t('result.seekerWon') : t('result.hidersWon');
   const highlightReason = winner === 'seeker' ? t('result.highlightSeeker') : t('result.highlightHiders');
@@ -175,6 +176,11 @@ export default function ResultScreen() {
         {error ? (
           <Text selectable style={{ color: colors.danger, fontSize: 13, fontWeight: '900', textAlign: 'center' }}>
             {error}
+          </Text>
+        ) : null}
+        {resultExpiresAt ? (
+          <Text selectable style={{ color: colors.muted, fontSize: 12, fontWeight: '800', textAlign: 'center' }}>
+            Sala disponivel por 2 min para compartilhar.
           </Text>
         ) : null}
       </MenuPanel>

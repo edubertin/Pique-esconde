@@ -197,12 +197,19 @@ Base atual:
 - Fluxos `Resultado -> Jogar novamente -> Lobby` e `Resultado -> Sair -> Home` foram estabilizados no cliente.
 - O app usa guard central de rota e snapshot terminal do resultado para evitar piscadas causadas por eventos realtime atrasados.
 - `Sair -> Home -> Criar sala` foi validado apos uma rodada completa.
-- A tela de Resultado ainda pode aguardar o `room.result` final chegar pelo Supabase Realtime antes de preencher vencedor/estatisticas.
+- `pe_finish_round`, `pe_try_capture_nearest`, `pe_tick_game_session` e `pe_simulate_capture` retornam snapshot final completo quando encerram a rodada.
+- A finalizacao agora e idempotente: se a rodada ja estiver encerrada, o backend retorna o snapshot gravado.
+- O payload de `result` inclui `gameSessionId` e `finishedAt`.
+- O snapshot final inclui `players`, `roomCode`, `expiresAt` e `result`, permitindo abrir Resultado/Card Social sem aguardar Realtime.
+- A captura oficial foi calibrada para 5m por 2s continuos.
+- Salas finalizadas expiram em 2 minutos, tempo curto para jogar novamente ou compartilhar.
+- `pe_cleanup_expired_state()` limpa salas expiradas e dados temporarios de GPS/captura/DEV; a limpeza tambem roda oportunisticamente em criar/entrar sala.
+
+Validacao:
+
+- Smoke backend real no Supabase dev em 2026-05-09 confirmou captura `5m/2s`, retorno de `finalSnapshot`, sala `finished`, expiracao em 120s e limpeza de localizacoes/esconderijos/confirmacoes/DEV.
 
 Proxima atualizacao recomendada:
 
-- Evoluir `pe_finish_round`, `pe_try_capture_nearest` e caminhos de timeout/tick para retornar o snapshot final completo da rodada no mesmo retorno da acao.
-- Fazer a finalizacao ser idempotente: se a rodada ja estiver encerrada, a RPC retorna o mesmo resultado existente sem recalcular.
-- Adicionar `gameSessionId` e `finishedAt` ao payload de `result`.
-- Aplicar o snapshot final imediatamente no `room-store`; usar Realtime posterior apenas como confirmacao.
-- Manter uma tela contextual de "apurando resultado" apenas como fallback de rede, sem popup modal.
+- Rodar o mesmo fluxo pelo app com dois clientes para confirmar que Resultado abre instantaneamente no UI.
+- Testar em celulares reais via HTTPS tunnel ou build nativo para calibrar radar/direcao/captura em campo.

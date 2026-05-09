@@ -11,9 +11,9 @@ import { colors } from '@/src/theme/colors';
 import { surfaces } from '@/src/theme/surfaces';
 
 export default function SocialCardScreen() {
-  const { room } = useRoom();
-  const players = room?.players ?? [];
-  const result = room?.result;
+  const { finalResultSnapshot, room } = useRoom();
+  const players = finalResultSnapshot?.players ?? room?.players ?? [];
+  const result = finalResultSnapshot?.result ?? room?.result;
   const hasClosedResult = Boolean(result);
   const seeker =
     players.find((player) => player.id === result?.seekerPlayerId) ??
@@ -32,7 +32,7 @@ export default function SocialCardScreen() {
   const seekerName = result?.seekerNickname ?? seeker?.nickname;
   const title = winner === 'seeker' ? t('social.titleSeeker', { name: seekerName ?? t('player.roleLeaderSeeker') }) : t('social.titleHiders');
   const highlightLabel = winner === 'seeker' ? t('social.highlightSeeker') : t('social.highlightHiders');
-  const time = room?.result?.durationLabel ?? '3min';
+  const time = result?.durationLabel ?? '3min';
   const score =
     winner === 'seeker'
       ? t('social.scoreSeeker', { name: seekerName ?? t('player.roleLeaderSeeker'), time })

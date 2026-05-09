@@ -2,7 +2,7 @@ import type { RealtimeChannel } from '@supabase/supabase-js';
 
 import { gameRules } from '@/src/constants/game';
 import { assertSupabase } from '@/src/services/supabase-client';
-import type { CaptureAttempt, DevGpsDirection, GameResult, GameSession, HiderDangerHint, LobbyNotice, PlayerLocationInput, PlayerStatus, RadarHint, RoomDebugSnapshot, RoomPlayer } from '@/src/state/room-store';
+import type { CaptureAttempt, DevGpsDirection, FinalResultSnapshot, GameResult, GameSession, HiderDangerHint, LobbyNotice, PlayerLocationInput, PlayerStatus, RadarHint, RoomDebugSnapshot, RoomPlayer } from '@/src/state/room-store';
 
 export type RemoteRoomPhase = 'lobby' | 'hiding' | 'seeking' | 'finished';
 
@@ -71,6 +71,8 @@ type RemotePlayerRow = {
 type RemoteResult = {
   capturedPlayerIds: string[];
   durationLabel: string;
+  finishedAt?: string;
+  gameSessionId?: string;
   highlightAvatarId?: string;
   highlightPlayerId: string;
   highlightNickname?: string;
@@ -82,6 +84,22 @@ type RemoteResult = {
   winner: GameResult['winner'];
 };
 
+type RemoteFinalResultSnapshot = {
+  expiresAt?: string;
+  finishedAt?: string;
+  gameSessionId?: string;
+  players?: {
+    avatarId: string;
+    id: string;
+    isLeader: boolean;
+    nickname: string;
+    status: PlayerStatus;
+  }[];
+  result?: RemoteResult;
+  roomCode?: string;
+  roomId?: string;
+};
+
 type RoomPayload = {
   activePlayerId?: string;
   playerSessionToken?: string;
@@ -89,6 +107,10 @@ type RoomPayload = {
 };
 
 type CapturePayload = CaptureAttempt;
+
+type TickPayload = {
+  finalSnapshot?: RemoteFinalResultSnapshot;
+};
 
 type StartRoundPayload = {
   started?: boolean;
@@ -124,6 +146,8 @@ function mapResult(result: RemoteResult | null): GameResult | undefined {
   return {
     capturedPlayerIds: result.capturedPlayerIds ?? [],
     durationLabel: result.durationLabel ?? '3min',
+    finishedAt: result.finishedAt ? new Date(result.finishedAt).getTime() : undefined,
+    gameSessionId: result.gameSessionId,
     highlightAvatarId: result.highlightAvatarId,
     highlightPlayerId: result.highlightPlayerId ?? '',
     highlightNickname: result.highlightNickname,
@@ -133,6 +157,22 @@ function mapResult(result: RemoteResult | null): GameResult | undefined {
     seekerPlayerId: result.seekerPlayerId,
     survivorPlayerIds: result.survivorPlayerIds ?? [],
     winner: result.winner ?? 'hiders',
+  };
+}
+
+function mapFinalResultSnapshot(snapshot?: RemoteFinalResultSnapshot | null): FinalResultSnapshot | undefined {
+  const result = mapResult(snapshot?.result ?? null);
+  if (!snapshot?.roomId || !snapshot.roomCode || !result) return undefined;
+
+  return {
+    capturedAtClient: Date.now(),
+    expiresAt: snapshot.expiresAt ? new Date(snapshot.expiresAt).getTime() : undefined,
+    finishedAt: snapshot.finishedAt ? new Date(snapshot.finishedAt).getTime() : result.finishedAt,
+    gameSessionId: snapshot.gameSessionId ?? result.gameSessionId,
+    players: snapshot.players ?? [],
+    result,
+    roomCode: snapshot.roomCode,
+    roomId: snapshot.roomId,
   };
 }
 
@@ -269,7 +309,7 @@ export const roomService = {
   },
   async finishRound(roomId: string, activePlayerId: string, activePlayerToken: string, winner: GameResult['winner']) {
     const client = assertSupabase();
-    const { error } = await client.rpc('pe_finish_round', {
+    const { data, error } = await client.rpc('pe_finish_round', {
       actor_player_id: activePlayerId,
       player_session_token: activePlayerToken,
       round_winner: winner,
@@ -277,6 +317,8 @@ export const roomService = {
     });
 
     if (error) throw error;
+
+    return mapFinalResultSnapshot(data as RemoteFinalResultSnapshot | null);
   },
   async getRadarHint(roomId: string, activePlayerId: string, activePlayerToken: string) {
     const client = assertSupabase();
@@ -445,13 +487,15 @@ export const roomService = {
   },
   async tickGameSession(roomId: string, activePlayerId: string, activePlayerToken: string) {
     const client = assertSupabase();
-    const { error } = await client.rpc('pe_tick_game_session', {
+    const { data, error } = await client.rpc('pe_tick_game_session', {
       actor_player_id: activePlayerId,
       player_session_token: activePlayerToken,
       target_room_id: roomId,
     });
 
     if (error) throw error;
+
+    return mapFinalResultSnapshot((data as TickPayload | null)?.finalSnapshot);
   },
   async tryCaptureNearest(roomId: string, activePlayerId: string, activePlayerToken: string) {
     const client = assertSupabase();
@@ -463,7 +507,13 @@ export const roomService = {
 
     if (error) throw error;
 
-    return data as CapturePayload | null;
+    const payload = data as (Omit<CapturePayload, 'finalSnapshot'> & { finalSnapshot?: RemoteFinalResultSnapshot }) | null;
+    if (!payload) return null;
+
+    return {
+      ...payload,
+      finalSnapshot: mapFinalResultSnapshot(payload.finalSnapshot),
+    };
   },
   async updateDevTestDistance(
     roomId: string,

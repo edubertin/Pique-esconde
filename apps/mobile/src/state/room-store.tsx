@@ -16,6 +16,8 @@ export type RoomPlayer = {
 export type GameResult = {
   capturedPlayerIds: string[];
   durationLabel: string;
+  finishedAt?: number;
+  gameSessionId?: string;
   highlightAvatarId?: string;
   highlightPlayerId: string;
   highlightNickname?: string;
@@ -29,6 +31,8 @@ export type GameResult = {
 
 export type FinalResultSnapshot = {
   capturedAtClient: number;
+  expiresAt?: number;
+  finishedAt?: number;
   gameSessionId?: string;
   players: RoomPlayer[];
   result: GameResult;
@@ -125,6 +129,7 @@ export type CaptureAttempt = {
   capturedPlayerId?: string;
   confirmRemainingSeconds?: number;
   distanceMeters?: number;
+  finalSnapshot?: FinalResultSnapshot;
   reason?: 'confirming' | 'no_target_in_range' | 'no_target_signal' | 'seeker_signal_unstable';
   remainingHiders?: number;
   targetPlayerId?: string;
@@ -234,6 +239,34 @@ export function RoomProvider({ children }: { children: ReactNode }) {
     setFinalResultSnapshot(undefined);
   }, []);
 
+  const applyFinalResultSnapshot = useCallback((snapshot?: FinalResultSnapshot) => {
+    if (!snapshot) return;
+
+    finalResultSnapshotRef.current = snapshot;
+    setFinalResultSnapshot(snapshot);
+    setRoom((currentRoom) => {
+      if (currentRoom && currentRoom.id !== snapshot.roomId) return currentRoom;
+
+      return {
+        closedReason: currentRoom?.closedReason,
+        code: snapshot.roomCode,
+        expiresAt: snapshot.expiresAt ?? currentRoom?.expiresAt,
+        gameSession: currentRoom?.gameSession
+          ? {
+              ...currentRoom.gameSession,
+              status: 'finished',
+            }
+          : undefined,
+        id: snapshot.roomId,
+        lobbyNotice: currentRoom?.lobbyNotice,
+        maxPlayers: currentRoom?.maxPlayers ?? 8,
+        phase: 'finished',
+        players: snapshot.players,
+        result: snapshot.result,
+      };
+    });
+  }, []);
+
   const applySnapshot = useCallback(
     (snapshot: Awaited<ReturnType<typeof roomService.fetchSnapshot>>) => {
       if (ignoredRoomIdsRef.current.has(snapshot.room.id)) {
@@ -264,6 +297,7 @@ export function RoomProvider({ children }: { children: ReactNode }) {
         if (!currentFinalResult || !isSameFinishedRound) {
           const nextFinalResult: FinalResultSnapshot = {
             capturedAtClient: Date.now(),
+            expiresAt: snapshot.room.expiresAt,
             gameSessionId: snapshotGameSessionId,
             players: snapshot.room.players,
             result: snapshot.room.result,
@@ -346,7 +380,9 @@ export function RoomProvider({ children }: { children: ReactNode }) {
 
         setActivePlayerId(undefined);
         setActivePlayerToken(undefined);
-        clearFinalResultSnapshot();
+        if (!finalResultSnapshotRef.current || currentRoom.phase !== 'finished') {
+          clearFinalResultSnapshot();
+        }
         return undefined;
       });
     }, 1000);
@@ -404,8 +440,9 @@ export function RoomProvider({ children }: { children: ReactNode }) {
       async finishRound(winner = 'hiders') {
         const session = requireSession();
         await runAction(async () => {
-          await roomService.finishRound(session.roomId, session.activePlayerId, session.activePlayerToken, winner);
-          await refreshRoomSoft();
+          const finalSnapshot = await roomService.finishRound(session.roomId, session.activePlayerId, session.activePlayerToken, winner);
+          applyFinalResultSnapshot(finalSnapshot);
+          if (!finalSnapshot) await refreshRoomSoft();
         });
       },
       async getRadarHint() {
@@ -547,8 +584,9 @@ export function RoomProvider({ children }: { children: ReactNode }) {
       },
       async tickGameSession() {
         const session = requireSession();
-        await roomService.tickGameSession(session.roomId, session.activePlayerId, session.activePlayerToken);
-        await refreshRoom();
+        const finalSnapshot = await roomService.tickGameSession(session.roomId, session.activePlayerId, session.activePlayerToken);
+        applyFinalResultSnapshot(finalSnapshot);
+        if (!finalSnapshot) await refreshRoom();
       },
       async toggleReady() {
         const session = requireSession();
@@ -563,6 +601,7 @@ export function RoomProvider({ children }: { children: ReactNode }) {
 
         await runAction(async () => {
           payload = await roomService.tryCaptureNearest(session.roomId, session.activePlayerId, session.activePlayerToken) ?? undefined;
+          applyFinalResultSnapshot(payload?.finalSnapshot);
           await refreshRoomSoft();
         });
 
@@ -577,7 +616,7 @@ export function RoomProvider({ children }: { children: ReactNode }) {
         await roomService.updatePlayerLocation(session.roomId, session.activePlayerId, session.activePlayerToken, input);
       },
     };
-  }, [activePlayerId, activePlayerToken, applySnapshot, clearFinalResultSnapshot, error, finalResultSnapshot, isLoading, refreshRoom, refreshRoomSoft, room, roomNotice, runAction]);
+  }, [activePlayerId, activePlayerToken, applyFinalResultSnapshot, applySnapshot, clearFinalResultSnapshot, error, finalResultSnapshot, isLoading, refreshRoom, refreshRoomSoft, room, roomNotice, runAction]);
 
   return <RoomContext.Provider value={store}>{children}</RoomContext.Provider>;
 }
