@@ -26,6 +26,12 @@ export const patterns = {
       color: colors.danger,
       shadow: '0 4px 0 rgba(7, 26, 61, 0.08)',
     },
+    disabled: {
+      backgroundColor: '#7F91AA',
+      borderColor: colors.navy,
+      color: colors.surface,
+      shadow: '0 4px 0 rgba(7, 26, 61, 0.12)',
+    },
   },
   panel: {
     default: {

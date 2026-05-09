@@ -4,14 +4,15 @@ import { Pressable, Text } from 'react-native';
 import { patterns } from '@/src/theme/patterns';
 
 type GameButtonProps = {
+  disabled?: boolean;
   href?: Href;
   label: string;
   onPress?: () => void;
   size?: 'default' | 'compact';
-  variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'disabled';
 };
 
-export function GameButton({ href, label, onPress, size = 'default', variant = 'primary' }: GameButtonProps) {
+export function GameButton({ disabled = false, href, label, onPress, size = 'default', variant = 'primary' }: GameButtonProps) {
   const pattern = patterns.button[variant];
   const isCompact = size === 'compact';
 
@@ -19,7 +20,9 @@ export function GameButton({ href, label, onPress, size = 'default', variant = '
     <Pressable
       accessibilityLabel={label}
       accessibilityRole="button"
-      onPress={onPress}
+      accessibilityState={{ disabled }}
+      disabled={disabled}
+      onPress={disabled ? undefined : onPress}
       style={{
         alignItems: 'center',
         backgroundColor: pattern.backgroundColor,
@@ -38,7 +41,7 @@ export function GameButton({ href, label, onPress, size = 'default', variant = '
     </Pressable>
   );
 
-  if (!href) {
+  if (!href || disabled) {
     return button;
   }
 
