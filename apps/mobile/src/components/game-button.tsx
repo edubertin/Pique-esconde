@@ -9,7 +9,7 @@ type GameButtonProps = {
   label: string;
   onPress?: () => void;
   size?: 'default' | 'compact';
-  variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'disabled';
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
 };
 
 export function GameButton({ disabled = false, href, label, onPress, size = 'default', variant = 'primary' }: GameButtonProps) {

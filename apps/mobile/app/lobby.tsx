@@ -155,7 +155,7 @@ export default function LobbyScreen() {
                   disabled={!canLeaderStart || isLoading}
                   label={canLeaderStart ? (isLoading ? 'Sincronizando...' : t('lobby.start')) : t('lobby.startWaiting')}
                   onPress={handleStartRound}
-                  variant={canLeaderStart ? 'secondary' : 'disabled'}
+                  variant="secondary"
                 />
                 {leaderStartHint ? (
                   <Text selectable style={{ color: colors.muted, fontSize: 13, fontWeight: '800', lineHeight: 18, textAlign: 'center' }}>
