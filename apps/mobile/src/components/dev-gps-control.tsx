@@ -11,8 +11,8 @@ const baseLocation = {
 
 const maxDistanceMeters = 60;
 const metersPerDegreeLatitude = 111_320;
-const devGpsStorageKey = 'pe-dev-gps-active';
-const devGpsDistanceStorageKey = 'pe-dev-gps-distance';
+const devGpsStorageKey = 'pe-dev-gps-v2-active';
+const devGpsDistanceStorageKey = 'pe-dev-gps-v2-distance';
 const presets = [0, 4, 8, 15, 35, 60];
 
 function offsetLocation(distanceMeters: number) {
@@ -39,7 +39,7 @@ export function DevGpsControl({ defaultDistance = 0, label }: { defaultDistance?
   });
   const percent = Math.min(100, Math.max(0, (distance / maxDistanceMeters) * 100));
   const hintText = label === 'procurador'
-    ? 'Para testar: comece 35m e aproxime ate 4m.'
+    ? 'Para testar: comece 60m e aproxime ate 4m.'
     : 'Para testar: deixe o escondido fixo em 0m.';
 
   useEffect(() => {
