@@ -121,7 +121,7 @@ Objetivo: reunir o grupo, mostrar limite e preparar a partida.
 │ [ STORE COVER / BANNER ]     │
 │                              │
 │ Sala ABCD        4/8         │
-│ [ Compartilhar link ]        │
+│ [ Convidar ]                 │
 │                              │
 │ Procurador                   │
 │ [A1] Dudu        Líder       │
@@ -144,7 +144,7 @@ Elementos:
 - Código da sala.
 - Contador `4/8`.
 - Banner visual com store cover.
-- Compartilhar link.
+- Convidar por link/código.
 - Lista com avatar, apelido e status.
 - Botão preparado.
 - Ações do líder: regras e iniciar.
@@ -354,7 +354,7 @@ Objetivo: fechar a rodada e incentivar nova partida.
 │ [A3] Rafa  [A4] Bia          │
 │                              │
 │ [ Jogar novamente ]          │
-│ [ Trocar procurador ]        │
+│ [ Sair ]                     │
 │ [ Compartilhar resultado ]   │
 │ [ Sair da sala ]             │
 └─────────────────────────────┘
@@ -366,7 +366,7 @@ Elementos:
 - Sobreviventes.
 - Capturados.
 - Jogar novamente.
-- Trocar procurador manualmente.
+- Sair da sala.
 - Compartilhar card social.
 - Sair da sala.
 
@@ -398,3 +398,87 @@ Regras:
 - Não incluir rota.
 - Não incluir endereço.
 - Não incluir coordenadas.
+
+## Atualização - Pattern de Telas Internas
+
+Todas as telas internas passam a seguir o mesmo padrão visual:
+
+```txt
+Background ilustrado full-screen
+└─ Caixa translúcida padrão
+   ├─ Header interno
+   │  ├─ Voltar
+   │  └─ Título
+   ├─ Conteúdo
+   └─ Ações
+```
+
+Regras:
+
+- A home é a única tela sem header interno.
+- O botão de voltar não fica solto no topo da tela.
+- O background não rola junto com o conteúdo.
+- A caixa principal mantém largura máxima padrão.
+- Uma ação principal fica grande.
+- Três ou mais ações usam uma ação principal + grid compacto.
+
+## Atualização - Lobby
+
+```txt
+┌─────────────────────────────┐
+│ <  Sala ABCD                │
+│    4/8 jogadores            │
+├─────────────────────────────┤
+│ [ STORE COVER / BANNER ]    │
+│                             │
+│ Código                      │
+│ ABCD                 [4/8]  │
+│                             │
+│ Jogadores             Lobby │
+│ [A1] Dudu        Líder      │
+│ [A2] Ana         Preparada  │
+│ [A3] Rafa        Aguardando │
+│ [A4] Bia         Preparada  │
+├─────────────────────────────┤
+│ [ Iniciar partida ]         │
+│ [ Preparado ] [ Regras ]    │
+│ [ Convidar  ] [ Sair   ]    │
+└─────────────────────────────┘
+```
+
+Notas:
+
+- `Convidar` é usado para link/código da sala.
+- `Compartilhar` fica reservado para resultado/card social.
+- Futuramente o líder pode tocar em um jogador do lobby para promover como líder/procurador.
+
+## Atualização - Resultado
+
+```txt
+┌─────────────────────────────┐
+│ <  Resultados               │
+│    Resultado final da rodada│
+├─────────────────────────────┤
+│        [ Vencedor ]         │
+│          [ AVATAR ]         │
+│                             │
+│     Escondidos venceram     │
+│ Ana segurou o esconderijo   │
+│ até o fim.                  │
+│                             │
+│ [Tempo] [Jogadores]         │
+│ [Capt.] [Sobreviveu]        │
+│                             │
+│ Resumo curto da partida.    │
+├─────────────────────────────┤
+│ [ Jogar novamente ]         │
+│ [ Sair ] [ Compartilhar ]   │
+└─────────────────────────────┘
+```
+
+Notas:
+
+- Não exibir radar no resultado.
+- `Jogar novamente` volta ao lobby da mesma sala.
+- `Sair` atende quem não quer jogar outra rodada.
+- Troca de procurador acontece no lobby, não no resultado.

@@ -13,7 +13,8 @@ Definir salas temporárias, entrada por convite e lobby antes da partida.
 - Sala continua ativa enquanto houver jogadores conectados.
 - Se todos saírem, a sala é encerrada.
 - Se ficar sem atividade, expira automaticamente.
-- Sugestão inicial: 30 minutos sem atividade.
+- Expira após 6 minutos se restar apenas 1 jogador ativo.
+- Se ficar sem atividade sem jogadores ativos, expira imediatamente.
 - Jogadores podem voltar para a mesma sala após desconexão ou problema temporário.
 - Se o procurador/líder cair, a liderança passa automaticamente para o próximo jogador disponível.
 
@@ -32,11 +33,12 @@ Sem login completo no MVP.
 O lobby mostra:
 
 - Código/link da sala.
-- Botão de compartilhar.
+- Botão de convidar por link/código.
 - Lista de jogadores.
 - Avatar e apelido.
 - Status de cada jogador.
 - Quem é o procurador/líder.
+- A lista de jogadores permite promover outro jogador como líder/procurador.
 - Botão "preparado".
 - Configuração de regras para o líder.
 - Botão iniciar para o líder.
@@ -59,6 +61,8 @@ Estados principais:
 - Jogador pode sair da sala pelo lobby.
 - Se um jogador comum sair, a lista do lobby atualiza para todos.
 - Se o líder/procurador sair antes da partida, a liderança passa para o próximo jogador disponível.
+- Se restar apenas 1 jogador, a sala fica aguardando novos jogadores por até 6 minutos.
+- Se ainda houver apenas 1 jogador após 6 minutos, a sala expira.
 - Se todos saírem, a sala é encerrada.
 
 ## Decisões CEO Pendentes

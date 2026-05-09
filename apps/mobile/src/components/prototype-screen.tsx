@@ -1,76 +1,49 @@
 import type { ReactNode } from 'react';
+import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
-import { ScrollView, Text, useWindowDimensions, View } from 'react-native';
+import { Link, type Href } from 'expo-router';
+import { Pressable, ScrollView, Text, useWindowDimensions, View } from 'react-native';
 
 import { colors } from '@/src/theme/colors';
+import { patterns } from '@/src/theme/patterns';
 
 type PrototypeScreenProps = {
   children: ReactNode;
   centered?: boolean;
-  kicker?: string;
-  subtitle?: string;
-  title?: string;
 };
 
-export function PrototypeScreen({ centered = false, children, kicker, subtitle, title }: PrototypeScreenProps) {
+export function PrototypeScreen({ centered = false, children }: PrototypeScreenProps) {
   const { height, width } = useWindowDimensions();
-  const backgroundHeight = Math.max(height * 1.22, 920);
-  const backgroundWidth = Math.max(width, 390);
 
   return (
-    <ScrollView
-      contentInsetAdjustmentBehavior="automatic"
-      style={{ backgroundColor: colors.navy }}
-      contentContainerStyle={{
-        alignItems: 'center',
-        gap: 18,
-        justifyContent: centered ? 'center' : 'flex-start',
-        minHeight: '100%',
-        padding: 20,
-        paddingBottom: 40,
-      }}>
+    <View style={{ backgroundColor: patterns.screen.baseBackground, minHeight: height }}>
       <Image
         source={require('@/assets/images/pique-esconde-background.png')}
         contentFit="cover"
         style={{
-          height: backgroundHeight,
+          height,
           left: 0,
-          opacity: 0.58,
-          position: 'absolute',
-          right: 0,
-          top: -70,
-          width: backgroundWidth,
-        }}
-      />
-      <View
-        style={{
-          backgroundColor: 'rgba(7, 26, 61, 0.30)',
-          bottom: 0,
-          left: 0,
+          opacity: 1,
           position: 'absolute',
           right: 0,
           top: 0,
+          width,
         }}
       />
-      <View style={{ gap: 8, maxWidth: 520, width: '100%' }}>
-        {kicker ? (
-          <Text selectable style={{ color: colors.pink, fontSize: 12, fontWeight: '900' }}>
-            {kicker.toUpperCase()}
-          </Text>
-        ) : null}
-        {title ? (
-          <Text selectable style={{ color: colors.surface, fontSize: 32, fontWeight: '900', lineHeight: 36 }}>
-            {title}
-          </Text>
-        ) : null}
-        {subtitle ? (
-          <Text selectable style={{ color: colors.backgroundDeep, fontSize: 16, lineHeight: 23 }}>
-            {subtitle}
-          </Text>
-        ) : null}
-      </View>
-      {children}
-    </ScrollView>
+      <ScrollView
+        contentInsetAdjustmentBehavior="automatic"
+        style={{ height }}
+        contentContainerStyle={{
+          alignItems: 'center',
+          gap: 18,
+          justifyContent: centered ? 'center' : 'flex-start',
+          minHeight: height,
+          padding: 20,
+          paddingBottom: 40,
+        }}>
+        {children}
+      </ScrollView>
+    </View>
   );
 }
 
@@ -80,30 +53,89 @@ type PanelProps = {
 };
 
 export function Panel({ children, tone = 'default' }: PanelProps) {
-  const isStrong = tone === 'strong';
-  const isSunny = tone === 'sunny';
-  const isGlass = tone === 'glass';
+  const pattern = patterns.panel[tone];
 
   return (
     <View
       style={{
-        backgroundColor: isGlass
-          ? 'rgba(255, 255, 255, 0.78)'
-          : isStrong
-            ? colors.navy
-            : isSunny
-              ? colors.warningSoft
-              : colors.surface,
-        borderColor: isGlass ? 'rgba(255, 255, 255, 0.92)' : isStrong ? colors.pink : isSunny ? colors.yellow : colors.line,
-        borderRadius: 20,
-        borderWidth: isStrong ? 3 : 2,
-        boxShadow: isGlass ? '0 12px 0 rgba(7, 26, 61, 0.22)' : '0 8px 0 rgba(7, 26, 61, 0.10)',
+        backgroundColor: pattern.backgroundColor,
+        borderColor: pattern.borderColor,
+        borderRadius: pattern.radius,
+        borderWidth: pattern.borderWidth,
+        boxShadow: pattern.shadow,
         gap: 14,
-        maxWidth: 520,
+        maxWidth: patterns.layout.panelMaxWidth,
         padding: 16,
         width: '100%',
       }}>
       {children}
     </View>
+  );
+}
+
+type MenuPanelProps = {
+  actions?: ReactNode;
+  backHref?: Href;
+  children: ReactNode;
+  meta?: ReactNode;
+  title: string;
+};
+
+export function MenuPanel({ actions, backHref = '/', children, meta, title }: MenuPanelProps) {
+  return (
+    <Panel>
+      <View
+        style={{
+          alignItems: 'center',
+          borderBottomColor: 'rgba(7, 26, 61, 0.10)',
+          borderBottomWidth: 1,
+          flexDirection: 'row',
+          gap: 10,
+          minHeight: 48,
+          paddingBottom: 12,
+        }}>
+        <Link href={backHref} asChild>
+          <Pressable
+            accessibilityLabel="Voltar"
+            accessibilityRole="button"
+            style={{
+              alignItems: 'center',
+              backgroundColor: colors.surface,
+              borderColor: colors.pink,
+              borderRadius: 14,
+              borderWidth: 2,
+              height: 40,
+              justifyContent: 'center',
+              width: 40,
+            }}>
+            <Ionicons color={colors.navy} name="chevron-back" size={24} />
+          </Pressable>
+        </Link>
+        <View style={{ flex: 1, gap: 2 }}>
+          <Text
+            numberOfLines={2}
+            selectable
+            style={{ color: colors.ink, fontSize: 22, fontWeight: '900', lineHeight: 26 }}>
+            {title}
+          </Text>
+          {meta ? <View>{meta}</View> : null}
+        </View>
+      </View>
+
+      <View style={{ gap: 14, width: '100%' }}>{children}</View>
+
+      {actions ? (
+        <View
+          style={{
+            borderTopColor: 'rgba(7, 26, 61, 0.10)',
+            borderTopWidth: 1,
+            gap: 12,
+            paddingTop: 14,
+            width: '100%',
+          }}>
+          {actions}
+        </View>
+      ) : null}
+    </Panel>
   );
 }

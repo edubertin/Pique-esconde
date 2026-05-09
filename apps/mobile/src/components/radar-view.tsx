@@ -53,7 +53,7 @@ export function RadarView({ rush = false }: { rush?: boolean }) {
         />
         <View
           style={{
-            backgroundColor: rush ? colors.pink : colors.navy,
+            backgroundColor: rush ? colors.pink : colors.esconde,
             borderRadius: 999,
             height: 8,
             transform: [{ rotate: rush ? '42deg' : '28deg' }],

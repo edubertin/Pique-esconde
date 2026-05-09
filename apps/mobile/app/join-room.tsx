@@ -3,7 +3,7 @@ import { Text, TextInput } from 'react-native';
 import { AvatarChoice } from '@/src/components/avatar-choice';
 import { Badge } from '@/src/components/badge';
 import { GameButton } from '@/src/components/game-button';
-import { Panel, PrototypeScreen } from '@/src/components/prototype-screen';
+import { MenuPanel, PrototypeScreen } from '@/src/components/prototype-screen';
 import { colors } from '@/src/theme/colors';
 
 const inputStyle = {
@@ -19,8 +19,10 @@ const inputStyle = {
 
 export default function JoinRoomScreen() {
   return (
-    <PrototypeScreen title="Entrar na sala">
-      <Panel>
+    <PrototypeScreen>
+      <MenuPanel
+        title="Entrar na sala"
+        actions={<GameButton href="/location-permission" label="Entrar" />}>
         <Badge label="Sala temporária" tone="neutral" />
         <Text selectable style={{ color: colors.ink, fontSize: 16, fontWeight: '900' }}>
           Código da sala
@@ -42,8 +44,7 @@ export default function JoinRoomScreen() {
         </Text>
         <TextInput placeholder="Seu apelido" placeholderTextColor={colors.muted} value="Ana" style={inputStyle} />
         <AvatarChoice selectedId="avatar_02" />
-        <GameButton href="/location-permission" label="Entrar" />
-      </Panel>
+      </MenuPanel>
     </PrototypeScreen>
   );
 }

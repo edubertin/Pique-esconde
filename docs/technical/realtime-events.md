@@ -287,7 +287,7 @@ Razões:
 
 ### `game.rematch_requested`
 
-Emitido quando grupo decide jogar novamente.
+Emitido quando grupo decide jogar novamente. A sala é mantida e o grupo volta para o lobby.
 
 Payload:
 
@@ -301,7 +301,7 @@ Payload:
 
 ### `seeker.selected`
 
-Emitido quando líder escolhe manualmente o próximo procurador.
+Emitido quando líder escolhe manualmente o próximo procurador pelo lobby.
 
 Payload:
 
@@ -394,4 +394,3 @@ Aviso local ou realtime para instabilidade.
 - Eventos de debug: até 24 horas no MVP.
 - Localização bruta: apenas durante partida ativa.
 - Cards sociais: sem GPS, mapa, rota, endereço ou coordenadas.
-

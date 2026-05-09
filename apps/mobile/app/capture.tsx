@@ -2,13 +2,21 @@ import { Text, View } from 'react-native';
 
 import { Badge } from '@/src/components/badge';
 import { GameButton } from '@/src/components/game-button';
-import { Panel, PrototypeScreen } from '@/src/components/prototype-screen';
+import { MenuPanel, PrototypeScreen } from '@/src/components/prototype-screen';
 import { colors } from '@/src/theme/colors';
 
 export default function CaptureScreen() {
   return (
-    <PrototypeScreen title="Captura!">
-      <Panel tone="strong">
+    <PrototypeScreen>
+      <MenuPanel
+        backHref="/seeker-radar"
+        title="Captura!"
+        actions={
+          <>
+            <GameButton href="/seeker-radar" label="Continuar procurando" />
+            <GameButton href="/result" label="Encerrar rodada" variant="ghost" />
+          </>
+        }>
         <View style={{ alignItems: 'center', gap: 14 }}>
           <Badge label="Encontrado" tone="rush" />
           <View
@@ -24,16 +32,14 @@ export default function CaptureScreen() {
             }}>
             <Text style={{ color: colors.navy, fontSize: 24, fontWeight: '900' }}>A3</Text>
           </View>
-          <Text selectable style={{ color: colors.surface, fontSize: 26, fontWeight: '900', textAlign: 'center' }}>
+          <Text selectable style={{ color: colors.navy, fontSize: 26, fontWeight: '900', textAlign: 'center' }}>
             Rafa foi encontrado
           </Text>
-          <Text selectable style={{ color: colors.backgroundDeep, fontSize: 16, textAlign: 'center' }}>
+          <Text selectable style={{ color: colors.ink, fontSize: 16, textAlign: 'center' }}>
             Restam 2 escondidos na rodada.
           </Text>
         </View>
-        <GameButton href="/seeker-radar" label="Continuar procurando" />
-        <GameButton href="/result" label="Encerrar rodada" variant="ghost" />
-      </Panel>
+      </MenuPanel>
     </PrototypeScreen>
   );
 }

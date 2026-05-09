@@ -16,7 +16,8 @@ Decisões já tomadas:
 - O botão "estou escondido" serve para acelerar a liberação do procurador, não para travar a partida.
 - Se o tempo de esconder acabar, o procurador é liberado automaticamente.
 - O criador da sala é sempre o primeiro procurador.
-- Em novas rodadas, o procurador/líder escolhe manualmente o próximo procurador.
+- Em novas rodadas, o procurador/líder escolhe manualmente o próximo procurador pelo lobby.
+- O líder pode promover outro jogador da lista do lobby.
 - Se o procurador/líder cair, a liderança passa automaticamente para o próximo jogador disponível.
 - Jogadores podem voltar para a mesma sala após desconexão.
 - No MVP, começar com configuração padrão de ambiente e evoluir para presets aberto, misto e menor.
@@ -25,7 +26,7 @@ Decisões já tomadas:
 - O app não deve prometer bom funcionamento em ambiente fechado.
 - A comunicação deve recomendar local aberto ou misto.
 - Sala temporária expira quando todos saem ou após inatividade.
-- Sugestão inicial de expiração: 30 minutos sem atividade.
+- Se restar apenas 1 jogador ativo, a sala expira após 6 minutos sem novos jogadores.
 
 Pendências desta fase:
 

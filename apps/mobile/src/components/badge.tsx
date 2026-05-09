@@ -8,7 +8,7 @@ const badgeStyles: Record<BadgeTone, { backgroundColor: string; color: string; b
   neutral: { backgroundColor: colors.surface, borderColor: colors.line, color: colors.ink },
   ready: { backgroundColor: colors.successSoft, borderColor: colors.green, color: colors.green },
   waiting: { backgroundColor: colors.warningSoft, borderColor: colors.yellow, color: colors.ink },
-  leader: { backgroundColor: colors.navy, borderColor: colors.pink, color: colors.surface },
+  leader: { backgroundColor: colors.esconde, borderColor: colors.pink, color: colors.navy },
   captured: { backgroundColor: colors.dangerSoft, borderColor: colors.danger, color: colors.danger },
   rush: { backgroundColor: colors.pink, borderColor: colors.navy, color: colors.surface },
 };

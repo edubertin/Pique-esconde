@@ -23,7 +23,7 @@ export default function HomeScreen() {
             <GameButton href="/join-room" label="Entrar com código" variant="secondary" />
           </View>
           <Text selectable style={{ color: colors.muted, fontSize: 13, fontWeight: '800', textAlign: 'center' }}>
-            2-8 jogadores · sala temporária · GPS só na partida
+            2-8 jogadores
           </Text>
         </View>
       </Panel>

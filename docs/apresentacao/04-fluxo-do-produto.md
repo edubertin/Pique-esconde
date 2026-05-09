@@ -22,7 +22,8 @@ O fluxo principal do MVP deve ser simples e rápido. O app existe para iniciar u
 16. Nos segundos finais, entra o rush final com raio maior.
 17. Partida termina por captura de todos ou fim do tempo.
 18. Resultado mostra vencedor: procurador ou escondidos sobreviventes.
-19. Grupo pode jogar novamente na mesma sala.
+19. Grupo pode jogar novamente na mesma sala, voltando para o lobby.
+20. No lobby, o líder pode promover outro jogador como próximo procurador.
 
 ## Telas Necessárias
 
@@ -67,7 +68,7 @@ Objetivo: reunir o grupo antes da partida.
 Elementos:
 
 - Código/link da sala.
-- Botão de compartilhar convite.
+- Botão de convidar por link/código.
 - Lista de jogadores com apelido e avatar.
 - Status de cada jogador: entrou, preparado.
 - Indicação do procurador.
@@ -202,7 +203,8 @@ Direção recomendada:
 - A sala é temporária.
 - Limite rígido inicial: até 8 jogadores por sala.
 - Quem cria a sala é o procurador inicial.
-- O líder/procurador escolhe manualmente o próximo procurador em novas rodadas.
+- O líder/procurador escolhe manualmente o próximo procurador em novas rodadas pelo lobby.
+- O líder pode tocar/promover um jogador da lista para assumir a liderança/procurador.
 - Se o líder/procurador cair, a liderança passa automaticamente para o próximo jogador disponível.
 - Jogadores podem voltar para a mesma sala após desconexão.
 - O convite acontece por link e código.
@@ -223,7 +225,10 @@ Direção recomendada:
 - O rush final aumenta bastante o alcance do procurador.
 - Procurador vence se capturar todos antes do fim.
 - Escondidos vencem se ao menos um não for capturado até o fim.
-- Ao jogar novamente, o grupo permanece na mesma sala e uma nova rodada começa com as regras atuais ou ajustadas pelo criador.
+- Ao jogar novamente, o grupo permanece na mesma sala e volta para o lobby.
+- A próxima rodada começa depois que o líder confirmar o procurador e iniciar novamente.
+- Se restar apenas 1 jogador ativo na sala, ela fica aguardando por até 6 minutos.
+- Se ainda houver apenas 1 jogador após 6 minutos, a sala expira.
 - Jogadores podem sair da sala a qualquer momento antes de uma partida começar.
 - Ao encerrar a partida, dados temporários de localização devem parar de ser usados.
 

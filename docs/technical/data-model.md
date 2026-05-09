@@ -36,7 +36,8 @@ Notas:
 
 - O limite de 8 jogadores aparece para o usuário.
 - Se todos saírem, a sala pode ser encerrada.
-- Se ficar sem atividade por 30 minutos, expira.
+- Se todos saírem, expira imediatamente.
+- Se restar apenas 1 jogador ativo, expira após 6 minutos sem novos jogadores.
 
 ### `players`
 
@@ -90,6 +91,7 @@ Notas:
 
 - A sala pode ter várias rodadas.
 - O grupo pode jogar novamente sem criar nova sala.
+- Ao jogar novamente, o grupo volta para o lobby da mesma sala.
 
 ### `game_events`
 
@@ -201,6 +203,7 @@ Política:
 - Uma sala tem no máximo 8 jogadores ativos.
 - Uma sala tem um líder ativo.
 - Uma rodada tem um procurador.
+- O próximo líder/procurador pode ser promovido pelo lobby.
 - Jogador sem permissão de localização não pode ficar como `hider` ou `seeker`.
 - Jogador capturado não aparece como alvo ativo do radar.
 - Ao finalizar a rodada, localização deixa de ser usada.
@@ -223,4 +226,3 @@ Não incluir:
 - Coordenadas.
 - Endereço.
 - Identidade real.
-

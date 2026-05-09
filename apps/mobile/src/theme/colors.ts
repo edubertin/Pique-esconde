@@ -1,6 +1,8 @@
 export const colors = {
   background: '#F7FBFF',
   backgroundDeep: '#DDF4FF',
+  menuPink: '#F7B8CC',
+  menuSurface: '#FFFAFC',
   surface: '#FFFFFF',
   ink: '#071A3D',
   muted: '#59708F',
@@ -10,6 +12,8 @@ export const colors = {
   pinkDark: '#D5166C',
   lime: '#B6F000',
   limeDark: '#7FB000',
+  esconde: '#B6F000',
+  escondeDark: '#7FB000',
   green: '#33C759',
   yellow: '#FFCC00',
   blue: '#0A84FF',

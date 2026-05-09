@@ -2,13 +2,13 @@ import { Text, View } from 'react-native';
 
 import { BrandLogo } from '@/src/components/brand-logo';
 import { GameButton } from '@/src/components/game-button';
-import { Panel, PrototypeScreen } from '@/src/components/prototype-screen';
+import { MenuPanel, PrototypeScreen } from '@/src/components/prototype-screen';
 import { colors } from '@/src/theme/colors';
 
 export default function SocialCardScreen() {
   return (
-    <PrototypeScreen title="Card social">
-      <Panel tone="strong">
+    <PrototypeScreen>
+      <MenuPanel backHref="/result" title="Card social" actions={<GameButton href="/lobby" label="Voltar para sala" />}>
         <View
           style={{
             alignItems: 'center',
@@ -29,19 +29,18 @@ export default function SocialCardScreen() {
           <View
             style={{
               alignItems: 'center',
-              backgroundColor: colors.navy,
-              borderColor: colors.lime,
+              backgroundColor: colors.esconde,
+              borderColor: colors.pink,
               borderRadius: 16,
               borderWidth: 3,
               height: 88,
               justifyContent: 'center',
               width: 88,
             }}>
-            <Text style={{ color: colors.surface, fontWeight: '900', textAlign: 'center' }}>QR</Text>
+            <Text style={{ color: colors.navy, fontWeight: '900', textAlign: 'center' }}>QR</Text>
           </View>
         </View>
-        <GameButton href="/lobby" label="Voltar para sala" />
-      </Panel>
+      </MenuPanel>
     </PrototypeScreen>
   );
 }

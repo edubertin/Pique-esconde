@@ -2,7 +2,7 @@ import { Text, View } from 'react-native';
 
 import { Badge } from '@/src/components/badge';
 import { GameButton } from '@/src/components/game-button';
-import { Panel, PrototypeScreen } from '@/src/components/prototype-screen';
+import { MenuPanel, PrototypeScreen } from '@/src/components/prototype-screen';
 import { gameRules } from '@/src/constants/game';
 import { colors } from '@/src/theme/colors';
 
@@ -30,8 +30,8 @@ function RuleRow({ label, value, tone }: { label: string; tone?: 'ready' | 'wait
 
 export default function RulesScreen() {
   return (
-    <PrototypeScreen title="Regras">
-      <Panel>
+    <PrototypeScreen>
+      <MenuPanel backHref="/lobby" title="Regras" actions={<GameButton href="/lobby" label="Salvar regras" />}>
         <RuleRow label="Tempo para esconder" value={`${gameRules.hideSeconds}s`} tone="waiting" />
         <RuleRow label="Tempo para procurar" value="3min" tone="leader" />
         <RuleRow label="Ambiente" value="Padrão" />
@@ -40,8 +40,7 @@ export default function RulesScreen() {
           value={`${gameRules.captureRadiusMeters}m / ${gameRules.captureConfirmSeconds}s`}
           tone="ready"
         />
-        <GameButton href="/lobby" label="Salvar regras" />
-      </Panel>
+      </MenuPanel>
     </PrototypeScreen>
   );
 }

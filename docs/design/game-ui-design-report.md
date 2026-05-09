@@ -42,6 +42,26 @@ Decisões aplicadas:
 - Páginas com menos texto auxiliar e mais foco na ação principal.
 - Cards, badges, botões e radar padronizados com o pattern Arcade Card UI.
 
+### Atualização - Padronização de Menus
+
+Decisões aplicadas na UI navegável:
+
+- Home continua como tela especial, com logo grande, botões e texto mínimo.
+- Telas internas usam o pattern `GameScreen > MenuPanel`.
+- O background ilustrado fica full-screen e é redimensionado pela janela atual.
+- A rolagem acontece sobre o background, evitando cortes estranhos em telas longas.
+- Headers nativos foram escondidos; cada tela interna tem header dentro da caixa.
+- Botão voltar fica dentro da caixa, como controle de menu mobile.
+- Todos os painéis principais usam a mesma largura máxima e o mesmo visual translúcido da home.
+- Ações principais ficam como botão grande.
+- Telas com várias ações usam ação principal grande + `ActionGrid` compacto em duas colunas.
+- Verde da palavra `ESCONDE` virou acento de interação, principalmente no botão secundário.
+- O termo `Convidar` é usado no lobby para convite por link/código.
+- O termo `Compartilhar` fica reservado para resultado/card social.
+- A tela de resultado deixou de usar radar e passou a ter avatar, card de vencedor, estatísticas e resumo da partida.
+- `Jogar novamente` volta para o lobby da mesma sala.
+- A tela de resultado oferece `Sair` para quem não quiser continuar.
+
 Assets usados no app:
 
 - `apps/mobile/assets/images/pique-esconde-logo.png`
@@ -162,16 +182,30 @@ borderColor: navy
 
 Uso:
 
-- Regras.
-- Compartilhar link.
-- Trocar procurador.
+- Entrar com código.
+- Iniciar partida quando aparece como ação alternativa.
+- Ação secundária positiva em grid.
 
 Estilo:
 
-- Fundo `navy`.
-- Texto branco.
+- Fundo `lime/esconde`.
+- Texto `navy`.
 - Mesmo tamanho do primário.
 - Menos destaque que o primário por posição/hierarquia, não por tamanho.
+
+### Botões Compactos / ActionGrid
+
+Uso:
+
+- Ações secundárias em telas com muitos comandos.
+- Lobby.
+- Resultado.
+
+Pattern:
+
+- Uma ação principal grande.
+- Ações secundárias em grid de duas colunas.
+- Botão perigoso (`Sair`) menor e visualmente menos dominante.
 
 ### Botão Ghost
 
@@ -279,7 +313,7 @@ O lobby é a tela social mais importante.
 Recomendação de estrutura:
 
 1. Topo com código da sala e contador `4/8`.
-2. Botão de compartilhar link.
+2. Botão de convidar por link/código.
 3. Bloco do procurador/líder.
 4. Lista de jogadores.
 5. Ação principal no fim.
@@ -492,15 +526,27 @@ Pattern:
 
 ### Resultado
 
-Foco em jogar de novo.
+Foco em celebração e próxima decisão.
 
 Ordem:
 
-1. Resultado.
-2. Vencedores/capturados.
-3. Jogar novamente.
-4. Compartilhar resultado.
-5. Sair.
+1. Título `Resultados`.
+2. Card de vencedor com avatar.
+3. Resumo curto da partida.
+4. Estatísticas rápidas.
+5. Jogar novamente.
+6. Sair.
+7. Compartilhar resultado.
+
+Evitar:
+
+- Radar na tela de resultado.
+- Texto técnico ou frio.
+- Botão de trocar procurador no resultado.
+
+Troca de procurador:
+
+- Deve acontecer no lobby, clicando/promovendo um jogador, não no resultado.
 
 ## Prioridades de Implementação
 

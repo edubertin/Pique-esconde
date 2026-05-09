@@ -9,6 +9,7 @@ This folder contains the product, design and technical planning for Pique Escond
 - `technical/decisions/`: ADRs explaining important technical choices.
 - `design/`: visual references and future wireframes/design artifacts.
 - `agents/`: specialized agent prompts and role briefings.
+- `qa/`: test plan, manual cases, regression checklist and test run reports.
 
 ## Recommended Reading Order
 
@@ -25,3 +26,4 @@ This folder contains the product, design and technical planning for Pique Escond
 11. `design/wireframes.md`
 12. `design/game-ui-design-report.md`
 13. `agents/`
+14. `qa/`

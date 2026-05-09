@@ -19,7 +19,8 @@ Decisões já encaminhadas:
 - Diversidade inicial: 2 avatares masculinos e 2 femininos, com cuidado de inclusão visual.
 - Limite rígido inicial de sala: até 8 jogadores, evitando lobbies grandes.
 - O limite de 8 jogadores aparece para o usuário.
-- Troca de procurador em nova rodada: manual, escolhida pelo líder/procurador.
+- Troca de procurador em nova rodada: manual, escolhida pelo líder/procurador no lobby.
+- O líder pode promover outro jogador da lista.
 - Se o líder/procurador cair, liderança passa para o próximo jogador disponível.
 - Jogadores podem voltar para a mesma sala após desconexão.
 - Sala temporária deve expirar quando todos saírem ou após limite de inatividade.
@@ -117,4 +118,4 @@ Texto para quem negar:
 - A sala continua ativa enquanto houver jogadores conectados.
 - Se todos saírem, a sala é encerrada.
 - Se a sala ficar sem atividade por um período definido, ela expira automaticamente.
-- Sugestão inicial de expiração: 30 minutos sem atividade.
+- Se restar apenas 1 jogador ativo, a sala expira após 6 minutos sem novos jogadores.

@@ -36,9 +36,9 @@ Funcionalidades essenciais:
 - Progressão de raio durante a partida.
 - Rush final nos últimos segundos.
 - Resultado da partida.
-- Jogar novamente usando a mesma sala e o mesmo grupo.
+- Jogar novamente usando a mesma sala e o mesmo grupo, voltando para o lobby.
 - Compartilhar card social de resultado da partida, sem GPS ou mapa real.
-- Escolher manualmente o próximo procurador em nova rodada.
+- Escolher manualmente o próximo procurador pelo lobby em nova rodada.
 - Permitir retorno de jogador desconectado para a mesma sala.
 - Passar liderança automaticamente para o próximo jogador disponível se o líder/procurador cair.
 - Encerramento da sala/partida.
@@ -105,7 +105,9 @@ O MVP está pronto quando um grupo consegue completar uma partida real de ponta 
 14. A partida termina corretamente por captura total ou fim do tempo.
 15. O resultado mostra vencedor e participantes.
 16. O grupo consegue iniciar nova rodada sem criar uma nova sala.
-17. O app para de usar localização ao terminar.
+17. Ao jogar novamente, o grupo volta para o lobby.
+18. O líder pode promover outro jogador como próximo procurador no lobby.
+19. O app para de usar localização ao terminar.
 
 Critérios técnicos mínimos:
 

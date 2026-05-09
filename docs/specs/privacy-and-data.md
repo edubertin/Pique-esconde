@@ -39,7 +39,8 @@ Política inicial proposta:
 - Localização bruta: manter apenas durante a partida ativa e apagar ao fim da rodada/partida.
 - Última localização em memória/realtime: usada somente para calcular radar e captura.
 - Eventos da partida: manter por até 24 horas para depuração básica do MVP.
-- Sala temporária: expira quando todos saem ou após 30 minutos sem atividade.
+- Sala temporária: expira quando todos saem.
+- Se restar apenas 1 jogador ativo, expira após 6 minutos sem novos jogadores.
 - Apelido e avatar da sala: manter enquanto a sala estiver ativa ou dentro da janela curta de reconexão.
 - Card social: gerado sem GPS, mapa real, rota, endereço ou coordenadas.
 - Dados agregados anônimos: podem ser mantidos para métricas de produto, como partidas criadas, partidas concluídas e quantidade de jogadores, desde que não identifiquem pessoas nem trajetos.

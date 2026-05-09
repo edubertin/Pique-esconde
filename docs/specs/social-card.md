@@ -4,6 +4,12 @@
 
 Definir o card social de resultado para divulgação do jogo sem expor localização.
 
+## Diferença Entre Convite e Compartilhamento
+
+- `Convidar` é usado no lobby para chamar amigos por link/código da sala.
+- `Compartilhar` é usado no resultado/card social.
+- O card social divulga o placar ou resultado, não a localização da partida.
+
 ## Conteúdo Permitido
 
 - Logo/nome Pique Esconde.
