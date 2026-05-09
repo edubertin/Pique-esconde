@@ -22,12 +22,6 @@ export default function LobbyScreen() {
   const isLeader = Boolean(activePlayer?.isLeader);
   const notReadyPlayers = players.filter((player) => !player.isLeader && player.status !== 'Preparado');
   const canLeaderStart = isLeader && players.length >= 2 && notReadyPlayers.length === 0;
-  const leaderStartHint =
-    players.length < 2
-      ? t('lobby.startNeedPlayers')
-      : notReadyPlayers.length > 0
-        ? t('lobby.startWaitingNames', { names: notReadyPlayers.map((player) => player.nickname).join(', ') })
-        : undefined;
   const lobbyNoticeNames =
     room?.lobbyNotice?.type === 'players_not_ready'
       ? room.lobbyNotice.names.filter((name) => players.some((player) => player.nickname === name && !player.isLeader && player.status !== 'Preparado'))
@@ -150,19 +144,12 @@ export default function LobbyScreen() {
         actions={
           <>
             {isLeader ? (
-              <View style={{ gap: 8 }}>
-                <GameButton
-                  disabled={!canLeaderStart || isLoading}
-                  label={canLeaderStart ? (isLoading ? 'Sincronizando...' : t('lobby.start')) : t('lobby.startWaiting')}
-                  onPress={handleStartRound}
-                  variant="secondary"
-                />
-                {leaderStartHint ? (
-                  <Text selectable style={{ color: colors.muted, fontSize: 13, fontWeight: '800', lineHeight: 18, textAlign: 'center' }}>
-                    {leaderStartHint}
-                  </Text>
-                ) : null}
-              </View>
+              <GameButton
+                disabled={!canLeaderStart || isLoading}
+                label={canLeaderStart ? (isLoading ? 'Sincronizando...' : t('lobby.start')) : t('lobby.startWaiting')}
+                onPress={handleStartRound}
+                variant="secondary"
+              />
             ) : (
               <GameButton label={readyLabel} onPress={handleToggleReady} variant="secondary" />
             )}
