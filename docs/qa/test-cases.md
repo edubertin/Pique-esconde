@@ -243,6 +243,9 @@ Passos:
 
 Resultado esperado:
 - Resultado mostra quem venceu.
+- Se o procurador venceu, o avatar em destaque é o procurador.
+- Se os escondidos venceram, o avatar em destaque é o escondido que ficou mais tempo sem ser capturado.
+- Em vitória dos escondidos, a tela explica o destaque com texto curto, como `Ficou mais tempo escondido`.
 - Jogador volta para o lobby da mesma sala.
 - Sala continua reutilizavel.
 - Lider pode promover o proximo procurador manualmente pelo lobby.

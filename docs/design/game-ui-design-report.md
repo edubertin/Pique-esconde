@@ -548,6 +548,13 @@ Troca de procurador:
 
 - Deve acontecer no lobby, clicando/promovendo um jogador, não no resultado.
 
+Destaque do resultado:
+
+- Se o procurador vencer, o card principal mostra o procurador com avatar comemorando.
+- Se os escondidos vencerem, o card principal mostra o escondido que ficou mais tempo sem ser capturado.
+- Em vitória dos escondidos, o texto precisa explicar a referência do avatar, por exemplo: `Ficou mais tempo escondido`.
+- Quando houver mais de um escondido vencedor, o resultado continua tratando a vitória como vitória do grupo; o avatar principal é o destaque individual da rodada.
+
 ## Prioridades de Implementação
 
 1. Criar tokens formais de design em `src/theme`.

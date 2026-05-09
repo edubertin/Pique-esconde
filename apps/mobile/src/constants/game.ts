@@ -1,9 +1,48 @@
+import type { ImageSourcePropType } from 'react-native';
+
+type Avatar = {
+  celebrateImage: ImageSourcePropType;
+  color: string;
+  faceImage: ImageSourcePropType;
+  id: string;
+  label: string;
+  name: string;
+};
+
 export const avatars = [
-  { id: 'avatar_01', label: 'A1', name: 'Avatar 1', color: '#FF2D8D', roomArticle: 'do' },
-  { id: 'avatar_02', label: 'A2', name: 'Avatar 2', color: '#33C759', roomArticle: 'da' },
-  { id: 'avatar_03', label: 'A3', name: 'Avatar 3', color: '#FFCC00', roomArticle: 'do' },
-  { id: 'avatar_04', label: 'A4', name: 'Avatar 4', color: '#0A84FF', roomArticle: 'da' },
-];
+  {
+    id: 'avatar_01',
+    label: 'A1',
+    name: 'Avatar 1',
+    color: '#FF2D8D',
+    faceImage: require('@/assets/images/avatars/avatar-girl-01-face.png'),
+    celebrateImage: require('@/assets/images/avatars/avatar-girl-01-celebrate.png'),
+  },
+  {
+    id: 'avatar_02',
+    label: 'A2',
+    name: 'Avatar 2',
+    color: '#33C759',
+    faceImage: require('@/assets/images/avatars/avatar-girl-02-face.png'),
+    celebrateImage: require('@/assets/images/avatars/avatar-girl-02-celebrate.png'),
+  },
+  {
+    id: 'avatar_03',
+    label: 'A3',
+    name: 'Avatar 3',
+    color: '#FFCC00',
+    faceImage: require('@/assets/images/avatars/avatar-boy-01-face.png'),
+    celebrateImage: require('@/assets/images/avatars/avatar-boy-01-celebrate.png'),
+  },
+  {
+    id: 'avatar_04',
+    label: 'A4',
+    name: 'Avatar 4',
+    color: '#0A84FF',
+    faceImage: require('@/assets/images/avatars/avatar-robot-01-face.png'),
+    celebrateImage: require('@/assets/images/avatars/avatar-robot-01-celebrate.png'),
+  },
+] satisfies Avatar[];
 
 export const players = [
   { id: 'p1', nickname: 'Dudu', avatarId: 'avatar_01', status: 'Líder' },

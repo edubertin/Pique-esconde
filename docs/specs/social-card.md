@@ -24,6 +24,14 @@ Definir o card social de resultado para divulgação do jogo sem expor localiza�
 - Chamada simples de disponibilidade na loja.
 - QR code ou link de instalação, a definir no design.
 
+## Avatar em Destaque
+
+- Se o procurador vencer, o card pode destacar o procurador com seu avatar comemorando.
+- Se os escondidos vencerem, o card deve destacar o escondido que ficou mais tempo sem ser capturado.
+- O card precisa deixar claro o motivo do destaque. Exemplo: `Ficou mais tempo escondido`.
+- Quando houver vários escondidos vencedores, o card pode citar a vitória do grupo, mas o avatar principal representa o destaque individual da rodada.
+- O card social continua proibido de mostrar localização, mapa, rota, endereço ou coordenadas.
+
 ## Conteúdo Proibido
 
 - GPS.

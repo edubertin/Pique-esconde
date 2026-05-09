@@ -6,16 +6,19 @@ import { AvatarChoice } from '@/src/components/avatar-choice';
 import { Badge } from '@/src/components/badge';
 import { GameButton } from '@/src/components/game-button';
 import { MenuPanel, PrototypeScreen } from '@/src/components/prototype-screen';
+import { t } from '@/src/i18n';
 import { useRoom } from '@/src/state/room-store';
 import { colors } from '@/src/theme/colors';
 
 const inputStyle = {
-  backgroundColor: colors.surface,
-  borderColor: colors.line,
+  backgroundColor: 'rgba(221, 244, 255, 0.78)',
+  borderColor: colors.navy,
   borderRadius: 16,
   borderWidth: 2,
+  boxShadow: '0 5px 0 rgba(7, 26, 61, 0.10)',
   color: colors.ink,
   fontSize: 16,
+  fontWeight: '800' as const,
   minHeight: 56,
   padding: 14,
 };
@@ -38,15 +41,13 @@ export default function JoinRoomScreen() {
 
   return (
     <PrototypeScreen>
-      <MenuPanel
-        title="Entrar na sala"
-        actions={<GameButton label="Entrar" onPress={handleJoinRoom} />}>
-        <Badge label="Sala temporária" tone="neutral" />
+      <MenuPanel title={t('join.title')} actions={<GameButton label={t('join.enter')} onPress={handleJoinRoom} />}>
+        <Badge label={t('join.badge')} tone="neutral" />
         <Text selectable style={{ color: colors.ink, fontSize: 16, fontWeight: '900' }}>
-          Código da sala
+          {t('join.code')}
         </Text>
         <TextInput
-          placeholder="Código da sala"
+          placeholder={t('join.code')}
           placeholderTextColor={colors.muted}
           onChangeText={setCode}
           value={code}
@@ -59,11 +60,11 @@ export default function JoinRoomScreen() {
           }}
         />
         <Text selectable style={{ color: colors.ink, fontSize: 16, fontWeight: '900' }}>
-          Seu apelido
+          {t('create.nickname')}
         </Text>
         <TextInput
           onChangeText={setNickname}
-          placeholder="Seu apelido"
+          placeholder={t('create.nickname')}
           placeholderTextColor={colors.muted}
           value={nickname}
           style={inputStyle}

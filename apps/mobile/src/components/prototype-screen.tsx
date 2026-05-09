@@ -5,7 +5,9 @@ import { Link, type Href } from 'expo-router';
 import { Pressable, ScrollView, Text, useWindowDimensions, View } from 'react-native';
 
 import { colors } from '@/src/theme/colors';
+import { t } from '@/src/i18n';
 import { patterns } from '@/src/theme/patterns';
+import { surfaces } from '@/src/theme/surfaces';
 
 type PrototypeScreenProps = {
   children: ReactNode;
@@ -97,14 +99,12 @@ export function MenuPanel({ actions, backHref = '/', children, headerAction, met
         }}>
         <Link href={backHref} asChild>
           <Pressable
-            accessibilityLabel="Voltar"
+            accessibilityLabel={t('common.back')}
             accessibilityRole="button"
             style={{
+              ...surfaces.iconButtonActive,
               alignItems: 'center',
-              backgroundColor: colors.surface,
-              borderColor: colors.pink,
               borderRadius: 14,
-              borderWidth: 2,
               height: 40,
               justifyContent: 'center',
               width: 40,

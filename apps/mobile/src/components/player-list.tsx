@@ -1,9 +1,13 @@
+import { Ionicons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 
 import { Badge, type BadgeTone } from '@/src/components/badge';
 import { avatars } from '@/src/constants/game';
+import { t } from '@/src/i18n';
 import type { RoomPlayer } from '@/src/state/room-store';
 import { colors } from '@/src/theme/colors';
+import { surfaces } from '@/src/theme/surfaces';
 
 function getAvatar(avatarId: string) {
   return avatars.find((avatar) => avatar.id === avatarId) ?? avatars[0];
@@ -11,11 +15,13 @@ function getAvatar(avatarId: string) {
 
 type PlayerListProps = {
   activePlayerId?: string;
+  canRemove?: boolean;
   onPromote?: (playerId: string) => void;
+  onRemove?: (playerId: string) => void;
   players: RoomPlayer[];
 };
 
-export function PlayerList({ activePlayerId, onPromote, players }: PlayerListProps) {
+export function PlayerList({ activePlayerId, canRemove, onPromote, onRemove, players }: PlayerListProps) {
   const orderedPlayers = [...players].sort((firstPlayer, secondPlayer) => {
     if (firstPlayer.isLeader === secondPlayer.isLeader) return 0;
     return firstPlayer.isLeader ? -1 : 1;
@@ -48,23 +54,24 @@ export function PlayerList({ activePlayerId, onPromote, players }: PlayerListPro
         style={{ maxHeight: 302 }}>
         {orderedPlayers.map((player) => {
           const avatar = getAvatar(player.avatarId);
+          const canRemovePlayer = canRemove && player.id !== activePlayerId;
 
           return (
             <Pressable
-              accessibilityLabel={`${player.nickname} - ${player.isLeader ? 'Líder' : player.status}`}
+              accessibilityLabel={`${player.nickname} - ${player.isLeader ? t('player.leader') : player.status}`}
               accessibilityRole="button"
               key={player.id}
               onPress={() => onPromote?.(player.id)}
               style={{
                 alignItems: 'center',
-                backgroundColor: colors.surface,
-                borderColor: player.isLeader ? colors.pink : colors.line,
+                ...(player.isLeader ? surfaces.highlightTile : surfaces.glassTile),
                 borderRadius: 18,
-                borderWidth: player.isLeader ? 2 : 1,
+                borderWidth: player.isLeader ? 2 : surfaces.glassTile.borderWidth,
+                boxShadow: player.isLeader ? '0 5px 0 rgba(255, 45, 141, 0.16)' : surfaces.glassTile.boxShadow,
                 flexDirection: 'row',
-                gap: 12,
+                gap: 10,
                 height: 66,
-                padding: 12,
+                padding: 10,
               }}>
               <View
                 style={{
@@ -75,19 +82,41 @@ export function PlayerList({ activePlayerId, onPromote, players }: PlayerListPro
                   borderWidth: 2,
                   height: 40,
                   justifyContent: 'center',
+                  overflow: 'hidden',
                   width: 40,
                 }}>
-                <Text style={{ color: colors.surface, fontWeight: '900' }}>{avatar.label}</Text>
+                <Image contentFit="cover" source={avatar.faceImage} style={{ height: 40, width: 40 }} />
               </View>
-              <View style={{ flex: 1, gap: 2 }}>
+              <View style={{ flex: 1, gap: 2, minWidth: 0 }}>
                 <Text numberOfLines={1} style={{ color: colors.ink, fontSize: 16, fontWeight: '800' }}>
                   {player.nickname}
                 </Text>
                 <Text numberOfLines={1} style={{ color: colors.muted, fontSize: 13 }}>
-                  {player.isLeader ? 'Procurador' : player.id === activePlayerId ? 'Você' : 'Jogador'}
+                  {player.isLeader ? t('player.roleSeeker') : player.id === activePlayerId ? t('player.roleYou') : t('player.rolePlayer')}
                 </Text>
               </View>
-              <Badge label={player.isLeader ? 'Líder' : player.status} tone={getTone(player)} />
+              <Badge label={player.isLeader ? t('player.leader') : player.status} tone={getTone(player)} />
+              {canRemovePlayer ? (
+                <Pressable
+                  accessibilityLabel={t('player.remove', { name: player.nickname })}
+                  accessibilityRole="button"
+                  onPress={(event) => {
+                    event.stopPropagation();
+                    onRemove?.(player.id);
+                  }}
+                  style={{
+                    alignItems: 'center',
+                    backgroundColor: colors.dangerSoft,
+                    borderColor: colors.danger,
+                    borderRadius: 14,
+                    borderWidth: 2,
+                    height: 36,
+                    justifyContent: 'center',
+                    width: 36,
+                  }}>
+                  <Ionicons color={colors.danger} name="person-remove-outline" size={18} />
+                </Pressable>
+              ) : null}
             </Pressable>
           );
         })}

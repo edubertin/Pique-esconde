@@ -3,6 +3,7 @@ import { Text, View } from 'react-native';
 import { BrandLogo } from '@/src/components/brand-logo';
 import { GameButton } from '@/src/components/game-button';
 import { Panel, PrototypeScreen } from '@/src/components/prototype-screen';
+import { t } from '@/src/i18n';
 import { colors } from '@/src/theme/colors';
 
 export default function HomeScreen() {
@@ -19,11 +20,11 @@ export default function HomeScreen() {
           }}>
           <BrandLogo />
           <View style={{ gap: 12, width: '100%' }}>
-            <GameButton href="/create-room" label="Criar sala" />
-            <GameButton href="/join-room" label="Entrar com código" variant="secondary" />
+            <GameButton href="/create-room" label={t('home.createRoom')} />
+            <GameButton href="/join-room" label={t('home.joinWithCode')} variant="secondary" />
           </View>
           <Text selectable style={{ color: colors.muted, fontSize: 13, fontWeight: '800', textAlign: 'center' }}>
-            2-8 jogadores
+            {t('common.playersRange')}
           </Text>
         </View>
       </Panel>

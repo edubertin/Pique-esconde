@@ -1,3 +1,4 @@
+import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { Text, View } from 'react-native';
 
@@ -6,19 +7,17 @@ import { Badge } from '@/src/components/badge';
 import { GameButton } from '@/src/components/game-button';
 import { MenuPanel, PrototypeScreen } from '@/src/components/prototype-screen';
 import { avatars } from '@/src/constants/game';
+import { t } from '@/src/i18n';
 import { useRoom } from '@/src/state/room-store';
 import { colors } from '@/src/theme/colors';
-
-const winnerAvatar = avatars[1];
+import { surfaces } from '@/src/theme/surfaces';
 
 function ResultStat({ label, value }: { label: string; value: string }) {
   return (
     <View
       style={{
-        backgroundColor: colors.surface,
-        borderColor: colors.line,
+        ...surfaces.glassTile,
         borderRadius: 16,
-        borderWidth: 1,
         flex: 1,
         gap: 4,
         minWidth: 132,
@@ -38,6 +37,20 @@ export default function ResultScreen() {
   const router = useRouter();
   const { leaveRoom, rematch, room } = useRoom();
   const players = room?.players ?? [];
+  const seeker = players.find((player) => player.isLeader) ?? players[0];
+  const hiders = players.filter((player) => player.id !== seeker?.id);
+  const fallbackHighlight = hiders[0] ?? seeker;
+  const highlightPlayer = players.find((player) => player.id === room?.result?.highlightPlayerId) ?? fallbackHighlight;
+  const highlightAvatar = avatars.find((avatar) => avatar.id === highlightPlayer?.avatarId) ?? avatars[0];
+  const winner = room?.result?.winner ?? 'hiders';
+  const survivorCount = room?.result?.survivorPlayerIds.length ?? Math.max(1, hiders.length - 2);
+  const capturedCount = room?.result?.capturedPlayerIds.length ?? Math.min(2, hiders.length);
+  const resultTitle = winner === 'seeker' ? t('result.seekerWon') : t('result.hidersWon');
+  const highlightReason = winner === 'seeker' ? t('result.highlightSeeker') : t('result.highlightHiders');
+  const summary =
+    winner === 'seeker'
+      ? t('result.summarySeeker', { name: highlightPlayer?.nickname ?? t('player.roleSeeker') })
+      : t('result.summaryHiders', { name: highlightPlayer?.nickname ?? t('social.placeholder') });
 
   const handleRematch = () => {
     rematch();
@@ -53,15 +66,15 @@ export default function ResultScreen() {
     <PrototypeScreen>
       <MenuPanel
         backHref="/seeker-radar"
-        title="Resultados"
-        meta={<Text selectable style={{ color: colors.muted, fontSize: 12, fontWeight: '800' }}>Resultado final da rodada</Text>}
+        title={t('result.title')}
+        meta={<Text selectable style={{ color: colors.muted, fontSize: 12, fontWeight: '800' }}>{t('result.finalMeta')}</Text>}
         actions={
           <>
-            <GameButton label="Jogar novamente" onPress={handleRematch} />
+            <GameButton label={t('result.playAgain')} onPress={handleRematch} />
             <ActionGrid
               actions={[
-                { label: 'Sair', onPress: handleLeaveRoom, variant: 'danger' },
-                { href: '/social-card', label: 'Compartilhar', variant: 'ghost' },
+                { label: t('common.exit'), onPress: handleLeaveRoom, variant: 'danger' },
+                { href: '/social-card', label: t('common.share'), variant: 'ghost' },
               ]}
             />
           </>
@@ -69,53 +82,53 @@ export default function ResultScreen() {
         <View
           style={{
             alignItems: 'center',
-            backgroundColor: colors.surface,
-            borderColor: colors.pink,
+            ...surfaces.highlightTile,
             borderRadius: 22,
-            borderWidth: 3,
-            boxShadow: '0 8px 0 rgba(255, 45, 141, 0.18)',
             gap: 12,
             padding: 18,
           }}>
-          <Badge label="Vencedor" tone="leader" />
+          <Badge label={t('result.winner')} tone="leader" />
           <View
             style={{
               alignItems: 'center',
-              backgroundColor: winnerAvatar.color,
+              backgroundColor: highlightAvatar.color,
               borderColor: colors.esconde,
-              borderRadius: 52,
+              borderRadius: 64,
               borderWidth: 5,
-              height: 104,
+              height: 128,
               justifyContent: 'center',
-              width: 104,
+              overflow: 'hidden',
+              width: 128,
             }}>
-            <Text style={{ color: colors.surface, fontSize: 34, fontWeight: '900' }}>{winnerAvatar.label}</Text>
+            <Image contentFit="contain" source={highlightAvatar.celebrateImage} style={{ height: 118, width: 118 }} />
           </View>
           <Text selectable style={{ color: colors.ink, fontSize: 30, fontWeight: '900', textAlign: 'center' }}>
-            Escondidos venceram
+            {resultTitle}
           </Text>
+          <Badge label={highlightReason} tone="ready" />
           <Text selectable style={{ color: colors.muted, fontSize: 16, fontWeight: '700', lineHeight: 22, textAlign: 'center' }}>
-            Ana segurou o esconderijo até o fim e virou campeã da rodada.
+            {summary}
           </Text>
         </View>
 
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
-          <ResultStat label="Tempo de jogo" value="3min" />
-          <ResultStat label="Jogadores" value={`${players.length || 4}`} />
-          <ResultStat label="Capturados" value="2" />
-          <ResultStat label="Sobreviveu" value="Ana" />
+          <ResultStat label={t('result.time')} value={room?.result?.durationLabel ?? '3min'} />
+          <ResultStat label={t('result.players')} value={`${players.length || 4}`} />
+          <ResultStat label={t('result.captured')} value={`${capturedCount}`} />
+          <ResultStat
+            label={winner === 'seeker' ? t('result.seeker') : t('result.survived')}
+            value={winner === 'seeker' ? (highlightPlayer?.nickname ?? '-') : `${survivorCount}`}
+          />
         </View>
 
         <View
           style={{
-            backgroundColor: colors.warningSoft,
-            borderColor: colors.yellow,
+            ...surfaces.warningTile,
             borderRadius: 16,
-            borderWidth: 1,
             padding: 14,
           }}>
           <Text selectable style={{ color: colors.ink, fontSize: 15, fontWeight: '800', lineHeight: 21, textAlign: 'center' }}>
-            Resumo: Rafa e Bia foram encontrados. Ana escapou no rush final e garantiu a vitória dos escondidos.
+            {t('result.summary', { summary })}
           </Text>
         </View>
       </MenuPanel>

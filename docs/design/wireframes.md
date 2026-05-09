@@ -482,3 +482,7 @@ Notas:
 - `Jogar novamente` volta ao lobby da mesma sala.
 - `Sair` atende quem não quer jogar outra rodada.
 - Troca de procurador acontece no lobby, não no resultado.
+- Avatar em destaque:
+  - se o procurador vencer, mostrar o procurador;
+  - se os escondidos vencerem, mostrar o escondido que ficou mais tempo sem ser capturado.
+- Em vitória dos escondidos, incluir texto curto como `Ficou mais tempo escondido` para explicar por que aquele avatar aparece.

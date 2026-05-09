@@ -86,6 +86,7 @@ Campos sugeridos:
 | `rush_started_at` | timestamp | Início do rush final. |
 | `finished_at` | timestamp | Fim da rodada. |
 | `winner` | enum | `seeker`, `hiders`, `none`. |
+| `highlight_player_id` | uuid | Jogador exibido como destaque do resultado. Procurador se ele vencer; escondido que ficou mais tempo sem ser capturado se os escondidos vencerem. |
 
 Notas:
 

@@ -3,6 +3,7 @@ import { Text } from 'react-native';
 import { Badge } from '@/src/components/badge';
 import { GameButton } from '@/src/components/game-button';
 import { MenuPanel, PrototypeScreen } from '@/src/components/prototype-screen';
+import { t } from '@/src/i18n';
 import { colors } from '@/src/theme/colors';
 
 export default function HiderStatusScreen() {
@@ -10,17 +11,17 @@ export default function HiderStatusScreen() {
     <PrototypeScreen>
       <MenuPanel
         backHref="/hide-phase"
-        title="Continue escondido"
-        actions={<GameButton href="/capture" label="Simular fui encontrado" variant="secondary" />}>
-        <Badge label="Procurador liberado" tone="waiting" />
+        title={t('hiderStatus.title')}
+        actions={<GameButton href="/capture" label={t('hiderStatus.foundSimulation')} variant="secondary" />}>
+        <Badge label={t('hiderStatus.released')} tone="waiting" />
         <Text selectable style={{ color: colors.ink, fontSize: 48, fontVariant: ['tabular-nums'], fontWeight: '900' }}>
-          02:18
+          {t('hiderStatus.timer')}
         </Text>
         <Text selectable style={{ color: colors.ink, fontSize: 18, fontWeight: '900' }}>
-          Radar aumentando
+          {t('hiderStatus.radarIncreasing')}
         </Text>
         <Text selectable style={{ color: colors.muted, fontSize: 15, lineHeight: 22 }}>
-          Você vence se não for pego até o fim do tempo.
+          {t('hiderStatus.surviveText')}
         </Text>
       </MenuPanel>
     </PrototypeScreen>

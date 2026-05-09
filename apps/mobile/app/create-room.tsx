@@ -6,16 +6,19 @@ import { AvatarChoice } from '@/src/components/avatar-choice';
 import { Badge } from '@/src/components/badge';
 import { GameButton } from '@/src/components/game-button';
 import { MenuPanel, PrototypeScreen } from '@/src/components/prototype-screen';
+import { t } from '@/src/i18n';
 import { useRoom } from '@/src/state/room-store';
 import { colors } from '@/src/theme/colors';
 
 const inputStyle = {
-  backgroundColor: colors.surface,
+  backgroundColor: 'rgba(221, 244, 255, 0.78)',
   borderColor: colors.navy,
   borderRadius: 16,
   borderWidth: 2,
+  boxShadow: '0 5px 0 rgba(7, 26, 61, 0.10)',
   color: colors.ink,
   fontSize: 16,
+  fontWeight: '800' as const,
   minHeight: 56,
   padding: 14,
 };
@@ -38,24 +41,24 @@ export default function CreateRoomScreen() {
   return (
     <PrototypeScreen>
       <MenuPanel
-        title="Criar partida"
+        title={t('create.title')}
         actions={
           <>
-            <GameButton label="Criar sala" onPress={handleCreateRoom} />
-            <GameButton href="/join-room" label="Entrar com código" variant="secondary" />
+            <GameButton label={t('create.createRoom')} onPress={handleCreateRoom} />
+            <GameButton href="/join-room" label={t('create.joinWithCode')} variant="secondary" />
           </>
         }>
         <View style={{ alignItems: 'center', gap: 8 }}>
-          <Badge label="Nova sala" tone="rush" />
+          <Badge label={t('create.badge')} tone="rush" />
         </View>
 
         <View style={{ gap: 10, width: '100%' }}>
           <Text selectable style={{ color: colors.ink, fontSize: 16, fontWeight: '900' }}>
-            Seu apelido
+            {t('create.nickname')}
           </Text>
           <TextInput
             onChangeText={setNickname}
-            placeholder="Seu apelido"
+            placeholder={t('create.nickname')}
             placeholderTextColor={colors.muted}
             value={nickname}
             style={inputStyle}
@@ -75,7 +78,7 @@ export default function CreateRoomScreen() {
             width: '100%',
           }}>
           <Text selectable style={{ color: colors.navy, fontSize: 14, fontWeight: '900', textAlign: 'center' }}>
-            2-8 jogadores
+            {t('common.playersRange')}
           </Text>
         </View>
       </MenuPanel>

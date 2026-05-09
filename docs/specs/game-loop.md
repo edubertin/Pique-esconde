@@ -54,3 +54,12 @@ Definir o fluxo jogável principal do Pique Esconde no MVP.
 ## Decisões CEO Pendentes
 
 - Nenhuma decisão pendente no momento.
+
+## Atualização - Destaque do Resultado
+
+- A tela de resultado sempre mostra um jogador em destaque com seu avatar.
+- Se o procurador vencer, o destaque é o procurador.
+- Se os escondidos vencerem, o destaque é o escondido que ficou mais tempo sem ser capturado.
+- Quando houver mais de um escondido sobrevivente, o destaque representa o melhor desempenho individual dos escondidos, não o único vencedor.
+- O texto da tela deve explicar a referência. Exemplo: `Ficou mais tempo escondido`.
+- O resumo ainda deve deixar claro que a vitória foi dos escondidos como grupo quando houver sobreviventes.

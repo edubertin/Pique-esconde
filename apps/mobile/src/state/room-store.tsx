@@ -12,22 +12,33 @@ export type RoomPlayer = {
   status: PlayerStatus;
 };
 
+export type GameResult = {
+  capturedPlayerIds: string[];
+  durationLabel: string;
+  highlightPlayerId: string;
+  survivorPlayerIds: string[];
+  winner: 'seeker' | 'hiders';
+};
+
 type Room = {
   code: string;
   expiresAt?: number;
   maxPlayers: number;
   phase: 'lobby' | 'hiding' | 'seeking' | 'finished';
   players: RoomPlayer[];
+  result?: GameResult;
 };
 
 type RoomStore = {
   activePlayer?: RoomPlayer;
   addDemoPlayer: () => void;
   createRoom: (input: PlayerInput) => void;
+  finishRound: (winner?: GameResult['winner']) => void;
   joinRoom: (input: PlayerInput & { code: string }) => boolean;
   leaveRoom: () => void;
   promoteLeader: (playerId: string) => void;
   rematch: () => void;
+  removePlayer: (playerId: string) => void;
   room?: Room;
   startRound: () => void;
   toggleReady: () => void;
@@ -67,6 +78,32 @@ function createPlayer(input: PlayerInput, isLeader = false): RoomPlayer {
 
 function getSoloExpiresAt(players: RoomPlayer[]) {
   return players.length === 1 ? Date.now() + 6 * 60 * 1000 : undefined;
+}
+
+function createMockResult(players: RoomPlayer[], winner: GameResult['winner'] = 'hiders'): GameResult {
+  const seeker = players.find((player) => player.isLeader) ?? players[0];
+  const hiders = players.filter((player) => player.id !== seeker?.id);
+
+  if (winner === 'seeker') {
+    return {
+      capturedPlayerIds: hiders.map((player) => player.id),
+      durationLabel: '3min',
+      highlightPlayerId: seeker?.id ?? players[0]?.id ?? '',
+      survivorPlayerIds: [],
+      winner,
+    };
+  }
+
+  const highlightHider = hiders[0] ?? seeker ?? players[0];
+  const survivorPlayerIds = hiders.slice(0, Math.max(1, Math.min(2, hiders.length))).map((player) => player.id);
+
+  return {
+    capturedPlayerIds: hiders.filter((player) => !survivorPlayerIds.includes(player.id)).map((player) => player.id),
+    durationLabel: '3min',
+    highlightPlayerId: highlightHider?.id ?? '',
+    survivorPlayerIds,
+    winner,
+  };
 }
 
 export function RoomProvider({ children }: { children: ReactNode }) {
@@ -134,6 +171,18 @@ export function RoomProvider({ children }: { children: ReactNode }) {
           maxPlayers: gameRules.maxPlayers,
           phase: 'lobby',
           players,
+          result: undefined,
+        });
+      },
+      finishRound(winner = 'hiders') {
+        setRoom((currentRoom) => {
+          if (!currentRoom) return currentRoom;
+
+          return {
+            ...currentRoom,
+            phase: 'finished',
+            result: createMockResult(currentRoom.players, winner),
+          };
         });
       },
       joinRoom(input) {
@@ -148,6 +197,7 @@ export function RoomProvider({ children }: { children: ReactNode }) {
                   maxPlayers: gameRules.maxPlayers,
                   phase: 'lobby' as const,
                   players: [{ ...demoPlayers[0], isLeader: true }, demoPlayers[1], demoPlayers[2]],
+                  result: undefined,
                 };
 
           if (targetRoom.players.length >= targetRoom.maxPlayers) {
@@ -207,6 +257,34 @@ export function RoomProvider({ children }: { children: ReactNode }) {
           };
         });
       },
+      removePlayer(playerId) {
+        setRoom((currentRoom) => {
+          if (!currentRoom) return currentRoom;
+          const currentLeader = currentRoom.players.find((player) => player.id === activePlayerId);
+
+          if (!currentLeader?.isLeader || playerId === activePlayerId) {
+            return currentRoom;
+          }
+
+          const remainingPlayers = currentRoom.players.filter((player) => player.id !== playerId);
+
+          if (remainingPlayers.length === 0) {
+            return undefined;
+          }
+
+          const hasLeader = remainingPlayers.some((player) => player.isLeader);
+          const players = hasLeader
+            ? remainingPlayers
+            : remainingPlayers.map((player, index) => ({ ...player, isLeader: index === 0 }));
+
+          return {
+            ...currentRoom,
+            expiresAt: getSoloExpiresAt(players),
+            players,
+            result: undefined,
+          };
+        });
+      },
       rematch() {
         setRoom((currentRoom) => {
           if (!currentRoom) return currentRoom;
@@ -215,6 +293,7 @@ export function RoomProvider({ children }: { children: ReactNode }) {
             ...currentRoom,
             phase: 'lobby',
             players: currentRoom.players.map((player) => ({ ...player, status: player.isLeader ? 'Entrou' : 'Aguardando' })),
+            result: undefined,
           };
         });
       },
@@ -224,7 +303,7 @@ export function RoomProvider({ children }: { children: ReactNode }) {
             return currentRoom;
           }
 
-          return { ...currentRoom, phase: 'hiding' };
+          return { ...currentRoom, phase: 'hiding', result: undefined };
         });
       },
       toggleReady() {

@@ -4,17 +4,17 @@ import { Badge } from '@/src/components/badge';
 import { GameButton } from '@/src/components/game-button';
 import { MenuPanel, PrototypeScreen } from '@/src/components/prototype-screen';
 import { gameRules } from '@/src/constants/game';
+import { t } from '@/src/i18n';
 import { colors } from '@/src/theme/colors';
+import { surfaces } from '@/src/theme/surfaces';
 
 function RuleRow({ label, value, tone }: { label: string; tone?: 'ready' | 'waiting' | 'leader'; value: string }) {
   return (
     <View
       style={{
+        ...surfaces.glassTile,
         alignItems: 'center',
-        backgroundColor: colors.surface,
-        borderColor: colors.line,
         borderRadius: 16,
-        borderWidth: 1,
         flexDirection: 'row',
         gap: 10,
         justifyContent: 'space-between',
@@ -31,15 +31,11 @@ function RuleRow({ label, value, tone }: { label: string; tone?: 'ready' | 'wait
 export default function RulesScreen() {
   return (
     <PrototypeScreen>
-      <MenuPanel backHref="/lobby" title="Regras" actions={<GameButton href="/lobby" label="Salvar regras" />}>
-        <RuleRow label="Tempo para esconder" value={`${gameRules.hideSeconds}s`} tone="waiting" />
-        <RuleRow label="Tempo para procurar" value="3min" tone="leader" />
-        <RuleRow label="Ambiente" value="Padrão" />
-        <RuleRow
-          label="Captura automática"
-          value={`${gameRules.captureRadiusMeters}m / ${gameRules.captureConfirmSeconds}s`}
-          tone="ready"
-        />
+      <MenuPanel backHref="/lobby" title={t('rules.title')} actions={<GameButton href="/lobby" label={t('common.save')} />}>
+        <RuleRow label={t('rules.hideTime')} value={`${gameRules.hideSeconds}s`} tone="waiting" />
+        <RuleRow label={t('rules.seekTime')} value="3min" tone="leader" />
+        <RuleRow label={t('rules.environment')} value={t('rules.standard')} />
+        <RuleRow label={t('rules.capture')} value={`${gameRules.captureRadiusMeters}m / ${gameRules.captureConfirmSeconds}s`} tone="ready" />
       </MenuPanel>
     </PrototypeScreen>
   );
