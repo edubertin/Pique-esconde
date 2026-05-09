@@ -12,6 +12,7 @@ const baseLocation = {
 const maxDistanceMeters = 60;
 const metersPerDegreeLatitude = 111_320;
 const devGpsStorageKey = 'pe-dev-gps-active';
+const devGpsDistanceStorageKey = 'pe-dev-gps-distance';
 const presets = [0, 4, 8, 15, 35, 60];
 
 function offsetLocation(distanceMeters: number) {
@@ -26,10 +27,16 @@ function offsetLocation(distanceMeters: number) {
 
 export function DevGpsControl({ defaultDistance = 0, label }: { defaultDistance?: number; label: string }) {
   const { updatePlayerLocation } = useRoom();
-  const [active, setActive] = useState(false);
-  const [distance, setDistance] = useState(defaultDistance);
-
   const enabled = __DEV__ && Platform.OS === 'web';
+  const [active, setActive] = useState(() => (
+    enabled && typeof window !== 'undefined' && window.sessionStorage.getItem(devGpsStorageKey) === 'true'
+  ));
+  const [distance, setDistance] = useState(() => {
+    if (!enabled || typeof window === 'undefined') return defaultDistance;
+
+    const storedDistance = Number(window.sessionStorage.getItem(devGpsDistanceStorageKey));
+    return Number.isFinite(storedDistance) ? storedDistance : defaultDistance;
+  });
   const percent = Math.min(100, Math.max(0, (distance / maxDistanceMeters) * 100));
 
   useEffect(() => {
@@ -37,10 +44,16 @@ export function DevGpsControl({ defaultDistance = 0, label }: { defaultDistance?
 
     if (active) {
       window.sessionStorage.setItem(devGpsStorageKey, 'true');
+      window.sessionStorage.setItem(devGpsDistanceStorageKey, String(distance));
     } else {
       window.sessionStorage.removeItem(devGpsStorageKey);
     }
 
+    return undefined;
+  }, [active, distance, enabled]);
+
+  useEffect(() => {
+    if (!enabled) return undefined;
     if (!active) return undefined;
 
     let cancelled = false;
@@ -56,7 +69,6 @@ export function DevGpsControl({ defaultDistance = 0, label }: { defaultDistance?
     return () => {
       cancelled = true;
       clearInterval(interval);
-      window.sessionStorage.removeItem(devGpsStorageKey);
     };
   }, [active, distance, enabled, updatePlayerLocation]);
 
@@ -82,9 +94,7 @@ export function DevGpsControl({ defaultDistance = 0, label }: { defaultDistance?
         <Text style={{ color: colors.ink, flex: 1, fontSize: 12, fontWeight: '900' }}>
           DEV GPS: {label}
         </Text>
-        <Pressable
-          onPress={() => setActive((current) => !current)}
-          hitSlop={8}
+        <View
           style={{
             backgroundColor: active ? colors.green : colors.surface,
             borderColor: colors.navy,
@@ -95,9 +105,9 @@ export function DevGpsControl({ defaultDistance = 0, label }: { defaultDistance?
             paddingVertical: 9,
           }}>
           <Text style={{ color: active ? colors.surface : colors.ink, fontSize: 12, fontWeight: '900', textAlign: 'center' }}>
-            {active ? 'Ligado' : 'Desligado'}
+            {active ? 'Simulando' : 'Escolha metros'}
           </Text>
-        </Pressable>
+        </View>
       </View>
 
       <View
@@ -148,6 +158,23 @@ export function DevGpsControl({ defaultDistance = 0, label }: { defaultDistance?
             </Text>
           </Pressable>
         ))}
+        <Pressable
+          hitSlop={6}
+          onPress={() => setActive(false)}
+          style={{
+            backgroundColor: active ? colors.surface : colors.navy,
+            borderColor: colors.navy,
+            borderRadius: 999,
+            borderWidth: 1,
+            minHeight: 38,
+            minWidth: 98,
+            paddingHorizontal: 10,
+            paddingVertical: 9,
+          }}>
+          <Text style={{ color: active ? colors.ink : colors.surface, fontSize: 12, fontWeight: '900', textAlign: 'center' }}>
+            GPS real
+          </Text>
+        </Pressable>
       </View>
 
       <Text style={{ color: colors.muted, fontSize: 11, fontWeight: '800', textAlign: 'center' }}>
