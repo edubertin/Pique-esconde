@@ -10,6 +10,12 @@ import { surfaces } from '@/src/theme/surfaces';
 
 export default function HomeScreen() {
   const { roomNotice } = useRoom();
+  const noticeText =
+    roomNotice === 'removed'
+      ? { body: t('home.removedBody'), title: t('home.removedTitle') }
+      : roomNotice === 'left_match'
+        ? { body: t('home.leftMatchBody'), title: t('home.matchEndedTitle') }
+        : undefined;
 
   return (
     <PrototypeScreen centered>
@@ -30,7 +36,7 @@ export default function HomeScreen() {
           <Text selectable style={{ color: colors.muted, fontSize: 13, fontWeight: '800', textAlign: 'center' }}>
             {t('common.playersRange')}
           </Text>
-          {roomNotice === 'removed' ? (
+          {noticeText ? (
             <View
               style={{
                 ...surfaces.warningTile,
@@ -40,10 +46,10 @@ export default function HomeScreen() {
                 width: '100%',
               }}>
               <Text selectable style={{ color: colors.ink, fontSize: 14, fontWeight: '900', textAlign: 'center' }}>
-                {t('home.removedTitle')}
+                {noticeText.title}
               </Text>
               <Text selectable style={{ color: colors.muted, fontSize: 13, fontWeight: '700', lineHeight: 18, textAlign: 'center' }}>
-                {t('home.removedBody')}
+                {noticeText.body}
               </Text>
             </View>
           ) : null}

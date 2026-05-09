@@ -11,7 +11,7 @@ import { colors } from '@/src/theme/colors';
 
 export default function HiderStatusScreen() {
   const router = useRouter();
-  const { activePlayer, room } = useRoom();
+  const { activePlayer, leaveRoom, room } = useRoom();
 
   useEffect(() => {
     if (!room) {
@@ -34,12 +34,21 @@ export default function HiderStatusScreen() {
     }
   }, [activePlayer?.isLeader, activePlayer?.status, room, router]);
 
+  const handleLeaveRoom = async () => {
+    try {
+      await leaveRoom();
+      router.replace('/');
+    } catch {
+      // Error is shown from room store state.
+    }
+  };
+
   return (
     <PrototypeScreen>
       <MenuPanel
         backHref="/hide-phase"
         title={t('hiderStatus.title')}
-        actions={<GameButton href="/lobby" label={t('common.exit')} variant="danger" />}>
+        actions={<GameButton label={t('common.exit')} onPress={handleLeaveRoom} variant="danger" />}>
         <Badge label={t('hiderStatus.released')} tone="waiting" />
         <Text selectable style={{ color: colors.ink, fontSize: 48, fontVariant: ['tabular-nums'], fontWeight: '900' }}>
           {t('hiderStatus.timer')}

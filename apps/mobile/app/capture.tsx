@@ -11,9 +11,10 @@ import { surfaces } from '@/src/theme/surfaces';
 
 export default function CaptureScreen() {
   const router = useRouter();
-  const { finishRound, room } = useRoom();
+  const { activePlayer, finishRound, leaveRoom, room } = useRoom();
   const capturedPlayer = room?.players.find((player) => player.status === 'Capturado');
   const remainingHiders = room?.players.filter((player) => !player.isLeader && player.status !== 'Capturado').length ?? 0;
+  const isSeeker = Boolean(activePlayer?.isLeader || activePlayer?.id === room?.gameSession?.seekerPlayerId);
 
   const handleFinishWithSeeker = async () => {
     try {
@@ -28,16 +29,30 @@ export default function CaptureScreen() {
     router.push(room?.phase === 'finished' ? '/result' : '/seeker-radar');
   };
 
+  const handleLeaveRoom = async () => {
+    try {
+      await leaveRoom();
+      router.replace('/');
+    } catch {
+      // Error is shown from room store state.
+    }
+  };
+
   return (
     <PrototypeScreen>
       <MenuPanel
         backHref="/seeker-radar"
         title={t('capture.title')}
         actions={
-          <>
-            <GameButton label={room?.phase === 'finished' ? t('result.title') : t('capture.continue')} onPress={handleContinue} />
-            <GameButton label={t('capture.finish')} onPress={handleFinishWithSeeker} variant="ghost" />
-          </>
+          isSeeker ? (
+            <>
+              <GameButton label={room?.phase === 'finished' ? t('result.title') : t('capture.continue')} onPress={handleContinue} />
+              <GameButton label={t('capture.finish')} onPress={handleFinishWithSeeker} variant="ghost" />
+              <GameButton label={t('common.exit')} onPress={handleLeaveRoom} variant="danger" />
+            </>
+          ) : (
+            <GameButton label={t('common.exit')} onPress={handleLeaveRoom} variant="danger" />
+          )
         }>
         <View
           style={{

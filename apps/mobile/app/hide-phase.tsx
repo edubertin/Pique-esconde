@@ -11,7 +11,7 @@ import { colors } from '@/src/theme/colors';
 
 export default function HidePhaseScreen() {
   const router = useRouter();
-  const { activePlayer, error, isLoading, markHidden, releaseSeeker, room } = useRoom();
+  const { activePlayer, error, isLoading, leaveRoom, markHidden, releaseSeeker, room } = useRoom();
   const isSeeker = Boolean(activePlayer?.isLeader || activePlayer?.id === room?.gameSession?.seekerPlayerId);
   const hiddenCount = room?.players.filter((player) => !player.isLeader && player.status === 'Escondido').length ?? 0;
   const totalHiders = room?.players.filter((player) => !player.isLeader).length ?? 0;
@@ -50,17 +50,29 @@ export default function HidePhaseScreen() {
     }
   };
 
+  const handleLeaveRoom = async () => {
+    try {
+      await leaveRoom();
+      router.replace('/');
+    } catch {
+      // Error is shown from room store state.
+    }
+  };
+
   return (
     <PrototypeScreen>
       <MenuPanel
         backHref="/lobby"
         title={t('hide.title')}
         actions={
-          isSeeker ? (
-            <GameButton label={isLoading ? 'Liberando...' : t('hide.releaseSimulation')} onPress={handleReleaseSeeker} variant="secondary" />
-          ) : (
-            <GameButton label={isLoading ? 'Marcando...' : t('hide.ready')} onPress={handleMarkHidden} />
-          )
+          <>
+            {isSeeker ? (
+              <GameButton label={isLoading ? 'Liberando...' : t('hide.releaseSimulation')} onPress={handleReleaseSeeker} variant="secondary" />
+            ) : (
+              <GameButton label={isLoading ? 'Marcando...' : t('hide.ready')} onPress={handleMarkHidden} />
+            )}
+            <GameButton label={t('common.exit')} onPress={handleLeaveRoom} variant="danger" />
+          </>
         }>
         <Badge label={t('hide.badge')} tone="rush" />
         <Text

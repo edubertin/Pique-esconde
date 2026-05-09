@@ -29,6 +29,7 @@ export type GameSession = {
 };
 
 type Room = {
+  closedReason?: 'not_enough_players' | 'seeker_left';
   code: string;
   expiresAt?: number;
   gameSession?: GameSession;
@@ -56,7 +57,7 @@ type RoomStore = {
   rematch: () => Promise<void>;
   removePlayer: (playerId: string) => Promise<void>;
   room?: Room;
-  roomNotice?: 'removed';
+  roomNotice?: 'left_match' | 'removed';
   simulateCapture: () => Promise<string | undefined>;
   startRound: () => Promise<boolean>;
   toggleReady: () => Promise<void>;
@@ -215,9 +216,15 @@ export function RoomProvider({ children }: { children: ReactNode }) {
         }
 
         await runAction(async () => {
+          const notice =
+            room.phase === 'hiding' || room.phase === 'seeking'
+              ? 'left_match'
+              : undefined;
+
           await roomService.leaveRoom(room.id, activePlayerId, activePlayerToken);
           setActivePlayerId(undefined);
           setActivePlayerToken(undefined);
+          setRoomNotice(notice);
           setRoom(undefined);
         });
       },

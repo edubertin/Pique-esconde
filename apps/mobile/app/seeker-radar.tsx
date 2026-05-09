@@ -12,7 +12,7 @@ import { colors } from '@/src/theme/colors';
 
 export default function SeekerRadarScreen() {
   const router = useRouter();
-  const { error, finishRound, isLoading, room, simulateCapture } = useRoom();
+  const { error, finishRound, isLoading, leaveRoom, room, simulateCapture } = useRoom();
   const remainingHiders =
     room?.players.filter((player) => !player.isLeader && player.status !== 'Capturado').length ?? 0;
 
@@ -46,6 +46,15 @@ export default function SeekerRadarScreen() {
     }
   };
 
+  const handleLeaveRoom = async () => {
+    try {
+      await leaveRoom();
+      router.replace('/');
+    } catch {
+      // Error is shown from room store state.
+    }
+  };
+
   return (
     <PrototypeScreen>
       <MenuPanel
@@ -55,6 +64,7 @@ export default function SeekerRadarScreen() {
           <>
             <GameButton label={isLoading ? 'Capturando...' : t('radar.captureSimulation')} onPress={handleSimulateCapture} />
             <GameButton label={t('radar.finishHiders')} onPress={handleFinishWithHiders} variant="secondary" />
+            <GameButton label={t('common.exit')} onPress={handleLeaveRoom} variant="danger" />
           </>
         }>
         <View style={{ alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }}>

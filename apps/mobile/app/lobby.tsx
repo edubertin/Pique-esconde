@@ -19,7 +19,14 @@ export default function LobbyScreen() {
   const { activePlayer, addDemoPlayer, error, isLoading, leaveRoom, promoteLeader, removePlayer, room, startRound, toggleReady } = useRoom();
   const [copied, setCopied] = useState(false);
   const players = room?.players ?? [];
+  const isLeader = Boolean(activePlayer?.isLeader);
   const readyLabel = activePlayer?.status === 'Preparado' ? t('lobby.readyDone') : t('lobby.ready');
+  const roomWarning =
+    room?.closedReason === 'seeker_left'
+      ? { body: t('lobby.seekerLeftBody'), title: t('lobby.roundInterruptedTitle') }
+      : room?.closedReason === 'not_enough_players'
+        ? { body: t('lobby.notEnoughPlayersBody'), title: t('lobby.roundInterruptedTitle') }
+        : undefined;
 
   useEffect(() => {
     if (!room) {
@@ -119,14 +126,25 @@ export default function LobbyScreen() {
         }
         actions={
           <>
-            <GameButton label={isLoading ? 'Sincronizando...' : t('lobby.start')} onPress={handleStartRound} variant="secondary" />
+            {isLeader ? (
+              <GameButton label={isLoading ? 'Sincronizando...' : t('lobby.start')} onPress={handleStartRound} variant="secondary" />
+            ) : (
+              <GameButton label={readyLabel} onPress={handleToggleReady} variant="secondary" />
+            )}
             <ActionGrid
-              actions={[
-                { label: readyLabel, onPress: handleToggleReady },
-                { href: '/rules', label: t('lobby.rules'), variant: 'ghost' },
-                { label: t('lobby.invite'), onPress: handleAddDemoPlayer, variant: 'ghost' },
-                { label: t('common.exit'), onPress: handleLeaveRoom, variant: 'danger' },
-              ]}
+              actions={
+                isLeader
+                  ? [
+                      { label: readyLabel, onPress: handleToggleReady },
+                      { href: '/rules', label: t('lobby.rules'), variant: 'ghost' },
+                      { label: t('lobby.invite'), onPress: handleAddDemoPlayer, variant: 'ghost' },
+                      { label: t('common.exit'), onPress: handleLeaveRoom, variant: 'danger' },
+                    ]
+                  : [
+                      { href: '/rules', label: t('lobby.rules'), variant: 'ghost' },
+                      { label: t('common.exit'), onPress: handleLeaveRoom, variant: 'danger' },
+                    ]
+              }
             />
           </>
         }>
@@ -146,6 +164,23 @@ export default function LobbyScreen() {
           <Text selectable style={{ color: colors.muted, fontSize: 13, fontWeight: '800', textAlign: 'center' }}>
             {t('lobby.leaderHint')}
           </Text>
+        ) : null}
+        {roomWarning ? (
+          <View
+            style={{
+              ...surfaces.warningTile,
+              borderRadius: 16,
+              gap: 4,
+              padding: 12,
+              width: '100%',
+            }}>
+            <Text selectable style={{ color: colors.ink, fontSize: 14, fontWeight: '900', textAlign: 'center' }}>
+              {roomWarning.title}
+            </Text>
+            <Text selectable style={{ color: colors.muted, fontSize: 13, fontWeight: '700', lineHeight: 18, textAlign: 'center' }}>
+              {roomWarning.body}
+            </Text>
+          </View>
         ) : null}
         {error ? (
           <Text selectable style={{ color: colors.danger, fontSize: 13, fontWeight: '800', textAlign: 'center' }}>

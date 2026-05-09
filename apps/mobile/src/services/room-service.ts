@@ -10,6 +10,7 @@ export type RemoteRoomSnapshot = {
   activePlayer?: RoomPlayer;
   activePlayerToken?: string;
   room: {
+    closedReason?: 'not_enough_players' | 'seeker_left';
     code: string;
     expiresAt?: number;
     gameSession?: GameSession;
@@ -27,6 +28,7 @@ type PlayerInput = {
 };
 
 type RemoteRoomRow = {
+  closed_reason: 'not_enough_players' | 'seeker_left' | null;
   code: string;
   expires_at: string | null;
   id: string;
@@ -126,7 +128,7 @@ async function fetchSnapshot(roomId: string, activePlayerId?: string, activePlay
     { data: players, error: playersError },
     { data: gameSessions, error: gameSessionError },
   ] = await Promise.all([
-    client.from('pe_rooms').select('id, code, phase, max_players, expires_at, result').eq('id', roomId).single(),
+    client.from('pe_rooms').select('id, code, phase, max_players, expires_at, result, closed_reason').eq('id', roomId).single(),
     client.from('pe_players').select('id, nickname, avatar_id, status, is_leader').eq('room_id', roomId).order('joined_at'),
     client
       .from('pe_game_sessions')
@@ -147,6 +149,7 @@ async function fetchSnapshot(roomId: string, activePlayerId?: string, activePlay
     activePlayer: mappedPlayers.find((player) => player.id === activePlayerId),
     activePlayerToken,
     room: {
+      closedReason: (room as RemoteRoomRow).closed_reason ?? undefined,
       code: (room as RemoteRoomRow).code,
       expiresAt: (room as RemoteRoomRow).expires_at ? new Date((room as RemoteRoomRow).expires_at as string).getTime() : undefined,
       gameSession,
