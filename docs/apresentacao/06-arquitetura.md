@@ -202,3 +202,31 @@ Motivos:
 - O procurador recebe pistas/radar, não mapa exato dos escondidos.
 - Ao terminar a partida, o compartilhamento deve parar.
 - Cards sociais não devem conter GPS, mapa real, rota, endereço ou coordenadas.
+
+## Atualizacao 2026-05-09 - Base GPS/Radar
+
+A camada de sala e rodada ja esta apoiada em Supabase Realtime e RPCs. A base inicial de GPS/radar tambem foi implementada, mas ainda entra como camada em calibracao para testes reais.
+
+Estado atual:
+
+- Permissao de localizacao separada da entrada na sala.
+- Lobby bloqueia `Preparado` e `Iniciar partida` quando o jogador ainda nao liberou localizacao.
+- Escondido so consegue confirmar esconderijo quando ha leitura recente de GPS.
+- App envia posicao temporaria durante a partida, com throttle para evitar excesso de escrita/realtime.
+- Supabase guarda dados temporarios de localizacao e calcula derivados de jogo, sem expor coordenadas cruas para o procurador.
+- Radar do procurador recebe distancia aproximada, direcao, faixa quente/morno/frio e confianca.
+- Captura por proximidade ja existe como base, com confirmacao por tempo.
+- Ha ferramentas DEV para o lider simular distancia e inspecionar snapshot tecnico sem vazar latitude/longitude.
+- Teste mobile web exige origem segura HTTPS; localhost/IP local em celular nao e suficiente para GPS real.
+
+Decisao de arquitetura:
+
+- Para o MVP, o Supabase continua sendo a fonte de verdade da sala, da rodada e dos eventos de GPS derivados.
+- O app pode simular GPS apenas em DEV para teste logico.
+- Validacao real de sensor deve acontecer em celular fisico via HTTPS/tunnel ou build nativo.
+
+Riscos ainda abertos:
+
+- Radar/direcao precisam de calibracao em campo.
+- Navegador desktop nao e fonte confiavel para GPS real.
+- Captura automatica precisa de mais testes com dois ou mais celulares reais.

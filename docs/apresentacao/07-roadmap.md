@@ -153,3 +153,31 @@ Possíveis evoluções após validar o MVP:
 - Skins e personalização.
 - Ranking local da sala.
 - Backend próprio com Socket.IO, se Supabase não atender latência/escala.
+
+## Atualizacao 2026-05-09 - Estado GPS/Radar
+
+Base implementada nesta etapa:
+
+- Permissao de localizacao antes de acoes ativas do lobby.
+- Tela de permissao com leitura inicial de GPS e fallback web.
+- Envio temporario de localizacao durante a rodada.
+- Confirmacao de esconderijo apenas com GPS recente.
+- Radar inicial do procurador com distancia aproximada, direcao, confianca e faixas de sinal.
+- Captura por proximidade com confirmacao.
+- Resultado congelado com snapshot de jogador/contagem para nao mudar depois que alguem sai.
+- Drawer DEV apenas para lider no web/DEV, com simulacao de distancia e snapshot tecnico.
+- Teste mobile via HTTPS tunnel validou que GPS real depende de origem segura.
+
+Ainda pendente antes do piloto:
+
+- Calibrar radar/direcao em celulares reais.
+- Melhorar o desenho final do radar, mantendo a tela como experiencia principal do jogo.
+- Validar captura automatica em campo com pelo menos dois celulares reais.
+- Melhorar ferramenta DEV para controlar cenarios sem afetar jogador nao lider.
+- Testar perda/retomada de sinal com tolerancia de 15s aviso e 30s eliminacao.
+- Revalidar sons/haptics, convite/deep link e compartilhamento.
+
+Decisao:
+
+- A fase de GPS saiu de "nao iniciada" para "base funcional em calibracao".
+- O proximo bloco deve ser limpeza, QA pesado e calibracao, nao uma nova camada grande.

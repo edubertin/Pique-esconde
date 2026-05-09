@@ -165,3 +165,27 @@ Texto para quem negar:
 - Se o procurador sair durante uma rodada, a rodada é interrompida e a sala volta para o lobby.
 - Se um escondido sair durante a rodada e ainda restarem pelo menos 2 jogadores, a rodada continua.
 - Se qualquer saída deixar menos de 2 jogadores na rodada, a sala volta para o lobby com aviso.
+
+## Atualizacao 2026-05-09 - Proximos Passos GPS/Radar
+
+Base atual:
+
+- Salas, realtime de lobby, rodada, resultado e rematch estao funcionando.
+- GPS/radar tem primeira versao integrada ao Supabase.
+- Mobile web com GPS real precisa de HTTPS/tunnel; `localhost` e IP local nao sao suficientes no celular.
+- Desktop com dois browsers nao e teste confiavel de GPS real; serve para fluxo e ferramenta DEV.
+
+Antes de seguir para a proxima camada grande:
+
+- Limpar mensagens/debug visuais que ainda aparecem no jogo.
+- Rodar QA pesado em sala, hide phase, seeker radar, captura, sair e jogar novamente.
+- Testar com dois celulares reais via tunnel HTTPS ou build nativo.
+- Calibrar movimento do radar para ficar divertido, mas legivel.
+- Conferir se o GPS instavel nao domina a experiencia quando ha leitura valida recente.
+- Documentar bugs restantes como conhecidos, sem misturar com features novas.
+
+Decisao operacional:
+
+- Continuar usando ferramenta DEV para aproximar/afastar distancia no radar.
+- Usar celular real para permissao e sensor.
+- Nao abrir nova grande camada ate estabilizar a pagina de jogo.

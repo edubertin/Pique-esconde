@@ -234,3 +234,51 @@ Impacto:
 
 Decisao:
 - Card deve conter somente logo, placar simples, texto promocional e possivelmente QR code/link da loja no futuro.
+
+## Atualizacao 2026-05-09 - L-001 GPS real
+
+Status: Resolvido parcialmente / Em calibracao
+Severidade: Alta
+Area: Localizacao
+
+Resumo:
+- A base de GPS real foi implementada: permissao, leitura inicial, envio temporario, esconderijo com GPS recente, radar derivado e captura por proximidade.
+- Ainda nao esta pronto para piloto sem calibracao em celulares reais.
+- Navegador desktop e dois browsers no mesmo PC nao representam bem o comportamento final.
+
+Decisao:
+- Usar web/DEV para fluxo logico.
+- Usar HTTPS tunnel ou build nativo para validar GPS em celular.
+
+## L-007 - GPS mobile web exige origem segura
+
+Status: Aceito no MVP de desenvolvimento
+Severidade: Alta
+Area: Localizacao / Web
+
+Descricao:
+- Celular nao libera GPS confiavelmente em `localhost` do PC, IP local HTTP ou origem considerada insegura.
+- O teste mobile web deve usar HTTPS, como tunnel ou deploy.
+
+Impacto:
+- Testes com celular podem falhar antes mesmo da logica do app se a origem nao for segura.
+
+Decisao:
+- Para teste rapido, usar tunnel HTTPS.
+- Para piloto, preferir build nativo ou deploy HTTPS estavel.
+
+## L-008 - Radar e captura ainda precisam calibracao em campo
+
+Status: Aberto
+Severidade: Alta
+Area: Gameplay / GPS
+
+Descricao:
+- A base do radar existe, mas direcao, instabilidade proposital, quente/morno/frio e captura automatica ainda precisam de teste fisico.
+- O comportamento em web desktop pode parecer estranho por falta de sensor real.
+
+Impacto:
+- Pode haver falso positivo, falso negativo ou leitura visual confusa.
+
+Decisao:
+- Rodar QA pesado com pelo menos dois celulares reais antes de seguir para novas features grandes.
