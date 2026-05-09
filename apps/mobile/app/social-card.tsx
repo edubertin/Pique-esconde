@@ -20,12 +20,13 @@ export default function SocialCardScreen() {
   const highlightAvatar = avatars.find((avatar) => avatar.id === highlightPlayer?.avatarId) ?? avatars[0];
   const winner = room?.result?.winner ?? 'hiders';
   const survivorCount = room?.result?.survivorPlayerIds.length ?? Math.max(1, hiders.length - 2);
-  const title = winner === 'seeker' ? t('social.titleSeeker') : t('social.titleHiders');
+  const seekerName = seeker?.nickname ?? t('player.roleLeaderSeeker');
+  const title = winner === 'seeker' ? t('social.titleSeeker', { name: seekerName }) : t('social.titleHiders');
   const highlightLabel = winner === 'seeker' ? t('social.highlightSeeker') : t('social.highlightHiders');
   const time = room?.result?.durationLabel ?? '3min';
   const score =
     winner === 'seeker'
-      ? t('social.scoreSeeker', { time })
+      ? t('social.scoreSeeker', { name: seekerName, time })
       : t('social.scoreHiders', { count: survivorCount, suffix: survivorCount === 1 ? '' : 's', time });
 
   return (

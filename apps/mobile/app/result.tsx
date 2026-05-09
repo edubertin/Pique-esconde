@@ -43,13 +43,13 @@ export default function ResultScreen() {
   const highlightPlayer = players.find((player) => player.id === room?.result?.highlightPlayerId) ?? fallbackHighlight;
   const highlightAvatar = avatars.find((avatar) => avatar.id === highlightPlayer?.avatarId) ?? avatars[0];
   const winner = room?.result?.winner ?? 'hiders';
-  const survivorCount = room?.result?.survivorPlayerIds.length ?? Math.max(1, hiders.length - 2);
   const capturedCount = room?.result?.capturedPlayerIds.length ?? Math.min(2, hiders.length);
-  const resultTitle = winner === 'seeker' ? t('result.seekerWon') : t('result.hidersWon');
+  const seekerName = seeker?.nickname ?? t('player.roleLeaderSeeker');
+  const resultTitle = winner === 'seeker' ? t('result.seekerWonBy', { name: seekerName }) : t('result.hidersWon');
   const highlightReason = winner === 'seeker' ? t('result.highlightSeeker') : t('result.highlightHiders');
   const summary =
     winner === 'seeker'
-      ? t('result.summarySeeker', { name: highlightPlayer?.nickname ?? t('player.roleSeeker') })
+      ? t('result.summarySeeker', { name: seekerName })
       : t('result.summaryHiders', { name: highlightPlayer?.nickname ?? t('social.placeholder') });
 
   const handleRematch = async () => {
@@ -75,7 +75,6 @@ export default function ResultScreen() {
       <MenuPanel
         showBack={false}
         title={t('result.title')}
-        meta={<Text selectable style={{ color: colors.muted, fontSize: 12, fontWeight: '800' }}>{t('result.finalMeta')}</Text>}
         actions={
           <>
             <GameButton label={t('result.playAgain')} onPress={handleRematch} />
@@ -119,8 +118,8 @@ export default function ResultScreen() {
           <ResultStat label={t('result.players')} value={`${players.length || 4}`} />
           <ResultStat label={t('result.captured')} value={`${capturedCount}`} />
           <ResultStat
-            label={winner === 'seeker' ? t('result.seeker') : t('result.survived')}
-            value={winner === 'seeker' ? (highlightPlayer?.nickname ?? '-') : `${survivorCount}`}
+            label={winner === 'seeker' ? t('result.seeker') : t('result.highlight')}
+            value={winner === 'seeker' ? seekerName : (highlightPlayer?.nickname ?? '-')}
           />
         </View>
 

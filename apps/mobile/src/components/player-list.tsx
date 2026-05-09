@@ -98,7 +98,7 @@ export function PlayerList({ activePlayerId, canRemove, onPromote, onRemove, pla
                   {player.nickname}
                 </Text>
                 <Text numberOfLines={1} style={{ color: colors.muted, fontSize: 13 }}>
-                  {player.isLeader ? t('player.roleSeeker') : player.id === activePlayerId ? t('player.roleYou') : t('player.rolePlayer')}
+                  {player.isLeader ? t('player.roleLeaderSeeker') : player.id === activePlayerId ? t('player.roleYou') : t('player.rolePlayer')}
                 </Text>
               </View>
               <Badge label={player.isLeader ? t('player.leader') : player.status} tone={getTone(player)} />

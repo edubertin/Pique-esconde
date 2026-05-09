@@ -16,6 +16,10 @@ export default function HiderStatusScreen() {
   const [now, setNow] = useState(Date.now());
   const tickRequestedRef = useRef(false);
   const seekEndsAt = room?.gameSession?.seekEndsAt;
+  const seekerName =
+    room?.players.find((player) => player.id === room.gameSession?.seekerPlayerId)?.nickname ??
+    room?.players.find((player) => player.isLeader)?.nickname ??
+    t('player.roleLeaderSeeker');
   const remainingSeconds = seekEndsAt ? (seekEndsAt - now) / 1000 : 0;
   const timerLabel = seekEndsAt ? formatTimer(remainingSeconds) : t('hiderStatus.timerEnded');
 
@@ -69,7 +73,7 @@ export default function HiderStatusScreen() {
         backHref="/hide-phase"
         title={t('hiderStatus.title')}
         actions={<GameButton label={t('common.exit')} onPress={handleLeaveRoom} variant="danger" />}>
-        <Badge label={t('hiderStatus.released')} tone="waiting" />
+        <Badge label={t('hiderStatus.released', { name: seekerName })} tone="waiting" />
         <Text selectable style={{ color: colors.ink, fontSize: 48, fontVariant: ['tabular-nums'], fontWeight: '900' }}>
           {timerLabel}
         </Text>
@@ -77,7 +81,7 @@ export default function HiderStatusScreen() {
           {t('hiderStatus.radarIncreasing')}
         </Text>
         <Text selectable style={{ color: colors.muted, fontSize: 15, lineHeight: 22 }}>
-          {t('hiderStatus.surviveText')}
+          {t('hiderStatus.surviveText', { name: seekerName })}
         </Text>
       </MenuPanel>
     </PrototypeScreen>

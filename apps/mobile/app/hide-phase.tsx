@@ -16,17 +16,19 @@ export default function HidePhaseScreen() {
   const [now, setNow] = useState(Date.now());
   const tickRequestedRef = useRef(false);
   const isSeeker = Boolean(activePlayer?.isLeader || activePlayer?.id === room?.gameSession?.seekerPlayerId);
+  const seekerPlayer = room?.players.find((player) => player.id === room.gameSession?.seekerPlayerId) ?? room?.players.find((player) => player.isLeader);
+  const seekerName = seekerPlayer?.nickname ?? activePlayer?.nickname ?? t('player.roleLeaderSeeker');
   const hiddenCount = room?.players.filter((player) => !player.isLeader && player.status === 'Escondido').length ?? 0;
   const totalHiders = room?.players.filter((player) => !player.isLeader).length ?? 0;
   const hideEndsAt = room?.gameSession?.hideEndsAt;
   const remainingSeconds = hideEndsAt ? (hideEndsAt - now) / 1000 : 0;
   const timerLabel = hideEndsAt ? formatTimer(remainingSeconds) : t('hide.timerEnded');
   const phaseTitle = isSeeker ? t('hide.seekerTitle') : t('hide.title');
-  const phaseBadge = isSeeker ? t('hide.seekerBadge') : t('hide.badge');
+  const phaseBadge = isSeeker ? seekerName : t('hide.badge');
   const phaseHeading = isSeeker ? t('hide.seekerHeading') : t('hide.ready');
   const phaseBody = isSeeker
     ? t('hide.seekerStatusText', { hidden: hiddenCount, total: totalHiders })
-    : t('hide.statusText', { hidden: hiddenCount, total: totalHiders });
+    : t('hide.statusText', { hidden: hiddenCount, name: seekerName, total: totalHiders });
 
   useEffect(() => {
     if (!room) {
