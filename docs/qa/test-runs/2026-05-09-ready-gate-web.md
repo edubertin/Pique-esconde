@@ -13,6 +13,7 @@ Commit: worktree local
 - Validar que o lider nao consegue iniciar partida enquanto houver jogador nao preparado.
 - Confirmar que o banco bloqueia `pe_start_round` mesmo se chamado direto.
 - Confirmar que, depois de todos os nao-lideres marcarem `Preparado`, a partida inicia normalmente.
+- Confirmar a primeira versao da regra de pronto obrigatorio; aviso realtime para todos foi validado depois em `2026-05-09-lobby-ready-notice-web.md`.
 - Confirmar que o app segue compilando e o smoke visual de sala continua passando.
 
 ## Casos Executados
@@ -29,7 +30,10 @@ Commit: worktree local
 
 ## Evidencias
 
-- Migration: `supabase/migrations/202605090007_require_ready_to_start.sql`
+- Migration inicial: `supabase/migrations/202605090007_require_ready_to_start.sql`
+- Complementos de aviso realtime:
+  - `supabase/migrations/202605090008_lobby_start_notice.sql`
+  - `supabase/migrations/202605090009_refresh_lobby_notice_on_ready.sql`
 - UI: `apps/mobile/app/lobby.tsx`
 - Store: `apps/mobile/src/state/room-store.tsx`
 

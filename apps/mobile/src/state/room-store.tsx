@@ -32,12 +32,19 @@ export type GameSession = {
   status: 'hiding' | 'seeking' | 'finished';
 };
 
+export type LobbyNotice = {
+  createdAt?: number;
+  names: string[];
+  type: 'players_not_ready';
+};
+
 type Room = {
   closedReason?: 'not_enough_players' | 'seeker_left';
   code: string;
   expiresAt?: number;
   gameSession?: GameSession;
   id: string;
+  lobbyNotice?: LobbyNotice;
   maxPlayers: number;
   phase: 'lobby' | 'hiding' | 'seeking' | 'finished';
   players: RoomPlayer[];
@@ -78,10 +85,6 @@ const RoomContext = createContext<RoomStore | undefined>(undefined);
 function getErrorMessage(error: unknown) {
   if (error instanceof Error) return error.message;
   return 'Nao foi possivel sincronizar a sala agora.';
-}
-
-export function getMissingReadyPlayers(players: RoomPlayer[], activePlayerId?: string) {
-  return players.filter((player) => player.id !== activePlayerId && !player.isLeader && player.status !== 'Preparado');
 }
 
 export function RoomProvider({ children }: { children: ReactNode }) {
@@ -284,20 +287,13 @@ export function RoomProvider({ children }: { children: ReactNode }) {
           return false;
         }
 
-        const missingReadyPlayers = getMissingReadyPlayers(room?.players ?? [], activePlayerId);
-
-        if (missingReadyPlayers.length > 0) {
-          const names = missingReadyPlayers.map((player) => player.nickname).join(', ');
-          setError(`Falta preparar: ${names}.`);
-          return false;
-        }
-
+        let started = false;
         await runAction(async () => {
-          await roomService.startRound(session.roomId, session.activePlayerId, session.activePlayerToken);
+          started = await roomService.startRound(session.roomId, session.activePlayerId, session.activePlayerToken);
           await refreshRoom();
         });
 
-        return true;
+        return started;
       },
       async simulateCapture() {
         const session = requireSession();

@@ -58,6 +58,8 @@ export const enUS = {
   'lobby.players': 'Players',
   'lobby.notEnoughPlayersBody': 'There are not enough players to continue. Invite someone to start another round.',
   'lobby.notReadyBody': 'Still waiting for: {names}. The leader can wait or remove whoever is blocking the room.',
+  'lobby.notReadyPlayerBody': 'The leader tried to start. Tap Ready to join the match.',
+  'lobby.notReadyReadyBody': 'Waiting for {names} to get ready before starting.',
   'lobby.notReadyTitle': 'Some players are not ready',
   'lobby.ready': 'Ready',
   'lobby.readyDone': 'Ready',

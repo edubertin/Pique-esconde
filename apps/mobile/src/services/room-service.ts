@@ -2,7 +2,7 @@ import type { RealtimeChannel } from '@supabase/supabase-js';
 
 import { gameRules } from '@/src/constants/game';
 import { assertSupabase } from '@/src/services/supabase-client';
-import type { GameResult, GameSession, PlayerStatus, RoomPlayer } from '@/src/state/room-store';
+import type { GameResult, GameSession, LobbyNotice, PlayerStatus, RoomPlayer } from '@/src/state/room-store';
 
 export type RemoteRoomPhase = 'lobby' | 'hiding' | 'seeking' | 'finished';
 
@@ -16,6 +16,7 @@ export type RemoteRoomSnapshot = {
     expiresAt?: number;
     gameSession?: GameSession;
     id: string;
+    lobbyNotice?: LobbyNotice;
     maxPlayers: number;
     phase: RemoteRoomPhase;
     players: RoomPlayer[];
@@ -33,6 +34,7 @@ type RemoteRoomRow = {
   code: string;
   expires_at: string | null;
   id: string;
+  lobby_notice: RemoteLobbyNotice | null;
   max_players: number;
   phase: RemoteRoomPhase;
   result: RemoteResult | null;
@@ -46,6 +48,12 @@ type RemoteGameSessionRow = {
   seeker_player_id: string;
   started_at: string;
   status: GameSession['status'];
+};
+
+type RemoteLobbyNotice = {
+  createdAt?: string;
+  names?: string[];
+  type?: 'players_not_ready';
 };
 
 type RemotePlayerExitNoticeRow = {
@@ -77,6 +85,10 @@ type RoomPayload = {
 type CapturePayload = {
   capturedPlayerId?: string;
   remainingHiders?: number;
+};
+
+type StartRoundPayload = {
+  started?: boolean;
 };
 
 type RoomSubscription = {
@@ -134,10 +146,20 @@ function mapGameSession(row?: RemoteGameSessionRow | null): GameSession | undefi
   };
 }
 
+function mapLobbyNotice(notice?: RemoteLobbyNotice | null): LobbyNotice | undefined {
+  if (!notice || notice.type !== 'players_not_ready') return undefined;
+
+  return {
+    createdAt: notice.createdAt ? new Date(notice.createdAt).getTime() : undefined,
+    names: notice.names ?? [],
+    type: 'players_not_ready',
+  };
+}
+
 async function fetchSnapshot(roomId: string, activePlayerId?: string, activePlayerToken?: string): Promise<RemoteRoomSnapshot> {
   const client = assertSupabase();
 
-  const roomQuery = client.from('pe_rooms').select('id, code, phase, max_players, expires_at, result, closed_reason').eq('id', roomId).single();
+  const roomQuery = client.from('pe_rooms').select('id, code, phase, max_players, expires_at, result, closed_reason, lobby_notice').eq('id', roomId).single();
   const playersQuery = client.from('pe_players').select('id, nickname, avatar_id, status, is_leader').eq('room_id', roomId).order('joined_at');
   const gameSessionsQuery = client
     .from('pe_game_sessions')
@@ -180,6 +202,7 @@ async function fetchSnapshot(roomId: string, activePlayerId?: string, activePlay
       expiresAt: (room as RemoteRoomRow).expires_at ? new Date((room as RemoteRoomRow).expires_at as string).getTime() : undefined,
       gameSession,
       id: (room as RemoteRoomRow).id,
+      lobbyNotice: mapLobbyNotice((room as RemoteRoomRow).lobby_notice),
       maxPlayers: (room as RemoteRoomRow).max_players,
       phase: (room as RemoteRoomRow).phase,
       players: mappedPlayers,
@@ -303,13 +326,15 @@ export const roomService = {
   },
   async startRound(roomId: string, activePlayerId: string, activePlayerToken: string) {
     const client = assertSupabase();
-    const { error } = await client.rpc('pe_start_round', {
+    const { data, error } = await client.rpc('pe_start_round', {
       actor_player_id: activePlayerId,
       player_session_token: activePlayerToken,
       target_room_id: roomId,
     });
 
     if (error) throw error;
+
+    return (data as StartRoundPayload | null)?.started ?? true;
   },
   subscribeToRoom(roomId: string, onChange: () => void): RoomSubscription {
     const client = assertSupabase();

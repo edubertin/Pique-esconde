@@ -47,7 +47,10 @@ O lobby mostra:
 Regra de início:
 
 - O líder só pode iniciar quando todos os não-líderes estiverem `Preparado`.
-- Se faltar alguém, o lobby mostra quem ainda precisa preparar.
+- Se faltar alguém, a tentativa do líder gera aviso realtime para toda a sala.
+- O líder vê quem ainda precisa preparar.
+- O jogador pendente vê um chamado direto para tocar em `Preparado`.
+- Jogadores já prontos veem que estão aguardando os pendentes.
 - Não há expulsão automática por demora no lobby.
 - O líder pode remover manualmente jogadores que estejam travando a sala.
 
