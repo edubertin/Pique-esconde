@@ -22,9 +22,13 @@ export type GameResult = {
 
 export type GameSession = {
   hideDurationSeconds: number;
+  hideEndsAt: number;
   id: string;
   seekDurationSeconds: number;
+  seekEndsAt?: number;
   seekerPlayerId: string;
+  seekStartedAt?: number;
+  startedAt: number;
   status: 'hiding' | 'seeking' | 'finished';
 };
 
@@ -57,9 +61,10 @@ type RoomStore = {
   rematch: () => Promise<void>;
   removePlayer: (playerId: string) => Promise<void>;
   room?: Room;
-  roomNotice?: 'left_match' | 'removed';
+  roomNotice?: 'left_match' | 'not_hidden_in_time' | 'removed';
   simulateCapture: () => Promise<string | undefined>;
   startRound: () => Promise<boolean>;
+  tickGameSession: () => Promise<void>;
   toggleReady: () => Promise<void>;
 };
 
@@ -89,7 +94,7 @@ export function RoomProvider({ children }: { children: ReactNode }) {
         setActivePlayerId(undefined);
         setActivePlayerToken(undefined);
         setError(undefined);
-        setRoomNotice('removed');
+        setRoomNotice(snapshot.activePlayerExitReason ?? 'removed');
         setRoom(undefined);
         return;
       }
@@ -292,6 +297,11 @@ export function RoomProvider({ children }: { children: ReactNode }) {
         });
 
         return capturedPlayerId;
+      },
+      async tickGameSession() {
+        const session = requireSession();
+        await roomService.tickGameSession(session.roomId, session.activePlayerId, session.activePlayerToken);
+        await refreshRoom();
       },
       async toggleReady() {
         const session = requireSession();

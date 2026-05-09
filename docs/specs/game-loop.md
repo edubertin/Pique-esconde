@@ -27,16 +27,19 @@ Definir o fluxo jogável principal do Pique Esconde no MVP.
 6. Criador configura regras.
 7. Criador inicia partida.
 8. Escondidos têm tempo para se esconder.
-9. Escondidos podem marcar "estou escondido" para acelerar o início da busca.
-10. Procurador é liberado quando todos estiverem escondidos ou quando o tempo de esconder acabar.
-11. Procurador busca usando radar/proximidade.
-12. Captura acontece automaticamente por proximidade.
-13. Rush final aumenta o alcance do radar.
-14. Partida termina quando todos são capturados ou o tempo acaba.
-15. Resultado mostra vencedores.
-16. Grupo pode jogar novamente na mesma sala.
-17. Ao jogar novamente, todos voltam para o lobby.
-18. No lobby, o líder pode manter ou promover outro jogador como próximo procurador.
+9. Escondidos devem marcar "estou escondido" para continuar ativos na rodada.
+10. Se todos os escondidos confirmarem antes do tempo, o procurador é liberado.
+11. Se o tempo de esconder acabar, quem ainda estiver sem confirmar sai da rodada e volta para a tela inicial com aviso.
+12. Depois das remoções por timeout, o procurador é liberado se ainda houver pelo menos 2 jogadores.
+13. Se as remoções por timeout deixarem menos de 2 jogadores, a sala volta para o lobby com aviso de jogadores insuficientes.
+14. Procurador busca usando radar/proximidade.
+15. Captura acontece automaticamente por proximidade.
+16. Rush final aumenta o alcance do radar.
+17. Partida termina quando todos são capturados ou o tempo acaba.
+18. Resultado mostra vencedores.
+19. Grupo pode jogar novamente na mesma sala.
+20. Ao jogar novamente, todos voltam para o lobby.
+21. No lobby, o líder pode manter ou promover outro jogador como próximo procurador.
 
 ## Jogar Novamente
 

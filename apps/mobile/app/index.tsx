@@ -15,7 +15,9 @@ export default function HomeScreen() {
       ? { body: t('home.removedBody'), title: t('home.removedTitle') }
       : roomNotice === 'left_match'
         ? { body: t('home.leftMatchBody'), title: t('home.matchEndedTitle') }
-        : undefined;
+        : roomNotice === 'not_hidden_in_time'
+          ? { body: t('home.notHiddenInTimeBody'), title: t('home.notHiddenInTimeTitle') }
+          : undefined;
 
   return (
     <PrototypeScreen centered>

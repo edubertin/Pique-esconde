@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Text, View } from 'react-native';
 
 import { Badge } from '@/src/components/badge';
@@ -8,13 +8,19 @@ import { MenuPanel, PrototypeScreen } from '@/src/components/prototype-screen';
 import { t } from '@/src/i18n';
 import { useRoom } from '@/src/state/room-store';
 import { colors } from '@/src/theme/colors';
+import { formatTimer } from '@/src/utils/format-timer';
 
 export default function HidePhaseScreen() {
   const router = useRouter();
-  const { activePlayer, error, isLoading, leaveRoom, markHidden, releaseSeeker, room } = useRoom();
+  const { activePlayer, error, isLoading, leaveRoom, markHidden, room, tickGameSession } = useRoom();
+  const [now, setNow] = useState(Date.now());
+  const tickRequestedRef = useRef(false);
   const isSeeker = Boolean(activePlayer?.isLeader || activePlayer?.id === room?.gameSession?.seekerPlayerId);
   const hiddenCount = room?.players.filter((player) => !player.isLeader && player.status === 'Escondido').length ?? 0;
   const totalHiders = room?.players.filter((player) => !player.isLeader).length ?? 0;
+  const hideEndsAt = room?.gameSession?.hideEndsAt;
+  const remainingSeconds = hideEndsAt ? (hideEndsAt - now) / 1000 : 0;
+  const timerLabel = hideEndsAt ? formatTimer(remainingSeconds) : t('hide.timerEnded');
 
   useEffect(() => {
     if (!room) {
@@ -32,19 +38,24 @@ export default function HidePhaseScreen() {
     }
   }, [isSeeker, room, router]);
 
+  useEffect(() => {
+    const interval = setInterval(() => setNow(Date.now()), 500);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    if (room?.phase !== 'hiding' || !hideEndsAt || remainingSeconds > 0 || tickRequestedRef.current) return;
+
+    tickRequestedRef.current = true;
+    tickGameSession().catch(() => {
+      tickRequestedRef.current = false;
+    });
+  }, [hideEndsAt, remainingSeconds, room?.phase, tickGameSession]);
+
   const handleMarkHidden = async () => {
     try {
       await markHidden();
       router.push('/hider-status');
-    } catch {
-      // Error is shown from room store state.
-    }
-  };
-
-  const handleReleaseSeeker = async () => {
-    try {
-      await releaseSeeker();
-      router.push('/seeker-radar');
     } catch {
       // Error is shown from room store state.
     }
@@ -66,11 +77,9 @@ export default function HidePhaseScreen() {
         title={t('hide.title')}
         actions={
           <>
-            {isSeeker ? (
-              <GameButton label={isLoading ? 'Liberando...' : t('hide.releaseSimulation')} onPress={handleReleaseSeeker} variant="secondary" />
-            ) : (
+            {!isSeeker ? (
               <GameButton label={isLoading ? 'Marcando...' : t('hide.ready')} onPress={handleMarkHidden} />
-            )}
+            ) : null}
             <GameButton label={t('common.exit')} onPress={handleLeaveRoom} variant="danger" />
           </>
         }>
@@ -84,7 +93,7 @@ export default function HidePhaseScreen() {
             fontWeight: '900',
             textAlign: 'center',
           }}>
-          {t('hide.timer')}
+          {timerLabel}
         </Text>
         <View style={{ gap: 8 }}>
           <Text selectable style={{ color: colors.ink, fontSize: 18, fontWeight: '900' }}>

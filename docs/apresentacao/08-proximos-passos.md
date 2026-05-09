@@ -30,16 +30,14 @@ Decisões já encaminhadas:
 
 ## Tarefas Imediatas
 
-1. Implementar timer real de esconder/procurar sincronizado pelo backend.
-2. Atualizar UI para consumir tempo real da rodada em vez de textos fixos.
-3. Implementar permissão real de localização no dispositivo.
-4. Criar envio temporário de posição durante a partida.
-5. Implementar radar aproximado por distância, sem mapa exato.
-6. Implementar captura automática por proximidade com tolerância de alguns segundos.
-7. Calibrar som/haptics em celular real.
-8. Implementar convite por link/deep link e compartilhamento nativo.
-9. Testar em dois ou mais celulares no mesmo espaço físico.
-10. Ajustar textos de permissão, aviso de GPS e estados de erro.
+1. Implementar permissão real de localização no dispositivo.
+2. Criar envio temporário de posição durante a partida.
+3. Implementar radar aproximado por distância, sem mapa exato.
+4. Implementar captura automática por proximidade com tolerância de alguns segundos.
+5. Calibrar som/haptics em celular real.
+6. Implementar convite por link/deep link e compartilhamento nativo.
+7. Testar em dois ou mais celulares no mesmo espaço físico.
+8. Ajustar textos de permissão, aviso de GPS e estados de erro.
 
 Concluído nesta etapa:
 
@@ -52,6 +50,8 @@ Concluído nesta etapa:
 - Remoção pelo líder.
 - Promoção de líder/procurador.
 - Rodada real sem GPS.
+- Timer real de esconder/procurar.
+- Timeout de esconder remove quem não confirmou "Estou escondido" a tempo.
 - Captura simulada usando jogadores reais.
 - Resultado e rematch na mesma sala.
 - Regras reais de saída durante partida.
@@ -97,7 +97,6 @@ Status: majoritariamente concluída.
 
 - Status: em andamento.
 
-- Timer real sincronizado.
 - Permissão de localização.
 - Atualização de posição.
 - Radar/proximidade.
@@ -109,6 +108,7 @@ Já concluído dentro desta fase:
 
 - Rodada real sem GPS.
 - Estados reais de jogadores.
+- Timer real de rodada.
 - Captura simulada em jogadores reais.
 - Resultado e rematch.
 - Regras de saída/encerramento da rodada.

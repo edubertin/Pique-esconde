@@ -8,6 +8,7 @@ export type RemoteRoomPhase = 'lobby' | 'hiding' | 'seeking' | 'finished';
 
 export type RemoteRoomSnapshot = {
   activePlayer?: RoomPlayer;
+  activePlayerExitReason?: 'not_hidden_in_time';
   activePlayerToken?: string;
   room: {
     closedReason?: 'not_enough_players' | 'seeker_left';
@@ -41,8 +42,14 @@ type RemoteGameSessionRow = {
   hide_duration_seconds: number;
   id: string;
   seek_duration_seconds: number;
+  seek_started_at: string | null;
   seeker_player_id: string;
+  started_at: string;
   status: GameSession['status'];
+};
+
+type RemotePlayerExitNoticeRow = {
+  reason: 'not_hidden_in_time';
 };
 
 type RemotePlayerRow = {
@@ -111,11 +118,18 @@ function mapResult(result: RemoteResult | null): GameResult | undefined {
 function mapGameSession(row?: RemoteGameSessionRow | null): GameSession | undefined {
   if (!row) return undefined;
 
+  const startedAt = new Date(row.started_at).getTime();
+  const seekStartedAt = row.seek_started_at ? new Date(row.seek_started_at).getTime() : undefined;
+
   return {
     hideDurationSeconds: row.hide_duration_seconds,
+    hideEndsAt: startedAt + row.hide_duration_seconds * 1000,
     id: row.id,
     seekDurationSeconds: row.seek_duration_seconds,
+    seekEndsAt: seekStartedAt ? seekStartedAt + row.seek_duration_seconds * 1000 : undefined,
     seekerPlayerId: row.seeker_player_id,
+    seekStartedAt,
+    startedAt,
     status: row.status,
   };
 }
@@ -123,30 +137,42 @@ function mapGameSession(row?: RemoteGameSessionRow | null): GameSession | undefi
 async function fetchSnapshot(roomId: string, activePlayerId?: string, activePlayerToken?: string): Promise<RemoteRoomSnapshot> {
   const client = assertSupabase();
 
+  const roomQuery = client.from('pe_rooms').select('id, code, phase, max_players, expires_at, result, closed_reason').eq('id', roomId).single();
+  const playersQuery = client.from('pe_players').select('id, nickname, avatar_id, status, is_leader').eq('room_id', roomId).order('joined_at');
+  const gameSessionsQuery = client
+    .from('pe_game_sessions')
+    .select('id, seeker_player_id, status, hide_duration_seconds, seek_duration_seconds, started_at, seek_started_at')
+    .eq('room_id', roomId)
+    .order('created_at', { ascending: false })
+    .limit(1);
+  const exitNoticeQuery = activePlayerId
+    ? client.from('pe_player_exit_notices').select('reason').eq('player_id', activePlayerId).order('created_at', { ascending: false }).limit(1)
+    : Promise.resolve({ data: [], error: null });
+
   const [
     { data: room, error: roomError },
     { data: players, error: playersError },
     { data: gameSessions, error: gameSessionError },
+    { data: exitNotices, error: exitNoticeError },
   ] = await Promise.all([
-    client.from('pe_rooms').select('id, code, phase, max_players, expires_at, result, closed_reason').eq('id', roomId).single(),
-    client.from('pe_players').select('id, nickname, avatar_id, status, is_leader').eq('room_id', roomId).order('joined_at'),
-    client
-      .from('pe_game_sessions')
-      .select('id, seeker_player_id, status, hide_duration_seconds, seek_duration_seconds')
-      .eq('room_id', roomId)
-      .order('created_at', { ascending: false })
-      .limit(1),
+    roomQuery,
+    playersQuery,
+    gameSessionsQuery,
+    exitNoticeQuery,
   ]);
 
   if (roomError) throw roomError;
   if (playersError) throw playersError;
   if (gameSessionError) throw gameSessionError;
+  if (exitNoticeError) throw exitNoticeError;
 
   const mappedPlayers = ((players ?? []) as RemotePlayerRow[]).map(mapPlayer);
   const gameSession = mapGameSession(((gameSessions ?? []) as RemoteGameSessionRow[])[0]);
+  const exitNotice = ((exitNotices ?? []) as RemotePlayerExitNoticeRow[])[0];
 
   return {
     activePlayer: mappedPlayers.find((player) => player.id === activePlayerId),
+    activePlayerExitReason: exitNotice?.reason,
     activePlayerToken,
     room: {
       closedReason: (room as RemoteRoomRow).closed_reason ?? undefined,
@@ -317,6 +343,16 @@ export const roomService = {
   async toggleReady(roomId: string, activePlayerId: string, activePlayerToken: string) {
     const client = assertSupabase();
     const { error } = await client.rpc('pe_toggle_ready', {
+      actor_player_id: activePlayerId,
+      player_session_token: activePlayerToken,
+      target_room_id: roomId,
+    });
+
+    if (error) throw error;
+  },
+  async tickGameSession(roomId: string, activePlayerId: string, activePlayerToken: string) {
+    const client = assertSupabase();
+    const { error } = await client.rpc('pe_tick_game_session', {
       actor_player_id: activePlayerId,
       player_session_token: activePlayerToken,
       target_room_id: roomId,

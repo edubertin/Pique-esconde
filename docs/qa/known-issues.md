@@ -145,6 +145,29 @@ Decisao:
 Link para test run:
 - `docs/qa/test-runs/2026-05-09-supabase-room-realtime-web.md`
 
+## L-006 - Tick de timer depende de cliente ativo
+
+Status: Aceito no MVP atual
+Severidade: Media
+Area: Timer/Regras
+Detectado em: 2026-05-09
+Commit/versao: worktree local
+
+Descricao:
+- O timer real de rodada existe no Supabase, mas a transição é acordada por chamada do app para `pe_tick_game_session`.
+- Ainda não há job server-side/agendado garantindo transição sem nenhum cliente ativo.
+
+Impacto:
+- Em testes normais com jogadores na sala, o timer funciona.
+- Se todos os clientes travarem ou fecharem exatamente durante uma fase, a transição pode aguardar o próximo cliente ativo.
+
+Decisao:
+- Aceito para o MVP atual.
+- Reavaliar com rotina agendada, Edge Function ou outra estratégia server-side antes de piloto/producao.
+
+Link para test run:
+- `docs/qa/test-runs/2026-05-09-round-timers-web.md`
+
 ## Riscos do MVP
 
 ## R-001 - GPS pode oscilar em ambiente fechado

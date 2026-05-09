@@ -88,6 +88,8 @@ Já implementado nesta fase:
 - Lobby realtime com jogadores, status, líder/procurador, remoção e promoção.
 - Sessão temporária por jogador, sem login completo.
 - Rodada real sem GPS: iniciar, esconder, liberar busca, captura simulada, resultado e jogar novamente.
+- Timer real sincronizado para esconder/procurar.
+- Regra de timeout de esconder: quem não confirma "Estou escondido" a tempo sai da rodada e recebe aviso local.
 - Regras reais de saída:
   - escondido comum pode sair e a partida continua se ainda restarem pelo menos 2 jogadores;
   - se o procurador sair, todos voltam ao lobby e outro jogador assume a liderança;
@@ -96,7 +98,6 @@ Já implementado nesta fase:
 
 Ainda pendente nesta fase:
 
-- Timer real sincronizado pelo backend.
 - Permissão de localização real no dispositivo.
 - Envio temporário de posição durante a rodada.
 - Radar real por proximidade aproximada.

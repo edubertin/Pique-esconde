@@ -77,6 +77,7 @@ Done:
 - Supabase project connected through local environment variables.
 - Realtime temporary rooms with room code, player list, ready state, leader promotion and leader removal.
 - Real game session layer without GPS yet: start round, hide phase, seek phase, simulated capture, result and rematch.
+- Real synchronized round timers for hiding/seeking. Hiders who do not confirm in time leave the round with a local notice.
 - Match-exit rules in Supabase:
   - if a regular hider leaves and at least 2 players remain, the match continues;
   - if the seeker leaves, the round returns to lobby and a new leader is promoted;
@@ -85,5 +86,5 @@ Done:
 
 Next implementation slice:
 
-- Real match timer stored/synchronized by the backend.
-- Then GPS/location permission, temporary position updates, approximate radar and proximity capture.
+- GPS/location permission.
+- Temporary position updates, approximate radar and proximity capture.
