@@ -2,7 +2,7 @@ import type { RealtimeChannel } from '@supabase/supabase-js';
 
 import { gameRules } from '@/src/constants/game';
 import { assertSupabase } from '@/src/services/supabase-client';
-import type { CaptureAttempt, GameResult, GameSession, HiderDangerHint, LobbyNotice, PlayerLocationInput, PlayerStatus, RadarHint, RoomPlayer } from '@/src/state/room-store';
+import type { CaptureAttempt, GameResult, GameSession, HiderDangerHint, LobbyNotice, PlayerLocationInput, PlayerStatus, RadarHint, RoomDebugSnapshot, RoomPlayer } from '@/src/state/room-store';
 
 export type RemoteRoomPhase = 'lobby' | 'hiding' | 'seeking' | 'finished';
 
@@ -245,6 +245,16 @@ export const roomService = {
     const payload = assertRoomPayload(data);
     return fetchSnapshot(payload.roomId, payload.activePlayerId, payload.playerSessionToken);
   },
+  async clearDevTestDistance(roomId: string, activePlayerId: string, activePlayerToken: string) {
+    const client = assertSupabase();
+    const { error } = await client.rpc('pe_dev_clear_test_distance', {
+      actor_player_id: activePlayerId,
+      player_session_token: activePlayerToken,
+      target_room_id: roomId,
+    });
+
+    if (error) throw error;
+  },
   async finishRound(roomId: string, activePlayerId: string, activePlayerToken: string, winner: GameResult['winner']) {
     const client = assertSupabase();
     const { error } = await client.rpc('pe_finish_round', {
@@ -280,6 +290,18 @@ export const roomService = {
     if (error) throw error;
 
     return data as HiderDangerHint | undefined;
+  },
+  async getRoomDebugSnapshot(roomId: string, activePlayerId: string, activePlayerToken: string) {
+    const client = assertSupabase();
+    const { data, error } = await client.rpc('pe_get_room_debug_snapshot', {
+      actor_player_id: activePlayerId,
+      player_session_token: activePlayerToken,
+      target_room_id: roomId,
+    });
+
+    if (error) throw error;
+
+    return data as RoomDebugSnapshot | undefined;
   },
   fetchSnapshot,
   async joinRoom(input: PlayerInput & { code: string }) {

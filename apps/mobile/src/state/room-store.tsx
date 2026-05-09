@@ -67,6 +67,47 @@ export type HiderDangerHint = {
   updatedAt?: string;
 };
 
+export type RoomDebugPlayer = {
+  accuracyMeters?: number;
+  hasHideSpot: boolean;
+  hideAgeSeconds?: number;
+  hideDriftMeters?: number;
+  hideViolationAgeSeconds?: number;
+  id: string;
+  isLeader: boolean;
+  isSeeker: boolean;
+  nickname: string;
+  signalAgeSeconds?: number;
+  signalStatus: 'fresh' | 'lost' | 'warning';
+  status: PlayerStatus;
+};
+
+export type RoomDebugSnapshot = {
+  activePlayerId: string;
+  closedReason?: string;
+  devDistance?: {
+    active: boolean;
+    ageSeconds: number;
+    distanceMeters: number;
+    hiderPlayerId: string;
+    seekerPlayerId: string;
+  };
+  gameSession?: {
+    hideDurationSeconds: number;
+    id: string;
+    seekAgeSeconds?: number;
+    seekDurationSeconds: number;
+    seekerPlayerId: string;
+    startedAgeSeconds: number;
+    status: GameSession['status'];
+  };
+  players: RoomDebugPlayer[];
+  roomCode: string;
+  roomId: string;
+  roomPhase: 'lobby' | 'hiding' | 'seeking' | 'finished';
+  serverTime: string;
+};
+
 export type CaptureAttempt = {
   captured?: boolean;
   capturedPlayerId?: string;
@@ -99,6 +140,7 @@ type Room = {
 type RoomStore = {
   activePlayer?: RoomPlayer;
   addDemoPlayer: () => Promise<void>;
+  clearDevTestDistance: () => Promise<void>;
   clearError: () => void;
   clearNotice: () => void;
   createRoom: (input: PlayerInput) => Promise<void>;
@@ -106,6 +148,7 @@ type RoomStore = {
   finishRound: (winner?: GameResult['winner']) => Promise<void>;
   getHiderDangerHint: () => Promise<HiderDangerHint | undefined>;
   getRadarHint: () => Promise<RadarHint | undefined>;
+  getRoomDebugSnapshot: () => Promise<RoomDebugSnapshot | undefined>;
   isLoading: boolean;
   joinRoom: (input: PlayerInput & { code: string }) => Promise<boolean>;
   leaveRoom: () => Promise<void>;
@@ -295,9 +338,19 @@ export function RoomProvider({ children }: { children: ReactNode }) {
         const session = requireSession();
         return roomService.getRadarHint(session.roomId, session.activePlayerId, session.activePlayerToken);
       },
+      async getRoomDebugSnapshot() {
+        if (!__DEV__) return undefined;
+
+        const session = requireSession();
+        return roomService.getRoomDebugSnapshot(session.roomId, session.activePlayerId, session.activePlayerToken);
+      },
       async getHiderDangerHint() {
         const session = requireSession();
         return roomService.getHiderDangerHint(session.roomId, session.activePlayerId, session.activePlayerToken);
+      },
+      async clearDevTestDistance() {
+        const session = requireSession();
+        await roomService.clearDevTestDistance(session.roomId, session.activePlayerId, session.activePlayerToken);
       },
       async joinRoom(input) {
         await runAction(async () => {

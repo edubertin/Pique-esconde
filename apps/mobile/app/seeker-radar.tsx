@@ -5,6 +5,7 @@ import { Text, View } from 'react-native';
 
 import { DevGpsControl } from '@/src/components/dev-gps-control';
 import { GameButton } from '@/src/components/game-button';
+import { LeaderDebugDrawer } from '@/src/components/leader-debug-drawer';
 import { PrototypeScreen } from '@/src/components/prototype-screen';
 import { RadarView } from '@/src/components/radar-view';
 import { usePlayerLocationSync } from '@/src/hooks/use-player-location-sync';
@@ -196,6 +197,8 @@ export default function SeekerRadarScreen() {
           padding: 10,
           width: '100%',
         }}>
+        <LeaderDebugDrawer radarHint={radarHint} />
+
         <View style={{ alignItems: 'center', width: 118 }}>
           <Image contentFit="contain" source={require('@/assets/images/pique-esconde-logo.png')} style={{ aspectRatio: 1.14, width: '100%' }} />
         </View>

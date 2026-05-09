@@ -11,7 +11,8 @@ const presets = [0, 4, 8, 15, 30, 40];
 type SyncStatus = 'idle' | 'active' | 'error';
 
 export function DevGpsControl({ defaultDistance = 0 }: { defaultDistance?: number }) {
-  const { updateDevTestDistance } = useRoom();
+  const { clearDevTestDistance, updateDevTestDistance } = useRoom();
+  const clearDevTestDistanceRef = useRef(clearDevTestDistance);
   const updateDevTestDistanceRef = useRef(updateDevTestDistance);
   const enabled = __DEV__ && Platform.OS === 'web';
   const [active, setActive] = useState(() => (
@@ -27,8 +28,9 @@ export function DevGpsControl({ defaultDistance = 0 }: { defaultDistance?: numbe
   const percent = Math.min(100, Math.max(0, (distance / maxDistanceMeters) * 100));
 
   useEffect(() => {
+    clearDevTestDistanceRef.current = clearDevTestDistance;
     updateDevTestDistanceRef.current = updateDevTestDistance;
-  }, [updateDevTestDistance]);
+  }, [clearDevTestDistance, updateDevTestDistance]);
 
   useEffect(() => {
     if (!enabled) return undefined;
@@ -170,6 +172,7 @@ export function DevGpsControl({ defaultDistance = 0 }: { defaultDistance?: numbe
           onPress={() => {
             setActive(false);
             setSyncStatus('idle');
+            clearDevTestDistanceRef.current().catch(() => undefined);
           }}
           style={{
             backgroundColor: active ? colors.surface : colors.navy,
