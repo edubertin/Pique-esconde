@@ -44,6 +44,13 @@ O lobby mostra:
 - Botão iniciar para o líder.
 - Botão sair da sala.
 
+Regra de início:
+
+- O líder só pode iniciar quando todos os não-líderes estiverem `Preparado`.
+- Se faltar alguém, o lobby mostra quem ainda precisa preparar.
+- Não há expulsão automática por demora no lobby.
+- O líder pode remover manualmente jogadores que estejam travando a sala.
+
 ## Status
 
 Estados principais:

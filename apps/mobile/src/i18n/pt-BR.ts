@@ -53,6 +53,8 @@ export const ptBR = {
   'lobby.invite': 'Convidar',
   'lobby.players': 'Jogadores',
   'lobby.notEnoughPlayersBody': 'Faltam jogadores para continuar. Convide alguém para iniciar outra rodada.',
+  'lobby.notReadyBody': 'Falta preparar: {names}. O lider pode esperar ou remover quem estiver travando a sala.',
+  'lobby.notReadyTitle': 'Ainda falta gente pronta',
   'lobby.ready': 'Preparado',
   'lobby.readyDone': 'Pronto',
   'lobby.rules': 'Regras',

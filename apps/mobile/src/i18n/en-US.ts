@@ -57,6 +57,8 @@ export const enUS = {
   'lobby.invite': 'Invite',
   'lobby.players': 'Players',
   'lobby.notEnoughPlayersBody': 'There are not enough players to continue. Invite someone to start another round.',
+  'lobby.notReadyBody': 'Still waiting for: {names}. The leader can wait or remove whoever is blocking the room.',
+  'lobby.notReadyTitle': 'Some players are not ready',
   'lobby.ready': 'Ready',
   'lobby.readyDone': 'Ready',
   'lobby.rules': 'Rules',

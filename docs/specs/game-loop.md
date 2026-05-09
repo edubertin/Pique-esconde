@@ -25,7 +25,7 @@ Definir o fluxo jogável principal do Pique Esconde no MVP.
 4. App solicita localização para participação ativa.
 5. Jogadores marcam "preparado".
 6. Criador configura regras.
-7. Criador inicia partida.
+7. Criador inicia partida somente quando todos os não-líderes estiverem preparados.
 8. Escondidos têm tempo para se esconder.
 9. Escondidos devem marcar "estou escondido" para continuar ativos na rodada.
 10. Se todos os escondidos confirmarem antes do tempo, o procurador é liberado.
@@ -48,6 +48,13 @@ Definir o fluxo jogável principal do Pique Esconde no MVP.
 - O grupo pode ajustar regras antes da próxima rodada.
 - O próximo procurador é definido no lobby.
 - Não há botão "trocar procurador" na tela de resultado.
+
+## Preparado no Lobby
+
+- Todos os jogadores não-líderes precisam marcar `Preparado` para o líder iniciar a partida.
+- Se alguém ainda não estiver preparado, o líder recebe aviso com os nomes que faltam.
+- O app não remove automaticamente quem demora para preparar no lobby.
+- Se alguém estiver travando a sala, o líder pode remover manualmente.
 
 ## Saída Durante a Rodada
 

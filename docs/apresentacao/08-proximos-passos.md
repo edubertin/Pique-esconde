@@ -22,6 +22,8 @@ Decisões já encaminhadas:
 - Troca de procurador em nova rodada: manual, escolhida pelo líder/procurador no lobby.
 - O líder pode promover outro jogador da lista.
 - Se o líder/procurador cair, liderança passa para o próximo jogador disponível.
+- O líder só inicia a partida quando todos os não-líderes estiverem preparados.
+- Não há kick automático no lobby; se alguém travar a sala, o líder remove manualmente.
 - Jogadores podem voltar para a mesma sala após desconexão.
 - Sala temporária deve expirar quando todos saírem ou após limite de inatividade.
 - Se um escondido sai durante a partida e ainda restam pelo menos 2 jogadores, a partida continua.
@@ -48,6 +50,8 @@ Concluído nesta etapa:
 - Lobby realtime.
 - Entrada por código.
 - Remoção pelo líder.
+- Bloqueio de início quando há jogador não preparado.
+- Aviso no lobby com quem falta preparar.
 - Promoção de líder/procurador.
 - Rodada real sem GPS.
 - Timer real de esconder/procurar.

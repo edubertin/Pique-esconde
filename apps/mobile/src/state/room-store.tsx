@@ -80,6 +80,10 @@ function getErrorMessage(error: unknown) {
   return 'Nao foi possivel sincronizar a sala agora.';
 }
 
+export function getMissingReadyPlayers(players: RoomPlayer[], activePlayerId?: string) {
+  return players.filter((player) => player.id !== activePlayerId && !player.isLeader && player.status !== 'Preparado');
+}
+
 export function RoomProvider({ children }: { children: ReactNode }) {
   const [activePlayerId, setActivePlayerId] = useState<string>();
   const [activePlayerToken, setActivePlayerToken] = useState<string>();
@@ -277,6 +281,14 @@ export function RoomProvider({ children }: { children: ReactNode }) {
 
         if ((room?.players.length ?? 0) < 2) {
           setError('Convide pelo menos mais 1 jogador para iniciar.');
+          return false;
+        }
+
+        const missingReadyPlayers = getMissingReadyPlayers(room?.players ?? [], activePlayerId);
+
+        if (missingReadyPlayers.length > 0) {
+          const names = missingReadyPlayers.map((player) => player.nickname).join(', ');
+          setError(`Falta preparar: ${names}.`);
           return false;
         }
 

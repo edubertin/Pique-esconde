@@ -10,7 +10,7 @@ import { GameButton } from '@/src/components/game-button';
 import { PlayerList } from '@/src/components/player-list';
 import { MenuPanel, PrototypeScreen } from '@/src/components/prototype-screen';
 import { t } from '@/src/i18n';
-import { useRoom } from '@/src/state/room-store';
+import { getMissingReadyPlayers, useRoom } from '@/src/state/room-store';
 import { colors } from '@/src/theme/colors';
 import { surfaces } from '@/src/theme/surfaces';
 
@@ -20,6 +20,8 @@ export default function LobbyScreen() {
   const [copied, setCopied] = useState(false);
   const players = room?.players ?? [];
   const isLeader = Boolean(activePlayer?.isLeader);
+  const missingReadyPlayers = isLeader ? getMissingReadyPlayers(players, activePlayer?.id) : [];
+  const missingReadyNames = missingReadyPlayers.map((player) => player.nickname).join(', ');
   const readyLabel = activePlayer?.status === 'Preparado' ? t('lobby.readyDone') : t('lobby.ready');
   const roomWarning =
     room?.closedReason === 'seeker_left'
@@ -164,6 +166,23 @@ export default function LobbyScreen() {
           <Text selectable style={{ color: colors.muted, fontSize: 13, fontWeight: '800', textAlign: 'center' }}>
             {t('lobby.leaderHint')}
           </Text>
+        ) : null}
+        {missingReadyPlayers.length > 0 ? (
+          <View
+            style={{
+              ...surfaces.warningTile,
+              borderRadius: 16,
+              gap: 4,
+              padding: 12,
+              width: '100%',
+            }}>
+            <Text selectable style={{ color: colors.ink, fontSize: 14, fontWeight: '900', textAlign: 'center' }}>
+              {t('lobby.notReadyTitle')}
+            </Text>
+            <Text selectable style={{ color: colors.muted, fontSize: 13, fontWeight: '700', lineHeight: 18, textAlign: 'center' }}>
+              {t('lobby.notReadyBody', { names: missingReadyNames })}
+            </Text>
+          </View>
         ) : null}
         {roomWarning ? (
           <View
