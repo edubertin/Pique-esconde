@@ -10,6 +10,40 @@ import { t } from '@/src/i18n';
 import { useRoom } from '@/src/state/room-store';
 import { colors } from '@/src/theme/colors';
 
+type InitialCoords = {
+  accuracy?: number | null;
+  heading?: number | null;
+  latitude: number;
+  longitude: number;
+  speed?: number | null;
+};
+
+async function getInitialCoords(): Promise<InitialCoords> {
+  try {
+    const currentLocation = await Location.getCurrentPositionAsync({
+      accuracy: Location.Accuracy.Balanced,
+    });
+
+    return currentLocation.coords;
+  } catch (expoError) {
+    if (typeof navigator === 'undefined' || !navigator.geolocation) {
+      throw expoError;
+    }
+
+    return new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(
+        (position) => resolve(position.coords),
+        reject,
+        {
+          enableHighAccuracy: false,
+          maximumAge: 10000,
+          timeout: 6000,
+        },
+      );
+    });
+  }
+}
+
 export default function LocationPermissionScreen() {
   const router = useRouter();
   const { room, updatePlayerLocation } = useRoom();
@@ -30,24 +64,20 @@ export default function LocationPermissionScreen() {
       }
 
       try {
-        const currentLocation = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.High,
-        });
+        const currentCoords = await getInitialCoords();
 
         if (room) {
           await updatePlayerLocation({
-            accuracyMeters: currentLocation.coords.accuracy ?? undefined,
-            headingDegrees: currentLocation.coords.heading ?? undefined,
-            lat: currentLocation.coords.latitude,
-            lng: currentLocation.coords.longitude,
-            speedMetersPerSecond: currentLocation.coords.speed ?? undefined,
+            accuracyMeters: currentCoords.accuracy ?? undefined,
+            headingDegrees: currentCoords.heading ?? undefined,
+            lat: currentCoords.latitude,
+            lng: currentCoords.longitude,
+            speedMetersPerSecond: currentCoords.speed ?? undefined,
           });
         }
       } catch {
         if (room) {
-          setIsRequesting(false);
-          setError('Permissao aceita. Aguardando primeira leitura do GPS.');
-          return;
+          setError('Permissao aceita. Vamos continuar enquanto o GPS pega sinal.');
         }
       }
 

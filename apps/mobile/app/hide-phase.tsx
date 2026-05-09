@@ -31,7 +31,16 @@ export default function HidePhaseScreen() {
   const phaseBody = isSeeker
     ? t('hide.seekerStatusText', { hidden: hiddenCount, total: totalHiders })
     : t('hide.statusText', { hidden: hiddenCount, name: seekerName, total: totalHiders });
-  usePlayerLocationSync(Boolean(room?.phase === 'hiding' && activePlayer));
+  const locationSync = usePlayerLocationSync(Boolean(room?.phase === 'hiding' && activePlayer));
+  const canMarkHidden = isSeeker || locationSync.status === 'active';
+  const gpsStatusText =
+    locationSync.status === 'active'
+      ? 'GPS pronto para salvar seu esconderijo.'
+      : locationSync.status === 'denied'
+        ? 'Permita a localizacao para salvar seu esconderijo.'
+        : locationSync.status === 'error'
+          ? locationSync.error ?? 'Nao foi possivel iniciar o GPS.'
+          : 'Buscando GPS para salvar seu esconderijo...';
 
   useEffect(() => {
     if (!room) {
@@ -94,7 +103,11 @@ export default function HidePhaseScreen() {
         actions={
           <>
             {!isSeeker ? (
-              <GameButton label={isLoading ? 'Marcando...' : t('hide.ready')} onPress={handleMarkHidden} />
+              <GameButton
+                disabled={!canMarkHidden || isLoading}
+                label={isLoading ? 'Marcando...' : canMarkHidden ? t('hide.ready') : 'Aguardando GPS'}
+                onPress={handleMarkHidden}
+              />
             ) : null}
             <GameButton label={t('common.exit')} onPress={handleLeaveRoom} variant="danger" />
           </>
@@ -119,6 +132,18 @@ export default function HidePhaseScreen() {
             {phaseBody}
           </Text>
         </View>
+        {!isSeeker ? (
+          <Text
+            selectable
+            style={{
+              color: locationSync.status === 'active' ? colors.green : colors.danger,
+              fontSize: 13,
+              fontWeight: '900',
+              textAlign: 'center',
+            }}>
+            {gpsStatusText}
+          </Text>
+        ) : null}
         {error ? (
           <Text selectable style={{ color: colors.danger, fontSize: 13, fontWeight: '800', textAlign: 'center' }}>
             {error}
