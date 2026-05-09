@@ -41,6 +41,16 @@ Decisão de produto:
 - Em alguns momentos ele pode "se perder" ou oscilar para manter a brincadeira divertida e compensar imprecisão natural de GPS/bússola.
 - Quando o procurador estiver mais perto, o sinal pode ficar mais claro e confiante.
 
+## Pistas Derivadas
+
+O backend calcula a pista do radar a partir das coordenadas reais e devolve apenas dados derivados para o app:
+
+- Estado de proximidade: frio, morno, quente ou sem sinal.
+- Direcao aproximada com ruido controlado.
+- Confianca do ponteiro, subindo com o tempo mas limitada a cerca de 90%.
+- Alvo mais proximo, sem expor latitude/longitude.
+- Estado do sinal para apagar indicadores quando a leitura estiver instavel.
+
 ## Captura Automática
 
 Regra inicial:

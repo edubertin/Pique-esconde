@@ -46,6 +46,19 @@ export type PlayerLocationInput = {
   speedMetersPerSecond?: number;
 };
 
+export type RadarHint = {
+  angleDegrees?: number;
+  band: 'cold' | 'hot' | 'none' | 'warm';
+  canCapture?: boolean;
+  confidence: number;
+  confirmRemainingSeconds?: number;
+  distanceMetersApprox?: number;
+  signalStatus: 'fresh' | 'lost' | 'warning';
+  targetNickname?: string;
+  targetPlayerId?: string;
+  updatedAt?: string;
+};
+
 export type LobbyNotice = {
   createdAt?: number;
   names: string[];
@@ -73,6 +86,7 @@ type RoomStore = {
   createRoom: (input: PlayerInput) => Promise<void>;
   error?: string;
   finishRound: (winner?: GameResult['winner']) => Promise<void>;
+  getRadarHint: () => Promise<RadarHint | undefined>;
   isLoading: boolean;
   joinRoom: (input: PlayerInput & { code: string }) => Promise<boolean>;
   leaveRoom: () => Promise<void>;
@@ -87,6 +101,7 @@ type RoomStore = {
   startRound: () => Promise<boolean>;
   tickGameSession: () => Promise<void>;
   toggleReady: () => Promise<void>;
+  tryCaptureNearest: () => Promise<string | undefined>;
   updatePlayerLocation: (input: PlayerLocationInput) => Promise<void>;
 };
 
@@ -226,6 +241,10 @@ export function RoomProvider({ children }: { children: ReactNode }) {
           await refreshRoom();
         });
       },
+      async getRadarHint() {
+        const session = requireSession();
+        return roomService.getRadarHint(session.roomId, session.activePlayerId, session.activePlayerToken);
+      },
       async joinRoom(input) {
         await runAction(async () => {
           const snapshot = await roomService.joinRoom(input);
@@ -332,6 +351,18 @@ export function RoomProvider({ children }: { children: ReactNode }) {
           await roomService.toggleReady(session.roomId, session.activePlayerId, session.activePlayerToken);
           await refreshRoom();
         });
+      },
+      async tryCaptureNearest() {
+        const session = requireSession();
+        let capturedPlayerId: string | undefined;
+
+        await runAction(async () => {
+          const payload = await roomService.tryCaptureNearest(session.roomId, session.activePlayerId, session.activePlayerToken);
+          capturedPlayerId = payload?.capturedPlayerId;
+          await refreshRoom();
+        });
+
+        return capturedPlayerId;
       },
       async updatePlayerLocation(input) {
         const session = requireSession();

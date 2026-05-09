@@ -8,13 +8,15 @@ import { MenuPanel, PrototypeScreen } from '@/src/components/prototype-screen';
 import { RadarView } from '@/src/components/radar-view';
 import { usePlayerLocationSync } from '@/src/hooks/use-player-location-sync';
 import { t } from '@/src/i18n';
-import { useRoom } from '@/src/state/room-store';
+import { type RadarHint, useRoom } from '@/src/state/room-store';
 import { colors } from '@/src/theme/colors';
 import { formatTimer } from '@/src/utils/format-timer';
 
 export default function SeekerRadarScreen() {
   const router = useRouter();
-  const { error, finishRound, isLoading, leaveRoom, room, simulateCapture, tickGameSession } = useRoom();
+  const { error, finishRound, getRadarHint, isLoading, leaveRoom, room, tickGameSession, tryCaptureNearest } = useRoom();
+  const [captureMessage, setCaptureMessage] = useState<string>();
+  const [radarHint, setRadarHint] = useState<RadarHint>();
   const [now, setNow] = useState(Date.now());
   const tickRequestedRef = useRef(false);
   const remainingHiders =
@@ -50,10 +52,40 @@ export default function SeekerRadarScreen() {
     });
   }, [remainingSeconds, room?.phase, seekEndsAt, tickGameSession]);
 
+  useEffect(() => {
+    if (room?.phase !== 'seeking') return undefined;
+
+    let cancelled = false;
+
+    const refreshHint = () => {
+      getRadarHint()
+        .then((hint) => {
+          if (!cancelled && hint) setRadarHint(hint);
+        })
+        .catch(() => undefined);
+    };
+
+    refreshHint();
+    const interval = setInterval(refreshHint, 1500);
+
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [getRadarHint, room?.phase]);
+
   const handleSimulateCapture = async () => {
     try {
-      await simulateCapture();
-      router.push('/capture');
+      setCaptureMessage(undefined);
+      const capturedPlayerId = await tryCaptureNearest();
+      if (capturedPlayerId) {
+        router.push('/capture');
+        return;
+      }
+
+      const hint = await getRadarHint();
+      if (hint) setRadarHint(hint);
+      setCaptureMessage(hint?.canCapture ? t('radar.confirmingCapture') : t('radar.noCaptureSignal'));
     } catch {
       // Error is shown from room store state.
     }
@@ -84,7 +116,7 @@ export default function SeekerRadarScreen() {
         title={t('radar.title')}
         actions={
           <>
-            <GameButton label={isLoading ? 'Capturando...' : t('radar.captureSimulation')} onPress={handleSimulateCapture} />
+            <GameButton label={isLoading ? 'Capturando...' : t('radar.capture')} onPress={handleSimulateCapture} />
             <GameButton label={t('radar.finishHiders')} onPress={handleFinishWithHiders} variant="secondary" />
             <GameButton label={t('common.exit')} onPress={handleLeaveRoom} variant="danger" />
           </>
@@ -95,7 +127,12 @@ export default function SeekerRadarScreen() {
           </Text>
           <Badge label={t('radar.remaining', { count: remainingHiders })} tone="rush" />
         </View>
-        <RadarView />
+        <RadarView hint={radarHint} />
+        {captureMessage ? (
+          <Text selectable style={{ color: colors.muted, fontSize: 13, fontWeight: '800', textAlign: 'center' }}>
+            {captureMessage}
+          </Text>
+        ) : null}
         {error ? (
           <Text selectable style={{ color: colors.danger, fontSize: 13, fontWeight: '800', textAlign: 'center' }}>
             {error}
