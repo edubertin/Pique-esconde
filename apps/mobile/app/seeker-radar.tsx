@@ -3,6 +3,7 @@ import { useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { Text, View } from 'react-native';
 
+import { DevGpsControl } from '@/src/components/dev-gps-control';
 import { GameButton } from '@/src/components/game-button';
 import { PrototypeScreen } from '@/src/components/prototype-screen';
 import { RadarView } from '@/src/components/radar-view';
@@ -14,8 +15,9 @@ import { formatTimer } from '@/src/utils/format-timer';
 
 export default function SeekerRadarScreen() {
   const router = useRouter();
-  const { error, finishRound, getRadarHint, isLoading, leaveRoom, room, tickGameSession, tryCaptureNearest } = useRoom();
+  const { error, finishRound, getRadarHint, leaveRoom, room, tickGameSession, tryCaptureNearest } = useRoom();
   const [captureMessage, setCaptureMessage] = useState<string>();
+  const [manualCapturePending, setManualCapturePending] = useState(false);
   const [radarHint, setRadarHint] = useState<RadarHint>();
   const [now, setNow] = useState(Date.now());
   const captureRequestedRef = useRef(false);
@@ -115,6 +117,7 @@ export default function SeekerRadarScreen() {
   const handleSimulateCapture = async () => {
     try {
       setCaptureMessage(undefined);
+      setManualCapturePending(true);
       const payload = await tryCaptureNearest();
       if (payload?.capturedPlayerId) {
         router.push('/capture');
@@ -126,6 +129,8 @@ export default function SeekerRadarScreen() {
       setCaptureMessage(payload?.reason === 'confirming' || hint?.canCapture ? t('radar.confirmingCapture') : t('radar.noCaptureSignal'));
     } catch {
       // Error is shown from room store state.
+    } finally {
+      setManualCapturePending(false);
     }
   };
 
@@ -186,8 +191,10 @@ export default function SeekerRadarScreen() {
 
         <RadarView hint={radarHint} />
 
+        <DevGpsControl defaultDistance={18} label="procurador" />
+
         <View style={{ gap: 10, width: '100%' }}>
-          <GameButton label={isLoading ? 'Capturando...' : t('radar.capture')} onPress={handleSimulateCapture} variant="capture" />
+          <GameButton label={manualCapturePending ? 'Capturando...' : t('radar.capture')} onPress={handleSimulateCapture} variant="capture" />
           <View style={{ flexDirection: 'row', gap: 10 }}>
             <View style={{ flex: 1 }}>
               <GameButton label={t('radar.finishHiders')} onPress={handleFinishWithHiders} size="compact" variant="rush" />
