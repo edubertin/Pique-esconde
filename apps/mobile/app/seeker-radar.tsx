@@ -18,6 +18,7 @@ export default function SeekerRadarScreen() {
   const [captureMessage, setCaptureMessage] = useState<string>();
   const [radarHint, setRadarHint] = useState<RadarHint>();
   const [now, setNow] = useState(Date.now());
+  const captureRequestedRef = useRef(false);
   const tickRequestedRef = useRef(false);
   const seekerPlayerId = room?.gameSession?.seekerPlayerId ?? room?.players.find((player) => player.isLeader)?.id;
   const remainingHiders = room?.players.filter((player) => player.id !== seekerPlayerId && player.status !== 'Capturado').length ?? 0;
@@ -74,18 +75,55 @@ export default function SeekerRadarScreen() {
     };
   }, [getRadarHint, room?.phase]);
 
+  useEffect(() => {
+    if (room?.phase !== 'seeking' || !radarHint?.canCapture || captureRequestedRef.current) return undefined;
+
+    let cancelled = false;
+
+    const attemptCapture = () => {
+      captureRequestedRef.current = true;
+      tryCaptureNearest()
+        .then((payload) => {
+          if (cancelled) return;
+
+          if (payload?.capturedPlayerId) {
+            router.push('/capture');
+            return;
+          }
+
+          if (payload?.reason === 'confirming') {
+            setCaptureMessage(t('radar.confirmingCapture'));
+          } else {
+            setCaptureMessage(t('radar.noCaptureSignal'));
+          }
+        })
+        .catch(() => undefined)
+        .finally(() => {
+          captureRequestedRef.current = false;
+        });
+    };
+
+    attemptCapture();
+    const interval = setInterval(attemptCapture, 900);
+
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [radarHint?.canCapture, room?.phase, router, tryCaptureNearest]);
+
   const handleSimulateCapture = async () => {
     try {
       setCaptureMessage(undefined);
-      const capturedPlayerId = await tryCaptureNearest();
-      if (capturedPlayerId) {
+      const payload = await tryCaptureNearest();
+      if (payload?.capturedPlayerId) {
         router.push('/capture');
         return;
       }
 
       const hint = await getRadarHint();
       if (hint) setRadarHint(hint);
-      setCaptureMessage(hint?.canCapture ? t('radar.confirmingCapture') : t('radar.noCaptureSignal'));
+      setCaptureMessage(payload?.reason === 'confirming' || hint?.canCapture ? t('radar.confirmingCapture') : t('radar.noCaptureSignal'));
     } catch {
       // Error is shown from room store state.
     }

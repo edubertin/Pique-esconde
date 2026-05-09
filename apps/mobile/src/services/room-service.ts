@@ -2,7 +2,7 @@ import type { RealtimeChannel } from '@supabase/supabase-js';
 
 import { gameRules } from '@/src/constants/game';
 import { assertSupabase } from '@/src/services/supabase-client';
-import type { GameResult, GameSession, HiderDangerHint, LobbyNotice, PlayerLocationInput, PlayerStatus, RadarHint, RoomPlayer } from '@/src/state/room-store';
+import type { CaptureAttempt, GameResult, GameSession, HiderDangerHint, LobbyNotice, PlayerLocationInput, PlayerStatus, RadarHint, RoomPlayer } from '@/src/state/room-store';
 
 export type RemoteRoomPhase = 'lobby' | 'hiding' | 'seeking' | 'finished';
 
@@ -88,12 +88,7 @@ type RoomPayload = {
   roomId: string;
 };
 
-type CapturePayload = {
-  capturedPlayerId?: string;
-  captured?: boolean;
-  reason?: string;
-  remainingHiders?: number;
-};
+type CapturePayload = CaptureAttempt;
 
 type StartRoundPayload = {
   started?: boolean;

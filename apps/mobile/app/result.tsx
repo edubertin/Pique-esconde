@@ -35,7 +35,7 @@ function ResultStat({ label, value }: { label: string; value: string }) {
 
 export default function ResultScreen() {
   const router = useRouter();
-  const { leaveRoom, rematch, room } = useRoom();
+  const { error, leaveRoom, rematch, room } = useRoom();
   const players = room?.players ?? [];
   const result = room?.result;
   const hasClosedResult = Boolean(result);
@@ -65,7 +65,7 @@ export default function ResultScreen() {
   const handleRematch = async () => {
     try {
       await rematch();
-      router.push('/lobby');
+      router.replace('/lobby');
     } catch {
       // Keep result visible if the room cannot sync.
     }
@@ -132,6 +132,12 @@ export default function ResultScreen() {
             value={winner === 'seeker' ? (seekerName ?? t('player.roleLeaderSeeker')) : highlightName}
           />
         </View>
+
+        {error ? (
+          <Text selectable style={{ color: colors.danger, fontSize: 13, fontWeight: '800', textAlign: 'center' }}>
+            {error}
+          </Text>
+        ) : null}
 
       </MenuPanel>
     </PrototypeScreen>
