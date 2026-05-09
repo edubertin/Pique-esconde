@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { Text, View } from 'react-native';
 
 import { ActionGrid } from '@/src/components/action-grid';
@@ -5,6 +6,7 @@ import { Badge } from '@/src/components/badge';
 import { GameButton } from '@/src/components/game-button';
 import { MenuPanel, PrototypeScreen } from '@/src/components/prototype-screen';
 import { avatars } from '@/src/constants/game';
+import { useRoom } from '@/src/state/room-store';
 import { colors } from '@/src/theme/colors';
 
 const winnerAvatar = avatars[1];
@@ -33,6 +35,20 @@ function ResultStat({ label, value }: { label: string; value: string }) {
 }
 
 export default function ResultScreen() {
+  const router = useRouter();
+  const { leaveRoom, rematch, room } = useRoom();
+  const players = room?.players ?? [];
+
+  const handleRematch = () => {
+    rematch();
+    router.push('/lobby');
+  };
+
+  const handleLeaveRoom = () => {
+    leaveRoom();
+    router.replace('/');
+  };
+
   return (
     <PrototypeScreen>
       <MenuPanel
@@ -41,10 +57,10 @@ export default function ResultScreen() {
         meta={<Text selectable style={{ color: colors.muted, fontSize: 12, fontWeight: '800' }}>Resultado final da rodada</Text>}
         actions={
           <>
-            <GameButton href="/lobby" label="Jogar novamente" />
+            <GameButton label="Jogar novamente" onPress={handleRematch} />
             <ActionGrid
               actions={[
-                { href: '/', label: 'Sair', variant: 'danger' },
+                { label: 'Sair', onPress: handleLeaveRoom, variant: 'danger' },
                 { href: '/social-card', label: 'Compartilhar', variant: 'ghost' },
               ]}
             />
@@ -85,7 +101,7 @@ export default function ResultScreen() {
 
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
           <ResultStat label="Tempo de jogo" value="3min" />
-          <ResultStat label="Jogadores" value="4" />
+          <ResultStat label="Jogadores" value={`${players.length || 4}`} />
           <ResultStat label="Capturados" value="2" />
           <ResultStat label="Sobreviveu" value="Ana" />
         </View>

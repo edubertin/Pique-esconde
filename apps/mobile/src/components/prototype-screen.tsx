@@ -77,11 +77,12 @@ type MenuPanelProps = {
   actions?: ReactNode;
   backHref?: Href;
   children: ReactNode;
+  headerAction?: ReactNode;
   meta?: ReactNode;
   title: string;
 };
 
-export function MenuPanel({ actions, backHref = '/', children, meta, title }: MenuPanelProps) {
+export function MenuPanel({ actions, backHref = '/', children, headerAction, meta, title }: MenuPanelProps) {
   return (
     <Panel>
       <View
@@ -120,6 +121,7 @@ export function MenuPanel({ actions, backHref = '/', children, meta, title }: Me
           </Text>
           {meta ? <View>{meta}</View> : null}
         </View>
+        {headerAction ? <View>{headerAction}</View> : null}
       </View>
 
       <View style={{ gap: 14, width: '100%' }}>{children}</View>

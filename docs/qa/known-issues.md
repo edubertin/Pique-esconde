@@ -41,6 +41,108 @@ Link para test run:
 
 Nenhum bug conhecido registrado ainda.
 
+## Limitações Aceitas Nesta Fase
+
+## L-001 - GPS real ainda não implementado
+
+Status: Aceito no MVP atual
+Severidade: Alta
+Area: Localizacao
+Detectado em: 2026-05-08
+Commit/versao: 8bec69f
+
+Descricao:
+- O prototipo ainda nao solicita nem usa GPS real.
+
+Impacto:
+- Radar, captura automatica e permissao de localizacao ainda sao fluxos visuais/simulados.
+
+Decisao:
+- Implementar estado de sala antes de conectar GPS real.
+
+Link para test run:
+- `docs/qa/test-runs/2026-05-08-privacidade-compartilhamento.md`
+
+## L-002 - Realtime real ainda não implementado
+
+Status: Aceito no MVP atual
+Severidade: Alta
+Area: Realtime
+Detectado em: 2026-05-08
+Commit/versao: 8bec69f
+
+Descricao:
+- Lobby, jogadores, status e eventos ainda usam dados mockados.
+
+Impacto:
+- Nao e possivel validar multiplos celulares na mesma sala ainda.
+
+Decisao:
+- Proxima fase deve criar estado de sala e depois plugar Supabase Realtime.
+
+Link para test run:
+- `docs/qa/test-runs/2026-05-08-lobby-rematch-web.md`
+
+## L-003 - Promover líder pelo lobby ainda não é realtime
+
+Status: Parcialmente resolvido localmente
+Severidade: Media
+Area: Lobby
+Detectado em: 2026-05-08
+Commit/versao: 8bec69f
+
+Descricao:
+- A regra de promover outro jogador como lider/procurador ja existe no estado local/mock, mas ainda nao esta conectada ao realtime.
+
+Impacto:
+- O fluxo pode ser validado em um aparelho, mas ainda nao sincroniza entre varios celulares.
+
+Decisao:
+- Validar localmente na fase 3.1 e depois conectar ao Supabase Realtime.
+
+Link para test run:
+- `docs/qa/test-runs/2026-05-08-lobby-rematch-web.md`
+
+## L-004 - Expiração em 6 minutos ainda não é backend
+
+Status: Parcialmente resolvido localmente
+Severidade: Media
+Area: Sala
+Detectado em: 2026-05-08
+Commit/versao: 8bec69f
+
+Descricao:
+- A regra de expirar sala apos 6 minutos com apenas 1 jogador ativo existe no estado local/mock, mas ainda nao existe backend para executar quando o app fecha.
+
+Impacto:
+- O comportamento local ajuda testes do fluxo, mas nao substitui expiracao server-side.
+
+Decisao:
+- Manter local para prototipo e mover para backend/realtime na fase Supabase.
+
+Link para test run:
+- `docs/qa/test-runs/2026-05-08-lobby-rematch-web.md`
+
+## L-005 - Botão Convidar ainda não abre compartilhamento nativo
+
+Status: Aceito no MVP atual
+Severidade: Media
+Area: Convite
+Detectado em: 2026-05-08
+Commit/versao: 8bec69f
+
+Descricao:
+- O lobby usa o termo `Convidar`, mas por enquanto adiciona amigos demo no estado local. Ainda nao abre share nativo nem gera link real.
+
+Impacto:
+- Convite local permite testar lobby, limite e promocao de lider, mas ainda nao convida outro aparelho.
+
+Decisao:
+- Implementar quando houver criacao real de sala/codigo/link.
+
+Link para test run:
+- `docs/qa/test-runs/2026-05-08-fluxo-navegavel-web.md`
+
 ## Riscos do MVP
 
 ## R-001 - GPS pode oscilar em ambiente fechado
@@ -106,4 +208,3 @@ Impacto:
 
 Decisao:
 - Card deve conter somente logo, placar simples, texto promocional e possivelmente QR code/link da loja no futuro.
-

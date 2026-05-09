@@ -1,9 +1,12 @@
+import { useRouter } from 'expo-router';
+import { useState } from 'react';
 import { Text, TextInput, View } from 'react-native';
 
 import { AvatarChoice } from '@/src/components/avatar-choice';
 import { Badge } from '@/src/components/badge';
 import { GameButton } from '@/src/components/game-button';
 import { MenuPanel, PrototypeScreen } from '@/src/components/prototype-screen';
+import { useRoom } from '@/src/state/room-store';
 import { colors } from '@/src/theme/colors';
 
 const inputStyle = {
@@ -18,13 +21,27 @@ const inputStyle = {
 };
 
 export default function CreateRoomScreen() {
+  const router = useRouter();
+  const { createRoom } = useRoom();
+  const [avatarId, setAvatarId] = useState('avatar_01');
+  const [nickname, setNickname] = useState('Dudu');
+
+  const handleSelectAvatar = (nextAvatarId: string) => {
+    setAvatarId(nextAvatarId);
+  };
+
+  const handleCreateRoom = () => {
+    createRoom({ avatarId, nickname });
+    router.push('/location-permission');
+  };
+
   return (
     <PrototypeScreen>
       <MenuPanel
         title="Criar partida"
         actions={
           <>
-            <GameButton href="/location-permission" label="Criar sala" />
+            <GameButton label="Criar sala" onPress={handleCreateRoom} />
             <GameButton href="/join-room" label="Entrar com código" variant="secondary" />
           </>
         }>
@@ -36,10 +53,16 @@ export default function CreateRoomScreen() {
           <Text selectable style={{ color: colors.ink, fontSize: 16, fontWeight: '900' }}>
             Seu apelido
           </Text>
-          <TextInput placeholder="Seu apelido" placeholderTextColor={colors.muted} value="Dudu" style={inputStyle} />
+          <TextInput
+            onChangeText={setNickname}
+            placeholder="Seu apelido"
+            placeholderTextColor={colors.muted}
+            value={nickname}
+            style={inputStyle}
+          />
         </View>
 
-        <AvatarChoice selectedId="avatar_01" />
+        <AvatarChoice onSelect={handleSelectAvatar} selectedId={avatarId} />
 
         <View
           style={{

@@ -1,11 +1,20 @@
+import { useRouter } from 'expo-router';
 import { Text, View } from 'react-native';
 
 import { Badge } from '@/src/components/badge';
 import { GameButton } from '@/src/components/game-button';
 import { MenuPanel, PrototypeScreen } from '@/src/components/prototype-screen';
+import { useRoom } from '@/src/state/room-store';
 import { colors } from '@/src/theme/colors';
 
 export default function LocationPermissionScreen() {
+  const router = useRouter();
+  const { room } = useRoom();
+
+  const handleAllow = () => {
+    router.push(room ? '/lobby' : '/create-room');
+  };
+
   return (
     <PrototypeScreen>
       <MenuPanel
@@ -13,7 +22,7 @@ export default function LocationPermissionScreen() {
         title="Localização"
         actions={
           <>
-            <GameButton href="/lobby" label="Permitir localização" />
+            <GameButton label="Permitir localização" onPress={handleAllow} />
             <GameButton href="/" label="Agora não" variant="danger" />
           </>
         }>

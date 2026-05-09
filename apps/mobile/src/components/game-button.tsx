@@ -6,11 +6,12 @@ import { patterns } from '@/src/theme/patterns';
 type GameButtonProps = {
   href?: Href;
   label: string;
+  onPress?: () => void;
   size?: 'default' | 'compact';
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
 };
 
-export function GameButton({ href, label, size = 'default', variant = 'primary' }: GameButtonProps) {
+export function GameButton({ href, label, onPress, size = 'default', variant = 'primary' }: GameButtonProps) {
   const pattern = patterns.button[variant];
   const isCompact = size === 'compact';
 
@@ -18,6 +19,7 @@ export function GameButton({ href, label, size = 'default', variant = 'primary' 
     <Pressable
       accessibilityLabel={label}
       accessibilityRole="button"
+      onPress={onPress}
       style={{
         alignItems: 'center',
         backgroundColor: pattern.backgroundColor,
