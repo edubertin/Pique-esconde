@@ -74,7 +74,7 @@ export default function SeekerRadarScreen() {
   }, [remainingSeconds, room?.phase, seekEndsAt, tickGameSession]);
 
   useEffect(() => {
-    if (room?.phase !== 'seeking') return undefined;
+    if (room?.phase !== 'seeking' || remainingHiders <= 0) return undefined;
 
     let cancelled = false;
 
@@ -93,7 +93,7 @@ export default function SeekerRadarScreen() {
       cancelled = true;
       clearInterval(interval);
     };
-  }, [getRadarHint, room?.phase]);
+  }, [getRadarHint, remainingHiders, room?.phase]);
 
   useEffect(() => {
     if (!autoCaptureEnabled || room?.phase !== 'seeking' || !radarHint?.canCapture || captureRequestedRef.current) return undefined;

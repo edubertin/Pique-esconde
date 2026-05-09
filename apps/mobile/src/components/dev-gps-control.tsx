@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Platform, Pressable, Text, View } from 'react-native';
 
 import { useRoom } from '@/src/state/room-store';
@@ -14,7 +14,7 @@ const metersPerDegreeLatitude = 111_320;
 const devGpsStorageKey = 'pe-dev-gps-v2-active';
 const devGpsDistanceStorageKey = 'pe-dev-gps-v2-distance';
 const presets = [0, 4, 8, 15, 35, 60];
-type SyncStatus = 'idle' | 'syncing' | 'synced' | 'error';
+type SyncStatus = 'idle' | 'active' | 'error';
 
 function offsetLocation(distanceMeters: number) {
   return {
@@ -28,6 +28,7 @@ function offsetLocation(distanceMeters: number) {
 
 export function DevGpsControl({ defaultDistance = 0, label }: { defaultDistance?: number; label: string }) {
   const { updatePlayerLocation } = useRoom();
+  const updatePlayerLocationRef = useRef(updatePlayerLocation);
   const enabled = __DEV__ && Platform.OS === 'web';
   const [active, setActive] = useState(() => (
     enabled && typeof window !== 'undefined' && window.sessionStorage.getItem(devGpsStorageKey) === 'true'
@@ -43,6 +44,10 @@ export function DevGpsControl({ defaultDistance = 0, label }: { defaultDistance?
   const hintText = label === 'procurador'
     ? 'Para testar: comece 60m e aproxime ate 4m.'
     : 'Para testar: deixe o escondido fixo em 0m.';
+
+  useEffect(() => {
+    updatePlayerLocationRef.current = updatePlayerLocation;
+  }, [updatePlayerLocation]);
 
   useEffect(() => {
     if (!enabled) return undefined;
@@ -62,38 +67,35 @@ export function DevGpsControl({ defaultDistance = 0, label }: { defaultDistance?
     if (!active) return undefined;
 
     let cancelled = false;
-    const sync = async () => {
-      setSyncStatus('syncing');
-
+    const sync = async (showError = false) => {
       try {
-        await updatePlayerLocation(offsetLocation(distance));
-        if (!cancelled) setSyncStatus('synced');
+        await updatePlayerLocationRef.current(offsetLocation(distance));
+        if (!cancelled) setSyncStatus('active');
       } catch {
-        if (!cancelled) setSyncStatus('error');
+        if (!cancelled && showError) setSyncStatus('error');
       }
     };
 
-    sync();
+    sync(true);
     const interval = setInterval(() => {
-      if (!cancelled) sync();
-    }, 3000);
+      if (!cancelled) sync(false);
+    }, 5000);
 
     return () => {
       cancelled = true;
       clearInterval(interval);
     };
-  }, [active, distance, enabled, updatePlayerLocation]);
+  }, [active, distance, enabled]);
 
   if (!enabled) return null;
 
   const setPreset = async (nextDistance: number) => {
     setDistance(nextDistance);
     setActive(true);
-    setSyncStatus('syncing');
 
     try {
-      await updatePlayerLocation(offsetLocation(nextDistance));
-      setSyncStatus('synced');
+      await updatePlayerLocationRef.current(offsetLocation(nextDistance));
+      setSyncStatus('active');
     } catch {
       setSyncStatus('error');
     }
@@ -205,15 +207,15 @@ export function DevGpsControl({ defaultDistance = 0, label }: { defaultDistance?
       <Text style={{ color: colors.muted, fontSize: 11, fontWeight: '800', textAlign: 'center' }}>
         {active ? `Simulando ${distance}m.` : `Toque em um metro para ligar. Atual: ${distance}m.`} {hintText}
       </Text>
-      {active ? (
+      {active && syncStatus === 'error' ? (
         <Text
           style={{
-            color: syncStatus === 'error' ? colors.danger : syncStatus === 'synced' ? colors.green : colors.muted,
+            color: colors.danger,
             fontSize: 11,
             fontWeight: '900',
             textAlign: 'center',
           }}>
-          {syncStatus === 'synced' ? 'GPS teste sincronizado' : syncStatus === 'error' ? 'GPS teste aguardando rede' : 'Sincronizando GPS teste...'}
+          GPS teste aguardando rede
         </Text>
       ) : null}
     </View>

@@ -27,12 +27,16 @@ function RadarRing({ size }: { size: `${number}%` }) {
 
 export function RadarView({ hint, rush = false }: { hint?: RadarHint; rush?: boolean }) {
   const { width } = useWindowDimensions();
+  const hasNoTarget = hint?.reason === 'no_target_signal';
+  const seekerSignalLost = hint?.reason === 'seeker_signal_lost';
   const band = hint?.signalStatus === 'fresh' ? (hint.band ?? 'none') : 'none';
   const meta = bandMeta[band];
   const confidence = Math.round((hint?.confidence ?? 0) * 100);
   const angle = hint?.angleDegrees ?? (rush ? 42 : 28);
   const radarSize = Math.min(Math.max(width * 0.76, 258), 348);
   const targetColor = band === 'none' ? 'rgba(255,255,255,0.55)' : meta.color;
+  const statusLabel = hasNoTarget ? 'Sem alvo ativo' : seekerSignalLost ? 'GPS sem sinal' : meta.label;
+  const statusBody = hasNoTarget ? 'Nenhum escondido ativo na rodada' : hint?.targetNickname ? `${hint.targetNickname} no alvo` : 'Buscando sinal';
 
   return (
     <View style={{ alignItems: 'center', gap: 12, width: '100%' }}>
@@ -127,10 +131,10 @@ export function RadarView({ hint, rush = false }: { hint?: RadarHint; rush?: boo
           />
         </View>
         <Text selectable style={{ color: meta.color, fontSize: 22, fontWeight: '900', textAlign: 'center' }}>
-          {meta.label} {confidence > 0 ? `${confidence}%` : ''}
+          {statusLabel} {confidence > 0 && !hasNoTarget ? `${confidence}%` : ''}
         </Text>
         <Text selectable style={{ color: 'rgba(255,255,255,0.86)', fontSize: 13, fontWeight: '800', textAlign: 'center' }}>
-          {hint?.targetNickname ? `${hint.targetNickname} no alvo` : 'Buscando sinal'}
+          {statusBody}
         </Text>
       </View>
     </View>

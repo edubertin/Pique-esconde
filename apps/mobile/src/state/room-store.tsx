@@ -53,6 +53,7 @@ export type RadarHint = {
   confidence: number;
   confirmRemainingSeconds?: number;
   distanceMetersApprox?: number;
+  reason?: 'no_active_search' | 'no_target_signal' | 'seeker_signal_lost';
   signalStatus: 'fresh' | 'lost' | 'warning';
   targetNickname?: string;
   targetPlayerId?: string;
@@ -129,13 +130,14 @@ type PlayerInput = {
 };
 
 const RoomContext = createContext<RoomStore | undefined>(undefined);
+const connectionUnstableMessage = 'Conexao instavel. Tente novamente em alguns segundos.';
 
 function getErrorMessage(error: unknown) {
   const cleanMessage = (message: string) => message.split('\n')[0]?.trim() || 'Nao foi possivel sincronizar a sala agora.';
   const isFetchFailure = (message: string) => message.toLowerCase().includes('failed to fetch');
 
   if (error instanceof Error) {
-    if (isFetchFailure(error.message)) return 'Conexao instavel. Tente novamente em alguns segundos.';
+    if (isFetchFailure(error.message)) return connectionUnstableMessage;
     return cleanMessage(error.message);
   }
 
@@ -146,7 +148,7 @@ function getErrorMessage(error: unknown) {
 
     if (parts.length > 0) {
       const message = parts.join(' ');
-      if (isFetchFailure(message)) return 'Conexao instavel. Tente novamente em alguns segundos.';
+      if (isFetchFailure(message)) return connectionUnstableMessage;
       return cleanMessage(message);
     }
     if (typeof supabaseError.code === 'string') return `Erro Supabase: ${supabaseError.code}`;
@@ -220,7 +222,8 @@ export function RoomProvider({ children }: { children: ReactNode }) {
 
     const subscription = roomService.subscribeToRoom(room.id, () => {
       refreshRoom().catch((subscriptionError: unknown) => {
-        setError(getErrorMessage(subscriptionError));
+        const message = getErrorMessage(subscriptionError);
+        if (message !== connectionUnstableMessage) setError(message);
       });
     });
 
