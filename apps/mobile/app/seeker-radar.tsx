@@ -42,6 +42,23 @@ export default function SeekerRadarScreen() {
   }, [room, router]);
 
   useEffect(() => {
+    if (room?.phase !== 'seeking' || remainingHiders > 0 || tickRequestedRef.current) return;
+
+    tickRequestedRef.current = true;
+    tickGameSession()
+      .then(() => {
+        if ((room.players.length ?? 0) <= 1) {
+          router.replace('/lobby');
+        } else {
+          router.replace('/result');
+        }
+      })
+      .catch(() => {
+        tickRequestedRef.current = false;
+      });
+  }, [remainingHiders, room?.phase, room?.players.length, router, tickGameSession]);
+
+  useEffect(() => {
     const interval = setInterval(() => setNow(Date.now()), 500);
     return () => clearInterval(interval);
   }, []);
@@ -210,7 +227,7 @@ export default function SeekerRadarScreen() {
             {captureMessage}
           </Text>
         ) : null}
-        {error ? (
+        {error && error !== 'Conexao instavel. Tente novamente em alguns segundos.' ? (
           <Text selectable style={{ color: colors.danger, fontSize: 13, fontWeight: '800', textAlign: 'center' }}>
             {error}
           </Text>
