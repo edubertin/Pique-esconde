@@ -73,7 +73,7 @@ export default function ResultScreen() {
   return (
     <PrototypeScreen>
       <MenuPanel
-        backHref="/seeker-radar"
+        showBack={false}
         title={t('result.title')}
         meta={<Text selectable style={{ color: colors.muted, fontSize: 12, fontWeight: '800' }}>{t('result.finalMeta')}</Text>}
         actions={
@@ -99,16 +99,11 @@ export default function ResultScreen() {
           <View
             style={{
               alignItems: 'center',
-              backgroundColor: highlightAvatar.color,
-              borderColor: colors.esconde,
-              borderRadius: 64,
-              borderWidth: 5,
-              height: 128,
+              height: 156,
               justifyContent: 'center',
-              overflow: 'hidden',
-              width: 128,
+              width: 156,
             }}>
-            <Image contentFit="contain" source={highlightAvatar.celebrateImage} style={{ height: 118, width: 118 }} />
+            <Image contentFit="contain" source={highlightAvatar.celebrateImage} style={{ height: 154, width: 154 }} />
           </View>
           <Text selectable style={{ color: colors.ink, fontSize: 30, fontWeight: '900', textAlign: 'center' }}>
             {resultTitle}
