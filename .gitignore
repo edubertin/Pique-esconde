@@ -29,6 +29,3 @@ web-build/
 # Build outputs
 build/
 coverage/
-
-# Local design imports
-docs/design/imports/
