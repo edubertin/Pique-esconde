@@ -1,5 +1,6 @@
 import * as Location from 'expo-location';
 import { useEffect, useRef, useState } from 'react';
+import { Platform } from 'react-native';
 
 import { useRoom } from '@/src/state/room-store';
 
@@ -27,6 +28,38 @@ export function usePlayerLocationSync(enabled: boolean): PlayerLocationSyncState
   useEffect(() => {
     let isMounted = true;
     let subscription: LocationSubscriptionLike | undefined;
+    let webWatchId: number | undefined;
+
+    const syncCoords = (coords: {
+      accuracy?: number | null;
+      heading?: number | null;
+      latitude: number;
+      longitude: number;
+      speed?: number | null;
+    }) => {
+      const { accuracy, heading, latitude, longitude, speed } = coords;
+
+      updatePlayerLocationRef.current({
+        accuracyMeters: accuracy ?? undefined,
+        headingDegrees: heading ?? undefined,
+        lat: latitude,
+        lng: longitude,
+        speedMetersPerSecond: speed ?? undefined,
+      })
+        .then(() => {
+          if (isMounted) {
+            setState({ lastUpdateAt: Date.now(), status: 'active' });
+          }
+        })
+        .catch((error: unknown) => {
+          if (isMounted) {
+            setState({
+              error: error instanceof Error ? error.message : 'Nao foi possivel sincronizar o GPS.',
+              status: 'error',
+            });
+          }
+        });
+    };
 
     async function startLocationSync() {
       if (!enabled) {
@@ -37,6 +70,28 @@ export function usePlayerLocationSync(enabled: boolean): PlayerLocationSyncState
       setState({ status: 'requesting' });
 
       try {
+        if (Platform.OS === 'web' && typeof navigator !== 'undefined' && navigator.geolocation) {
+          webWatchId = navigator.geolocation.watchPosition(
+            (position) => {
+              syncCoords(position.coords);
+            },
+            (error) => {
+              if (isMounted) {
+                setState({
+                  error: error.message || 'Nao foi possivel iniciar o GPS.',
+                  status: error.code === error.PERMISSION_DENIED ? 'denied' : 'error',
+                });
+              }
+            },
+            {
+              enableHighAccuracy: true,
+              maximumAge: 1000,
+              timeout: 10000,
+            },
+          );
+          return;
+        }
+
         const servicesEnabled = await Location.hasServicesEnabledAsync();
 
         if (!servicesEnabled) {
@@ -59,28 +114,7 @@ export function usePlayerLocationSync(enabled: boolean): PlayerLocationSyncState
             timeInterval: 2000,
           },
           (position) => {
-            const { accuracy, heading, latitude, longitude, speed } = position.coords;
-
-            updatePlayerLocationRef.current({
-              accuracyMeters: accuracy ?? undefined,
-              headingDegrees: heading ?? undefined,
-              lat: latitude,
-              lng: longitude,
-              speedMetersPerSecond: speed ?? undefined,
-            })
-              .then(() => {
-                if (isMounted) {
-                  setState({ lastUpdateAt: Date.now(), status: 'active' });
-                }
-              })
-              .catch((error: unknown) => {
-                if (isMounted) {
-                  setState({
-                    error: error instanceof Error ? error.message : 'Nao foi possivel sincronizar o GPS.',
-                    status: 'error',
-                  });
-                }
-              });
+            syncCoords(position.coords);
           },
         );
       } catch (error) {
@@ -97,7 +131,9 @@ export function usePlayerLocationSync(enabled: boolean): PlayerLocationSyncState
 
     return () => {
       isMounted = false;
-      if (typeof subscription?.remove === 'function') {
+      if (webWatchId !== undefined && typeof navigator !== 'undefined' && navigator.geolocation) {
+        navigator.geolocation.clearWatch(webWatchId);
+      } else if (typeof subscription?.remove === 'function' && Platform.OS !== 'web') {
         subscription.remove();
       } else if (typeof subscription?.unsubscribe === 'function') {
         subscription.unsubscribe();
