@@ -34,6 +34,11 @@ export default function HidePhaseScreen() {
       return;
     }
 
+    if (room.players.length < 2) {
+      router.replace('/lobby');
+      return;
+    }
+
     if (room.phase === 'seeking') {
       router.replace(isSeeker ? '/seeker-radar' : '/hider-status');
       return;
