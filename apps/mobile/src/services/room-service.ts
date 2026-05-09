@@ -71,7 +71,12 @@ type RemotePlayerRow = {
 type RemoteResult = {
   capturedPlayerIds: string[];
   durationLabel: string;
+  highlightAvatarId?: string;
   highlightPlayerId: string;
+  highlightNickname?: string;
+  seekerAvatarId?: string;
+  seekerNickname?: string;
+  seekerPlayerId?: string;
   survivorPlayerIds: string[];
   winner: GameResult['winner'];
 };
@@ -121,7 +126,12 @@ function mapResult(result: RemoteResult | null): GameResult | undefined {
   return {
     capturedPlayerIds: result.capturedPlayerIds ?? [],
     durationLabel: result.durationLabel ?? '3min',
+    highlightAvatarId: result.highlightAvatarId,
     highlightPlayerId: result.highlightPlayerId ?? '',
+    highlightNickname: result.highlightNickname,
+    seekerAvatarId: result.seekerAvatarId,
+    seekerNickname: result.seekerNickname,
+    seekerPlayerId: result.seekerPlayerId,
     survivorPlayerIds: result.survivorPlayerIds ?? [],
     winner: result.winner ?? 'hiders',
   };

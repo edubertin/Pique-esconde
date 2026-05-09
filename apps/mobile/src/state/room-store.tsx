@@ -15,7 +15,12 @@ export type RoomPlayer = {
 export type GameResult = {
   capturedPlayerIds: string[];
   durationLabel: string;
+  highlightAvatarId?: string;
   highlightPlayerId: string;
+  highlightNickname?: string;
+  seekerAvatarId?: string;
+  seekerNickname?: string;
+  seekerPlayerId?: string;
   survivorPlayerIds: string[];
   winner: 'seeker' | 'hiders';
 };

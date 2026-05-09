@@ -13,14 +13,22 @@ import { surfaces } from '@/src/theme/surfaces';
 export default function SocialCardScreen() {
   const { room } = useRoom();
   const players = room?.players ?? [];
-  const seeker = players.find((player) => player.isLeader) ?? players[0];
-  const hiders = players.filter((player) => player.id !== seeker?.id);
+  const result = room?.result;
+  const seeker =
+    players.find((player) => player.id === result?.seekerPlayerId) ??
+    players.find((player) => player.id === room?.gameSession?.seekerPlayerId) ??
+    players.find((player) => player.isLeader) ??
+    players[0];
+  const seekerId = result?.seekerPlayerId ?? seeker?.id;
+  const hiders = players.filter((player) => player.id !== seekerId);
   const fallbackHighlight = hiders[0] ?? seeker;
-  const highlightPlayer = players.find((player) => player.id === room?.result?.highlightPlayerId) ?? fallbackHighlight;
-  const highlightAvatar = avatars.find((avatar) => avatar.id === highlightPlayer?.avatarId) ?? avatars[0];
-  const winner = room?.result?.winner ?? 'hiders';
-  const survivorCount = room?.result?.survivorPlayerIds.length ?? Math.max(1, hiders.length - 2);
-  const seekerName = seeker?.nickname ?? t('player.roleLeaderSeeker');
+  const highlightPlayer = players.find((player) => player.id === result?.highlightPlayerId) ?? fallbackHighlight;
+  const highlightAvatarId = result?.highlightAvatarId ?? highlightPlayer?.avatarId;
+  const highlightAvatar = avatars.find((avatar) => avatar.id === highlightAvatarId) ?? avatars[0];
+  const highlightName = result?.highlightNickname ?? highlightPlayer?.nickname ?? t('social.placeholder');
+  const winner = result?.winner ?? 'hiders';
+  const survivorCount = result?.survivorPlayerIds.length ?? Math.max(1, hiders.length - 2);
+  const seekerName = result?.seekerNickname ?? seeker?.nickname ?? t('player.roleLeaderSeeker');
   const title = winner === 'seeker' ? t('social.titleSeeker', { name: seekerName }) : t('social.titleHiders');
   const highlightLabel = winner === 'seeker' ? t('social.highlightSeeker') : t('social.highlightHiders');
   const time = room?.result?.durationLabel ?? '3min';
@@ -45,7 +53,7 @@ export default function SocialCardScreen() {
             {title}
           </Text>
           <Text selectable style={{ color: colors.muted, fontSize: 16, fontWeight: '800', textAlign: 'center' }}>
-            {highlightPlayer?.nickname ?? t('social.placeholder')} - {highlightLabel}
+            {highlightName} - {highlightLabel}
           </Text>
           <Image contentFit="contain" source={highlightAvatar.celebrateImage} style={{ height: 132, width: 132 }} />
           <Text selectable style={{ color: colors.muted, fontSize: 16, textAlign: 'center' }}>
