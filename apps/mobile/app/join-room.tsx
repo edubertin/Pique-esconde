@@ -25,7 +25,7 @@ const inputStyle = {
 
 export default function JoinRoomScreen() {
   const router = useRouter();
-  const { joinRoom } = useRoom();
+  const { error, isLoading, joinRoom } = useRoom();
   const [avatarId, setAvatarId] = useState('avatar_02');
   const [code, setCode] = useState('ABCD');
   const [nickname, setNickname] = useState('Ana');
@@ -34,14 +34,18 @@ export default function JoinRoomScreen() {
     setAvatarId(nextAvatarId);
   };
 
-  const handleJoinRoom = () => {
-    joinRoom({ avatarId, code, nickname });
-    router.push('/location-permission');
+  const handleJoinRoom = async () => {
+    try {
+      await joinRoom({ avatarId, code, nickname });
+      router.push('/location-permission');
+    } catch {
+      // Error is shown from room store state.
+    }
   };
 
   return (
     <PrototypeScreen>
-      <MenuPanel title={t('join.title')} actions={<GameButton label={t('join.enter')} onPress={handleJoinRoom} />}>
+      <MenuPanel title={t('join.title')} actions={<GameButton label={isLoading ? 'Entrando...' : t('join.enter')} onPress={handleJoinRoom} />}>
         <Badge label={t('join.badge')} tone="neutral" />
         <Text selectable style={{ color: colors.ink, fontSize: 16, fontWeight: '900' }}>
           {t('join.code')}
@@ -70,6 +74,11 @@ export default function JoinRoomScreen() {
           style={inputStyle}
         />
         <AvatarChoice onSelect={handleSelectAvatar} selectedId={avatarId} />
+        {error ? (
+          <Text selectable style={{ color: colors.danger, fontSize: 13, fontWeight: '800', textAlign: 'center' }}>
+            {error}
+          </Text>
+        ) : null}
       </MenuPanel>
     </PrototypeScreen>
   );

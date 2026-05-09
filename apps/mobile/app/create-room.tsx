@@ -25,7 +25,7 @@ const inputStyle = {
 
 export default function CreateRoomScreen() {
   const router = useRouter();
-  const { createRoom } = useRoom();
+  const { createRoom, error, isLoading } = useRoom();
   const [avatarId, setAvatarId] = useState('avatar_01');
   const [nickname, setNickname] = useState('Dudu');
 
@@ -33,9 +33,13 @@ export default function CreateRoomScreen() {
     setAvatarId(nextAvatarId);
   };
 
-  const handleCreateRoom = () => {
-    createRoom({ avatarId, nickname });
-    router.push('/location-permission');
+  const handleCreateRoom = async () => {
+    try {
+      await createRoom({ avatarId, nickname });
+      router.push('/location-permission');
+    } catch {
+      // Error is shown from room store state.
+    }
   };
 
   return (
@@ -44,7 +48,7 @@ export default function CreateRoomScreen() {
         title={t('create.title')}
         actions={
           <>
-            <GameButton label={t('create.createRoom')} onPress={handleCreateRoom} />
+            <GameButton label={isLoading ? 'Criando...' : t('create.createRoom')} onPress={handleCreateRoom} />
             <GameButton href="/join-room" label={t('create.joinWithCode')} variant="secondary" />
           </>
         }>
@@ -81,6 +85,11 @@ export default function CreateRoomScreen() {
             {t('common.playersRange')}
           </Text>
         </View>
+        {error ? (
+          <Text selectable style={{ color: colors.danger, fontSize: 13, fontWeight: '800', textAlign: 'center' }}>
+            {error}
+          </Text>
+        ) : null}
       </MenuPanel>
     </PrototypeScreen>
   );

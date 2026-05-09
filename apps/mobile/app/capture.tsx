@@ -11,11 +11,21 @@ import { surfaces } from '@/src/theme/surfaces';
 
 export default function CaptureScreen() {
   const router = useRouter();
-  const { finishRound } = useRoom();
+  const { finishRound, room } = useRoom();
+  const capturedPlayer = room?.players.find((player) => player.status === 'Capturado');
+  const remainingHiders = room?.players.filter((player) => !player.isLeader && player.status !== 'Capturado').length ?? 0;
 
-  const handleFinishWithSeeker = () => {
-    finishRound('seeker');
-    router.push('/result');
+  const handleFinishWithSeeker = async () => {
+    try {
+      await finishRound('seeker');
+      router.push('/result');
+    } catch {
+      // Keep the player on the capture screen if the room cannot sync.
+    }
+  };
+
+  const handleContinue = () => {
+    router.push(room?.phase === 'finished' ? '/result' : '/seeker-radar');
   };
 
   return (
@@ -25,7 +35,7 @@ export default function CaptureScreen() {
         title={t('capture.title')}
         actions={
           <>
-            <GameButton href="/seeker-radar" label={t('capture.continue')} />
+            <GameButton label={room?.phase === 'finished' ? t('result.title') : t('capture.continue')} onPress={handleContinue} />
             <GameButton label={t('capture.finish')} onPress={handleFinishWithSeeker} variant="ghost" />
           </>
         }>
@@ -49,13 +59,13 @@ export default function CaptureScreen() {
               justifyContent: 'center',
               width: 84,
             }}>
-            <Text style={{ color: colors.navy, fontSize: 24, fontWeight: '900' }}>A3</Text>
+            <Text style={{ color: colors.navy, fontSize: 24, fontWeight: '900' }}>{capturedPlayer?.nickname?.slice(0, 2).toUpperCase() ?? 'OK'}</Text>
           </View>
           <Text selectable style={{ color: colors.navy, fontSize: 26, fontWeight: '900', textAlign: 'center' }}>
-            {t('capture.playerFound')}
+            {t('capture.playerFound', { name: capturedPlayer?.nickname ?? 'Jogador' })}
           </Text>
           <Text selectable style={{ color: colors.ink, fontSize: 16, textAlign: 'center' }}>
-            {t('capture.remaining')}
+            {t('capture.remaining', { count: remainingHiders })}
           </Text>
         </View>
       </MenuPanel>

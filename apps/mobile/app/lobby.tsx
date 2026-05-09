@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
 import { ActionGrid } from '@/src/components/action-grid';
@@ -16,10 +16,31 @@ import { surfaces } from '@/src/theme/surfaces';
 
 export default function LobbyScreen() {
   const router = useRouter();
-  const { activePlayer, addDemoPlayer, leaveRoom, promoteLeader, removePlayer, room, startRound, toggleReady } = useRoom();
+  const { activePlayer, addDemoPlayer, error, isLoading, leaveRoom, promoteLeader, removePlayer, room, startRound, toggleReady } = useRoom();
   const [copied, setCopied] = useState(false);
   const players = room?.players ?? [];
   const readyLabel = activePlayer?.status === 'Preparado' ? t('lobby.readyDone') : t('lobby.ready');
+
+  useEffect(() => {
+    if (!room) {
+      router.replace('/');
+      return;
+    }
+
+    if (room.phase === 'hiding') {
+      router.replace('/hide-phase');
+      return;
+    }
+
+    if (room.phase === 'seeking') {
+      router.replace(activePlayer?.isLeader ? '/seeker-radar' : '/hider-status');
+      return;
+    }
+
+    if (room.phase === 'finished') {
+      router.replace('/result');
+    }
+  }, [activePlayer?.isLeader, room, router]);
 
   const handleCopyCode = async () => {
     if (!room?.code) return;
@@ -32,18 +53,40 @@ export default function LobbyScreen() {
     setTimeout(() => setCopied(false), 1600);
   };
 
-  const handleLeaveRoom = () => {
-    leaveRoom();
-    router.replace('/');
+  const handleLeaveRoom = async () => {
+    try {
+      await leaveRoom();
+      router.replace('/');
+    } catch {
+      // Error is shown from room store state.
+    }
   };
 
-  const handleStartRound = () => {
-    if (players.length < 2) {
-      return;
+  const handleStartRound = async () => {
+    try {
+      const started = await startRound();
+      if (started) {
+        router.push('/hide-phase');
+      }
+    } catch {
+      // Error is shown from room store state.
     }
+  };
 
-    startRound();
-    router.push('/hide-phase');
+  const handleAddDemoPlayer = () => {
+    addDemoPlayer().catch(() => undefined);
+  };
+
+  const handleToggleReady = () => {
+    toggleReady().catch(() => undefined);
+  };
+
+  const handlePromoteLeader = (playerId: string) => {
+    promoteLeader(playerId).catch(() => undefined);
+  };
+
+  const handleRemovePlayer = (playerId: string) => {
+    removePlayer(playerId).catch(() => undefined);
   };
 
   return (
@@ -76,12 +119,12 @@ export default function LobbyScreen() {
         }
         actions={
           <>
-            <GameButton label={t('lobby.start')} onPress={handleStartRound} variant="secondary" />
+            <GameButton label={isLoading ? 'Sincronizando...' : t('lobby.start')} onPress={handleStartRound} variant="secondary" />
             <ActionGrid
               actions={[
-                { label: readyLabel, onPress: toggleReady },
+                { label: readyLabel, onPress: handleToggleReady },
                 { href: '/rules', label: t('lobby.rules'), variant: 'ghost' },
-                { label: t('lobby.invite'), onPress: addDemoPlayer, variant: 'ghost' },
+                { label: t('lobby.invite'), onPress: handleAddDemoPlayer, variant: 'ghost' },
                 { label: t('common.exit'), onPress: handleLeaveRoom, variant: 'danger' },
               ]}
             />
@@ -104,11 +147,16 @@ export default function LobbyScreen() {
             {t('lobby.leaderHint')}
           </Text>
         ) : null}
+        {error ? (
+          <Text selectable style={{ color: colors.danger, fontSize: 13, fontWeight: '800', textAlign: 'center' }}>
+            {error}
+          </Text>
+        ) : null}
         <PlayerList
           activePlayerId={activePlayer?.id}
           canRemove={activePlayer?.isLeader}
-          onPromote={promoteLeader}
-          onRemove={removePlayer}
+          onPromote={activePlayer?.isLeader ? handlePromoteLeader : undefined}
+          onRemove={handleRemovePlayer}
           players={players}
         />
       </MenuPanel>

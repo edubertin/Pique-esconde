@@ -1,8 +1,8 @@
-import { createContext, type ReactNode, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
-import { gameRules } from '@/src/constants/game';
+import { roomService } from '@/src/services/room-service';
 
-export type PlayerStatus = 'Entrou' | 'Preparado' | 'Aguardando';
+export type PlayerStatus = 'Entrou' | 'Preparado' | 'Aguardando' | 'Escondendo' | 'Escondido' | 'Procurando' | 'Capturado';
 
 export type RoomPlayer = {
   avatarId: string;
@@ -20,9 +20,19 @@ export type GameResult = {
   winner: 'seeker' | 'hiders';
 };
 
+export type GameSession = {
+  hideDurationSeconds: number;
+  id: string;
+  seekDurationSeconds: number;
+  seekerPlayerId: string;
+  status: 'hiding' | 'seeking' | 'finished';
+};
+
 type Room = {
   code: string;
   expiresAt?: number;
+  gameSession?: GameSession;
+  id: string;
   maxPlayers: number;
   phase: 'lobby' | 'hiding' | 'seeking' | 'finished';
   players: RoomPlayer[];
@@ -31,17 +41,25 @@ type Room = {
 
 type RoomStore = {
   activePlayer?: RoomPlayer;
-  addDemoPlayer: () => void;
-  createRoom: (input: PlayerInput) => void;
-  finishRound: (winner?: GameResult['winner']) => void;
-  joinRoom: (input: PlayerInput & { code: string }) => boolean;
-  leaveRoom: () => void;
-  promoteLeader: (playerId: string) => void;
-  rematch: () => void;
-  removePlayer: (playerId: string) => void;
+  addDemoPlayer: () => Promise<void>;
+  clearError: () => void;
+  clearNotice: () => void;
+  createRoom: (input: PlayerInput) => Promise<void>;
+  error?: string;
+  finishRound: (winner?: GameResult['winner']) => Promise<void>;
+  isLoading: boolean;
+  joinRoom: (input: PlayerInput & { code: string }) => Promise<boolean>;
+  leaveRoom: () => Promise<void>;
+  markHidden: () => Promise<void>;
+  promoteLeader: (playerId: string) => Promise<void>;
+  releaseSeeker: () => Promise<void>;
+  rematch: () => Promise<void>;
+  removePlayer: (playerId: string) => Promise<void>;
   room?: Room;
-  startRound: () => void;
-  toggleReady: () => void;
+  roomNotice?: 'removed';
+  simulateCapture: () => Promise<string | undefined>;
+  startRound: () => Promise<boolean>;
+  toggleReady: () => Promise<void>;
 };
 
 type PlayerInput = {
@@ -51,64 +69,76 @@ type PlayerInput = {
 
 const RoomContext = createContext<RoomStore | undefined>(undefined);
 
-const demoPlayers: RoomPlayer[] = [
-  { id: 'demo_ana', nickname: 'Ana', avatarId: 'avatar_02', status: 'Preparado', isLeader: false },
-  { id: 'demo_rafa', nickname: 'Rafa', avatarId: 'avatar_03', status: 'Aguardando', isLeader: false },
-  { id: 'demo_bia', nickname: 'Bia', avatarId: 'avatar_04', status: 'Preparado', isLeader: false },
-  { id: 'demo_lu', nickname: 'Lu', avatarId: 'avatar_01', status: 'Aguardando', isLeader: false },
-  { id: 'demo_thi', nickname: 'Thi', avatarId: 'avatar_03', status: 'Preparado', isLeader: false },
-  { id: 'demo_nina', nickname: 'Nina', avatarId: 'avatar_02', status: 'Aguardando', isLeader: false },
-  { id: 'demo_caio', nickname: 'Caio', avatarId: 'avatar_04', status: 'Preparado', isLeader: false },
-];
-
-function createRoomCode() {
-  const letters = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
-  return Array.from({ length: 4 }, () => letters[Math.floor(Math.random() * letters.length)]).join('');
-}
-
-function createPlayer(input: PlayerInput, isLeader = false): RoomPlayer {
-  return {
-    avatarId: input.avatarId,
-    id: `player_${Date.now()}_${Math.round(Math.random() * 1000)}`,
-    isLeader,
-    nickname: input.nickname.trim() || 'Jogador',
-    status: 'Entrou',
-  };
-}
-
-function getSoloExpiresAt(players: RoomPlayer[]) {
-  return players.length === 1 ? Date.now() + 6 * 60 * 1000 : undefined;
-}
-
-function createMockResult(players: RoomPlayer[], winner: GameResult['winner'] = 'hiders'): GameResult {
-  const seeker = players.find((player) => player.isLeader) ?? players[0];
-  const hiders = players.filter((player) => player.id !== seeker?.id);
-
-  if (winner === 'seeker') {
-    return {
-      capturedPlayerIds: hiders.map((player) => player.id),
-      durationLabel: '3min',
-      highlightPlayerId: seeker?.id ?? players[0]?.id ?? '',
-      survivorPlayerIds: [],
-      winner,
-    };
-  }
-
-  const highlightHider = hiders[0] ?? seeker ?? players[0];
-  const survivorPlayerIds = hiders.slice(0, Math.max(1, Math.min(2, hiders.length))).map((player) => player.id);
-
-  return {
-    capturedPlayerIds: hiders.filter((player) => !survivorPlayerIds.includes(player.id)).map((player) => player.id),
-    durationLabel: '3min',
-    highlightPlayerId: highlightHider?.id ?? '',
-    survivorPlayerIds,
-    winner,
-  };
+function getErrorMessage(error: unknown) {
+  if (error instanceof Error) return error.message;
+  return 'Nao foi possivel sincronizar a sala agora.';
 }
 
 export function RoomProvider({ children }: { children: ReactNode }) {
-  const [room, setRoom] = useState<Room>();
   const [activePlayerId, setActivePlayerId] = useState<string>();
+  const [activePlayerToken, setActivePlayerToken] = useState<string>();
+  const [error, setError] = useState<string>();
+  const [isLoading, setIsLoading] = useState(false);
+  const [room, setRoom] = useState<Room>();
+  const [roomNotice, setRoomNotice] = useState<RoomStore['roomNotice']>();
+
+  const applySnapshot = useCallback(
+    (snapshot: Awaited<ReturnType<typeof roomService.fetchSnapshot>>) => {
+      if (activePlayerId && !snapshot.activePlayer) {
+        setActivePlayerId(undefined);
+        setActivePlayerToken(undefined);
+        setError(undefined);
+        setRoomNotice('removed');
+        setRoom(undefined);
+        return;
+      }
+
+      setRoom(snapshot.room);
+      setActivePlayerId(snapshot.activePlayer?.id ?? activePlayerId);
+      setActivePlayerToken(snapshot.activePlayerToken ?? activePlayerToken);
+    },
+    [activePlayerId, activePlayerToken],
+  );
+
+  const refreshRoom = useCallback(async () => {
+    if (!room?.id) return;
+
+    const snapshot = await roomService.fetchSnapshot(room.id, activePlayerId, activePlayerToken);
+    applySnapshot(snapshot);
+  }, [activePlayerId, activePlayerToken, applySnapshot, room?.id]);
+
+  const runAction = useCallback(
+    async <T,>(action: () => Promise<T>) => {
+      setError(undefined);
+      setIsLoading(true);
+
+      try {
+        setRoomNotice(undefined);
+        return await action();
+      } catch (actionError) {
+        const message = getErrorMessage(actionError);
+        setError(message);
+        throw actionError;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [],
+  );
+
+  useEffect(() => {
+    if (!room?.id) return undefined;
+
+    const subscription = roomService.subscribeToRoom(room.id, () => {
+      refreshRoom().catch((subscriptionError: unknown) => {
+        setError(getErrorMessage(subscriptionError));
+      });
+    });
+
+    return () => {
+      subscription.unsubscribe().catch(() => undefined);
+    };
+  }, [refreshRoom, room?.id]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -118,6 +148,7 @@ export function RoomProvider({ children }: { children: ReactNode }) {
         }
 
         setActivePlayerId(undefined);
+        setActivePlayerToken(undefined);
         return undefined;
       });
     }, 1000);
@@ -127,201 +158,143 @@ export function RoomProvider({ children }: { children: ReactNode }) {
 
   const store = useMemo<RoomStore>(() => {
     const activePlayer = room?.players.find((player) => player.id === activePlayerId);
+    const requireSession = () => {
+      if (!room?.id || !activePlayerId || !activePlayerToken) {
+        throw new Error('Entre em uma sala antes de continuar.');
+      }
+
+      return { activePlayerId, activePlayerToken, roomId: room.id };
+    };
 
     return {
       activePlayer,
+      clearError() {
+        setError(undefined);
+      },
+      clearNotice() {
+        setRoomNotice(undefined);
+      },
+      error,
+      isLoading,
       room,
-      addDemoPlayer() {
-        setRoom((currentRoom) => {
-          if (!currentRoom || currentRoom.players.length >= currentRoom.maxPlayers) {
-            return currentRoom;
-          }
-
-          const template = demoPlayers.find(
-            (demoPlayer) => !currentRoom.players.some((player) => player.nickname === demoPlayer.nickname),
-          );
-
-          if (!template) {
-            return currentRoom;
-          }
-
-          const players = [
-            ...currentRoom.players,
-            {
-              ...template,
-              id: `${template.id}_${Date.now()}`,
-              isLeader: false,
-            },
-          ];
-
-          return {
-            ...currentRoom,
-            expiresAt: getSoloExpiresAt(players),
-            players,
-          };
+      roomNotice,
+      async addDemoPlayer() {
+        const session = requireSession();
+        await runAction(async () => {
+          await roomService.addDemoPlayer(session.roomId, session.activePlayerId, session.activePlayerToken);
+          await refreshRoom();
         });
       },
-      createRoom(input) {
-        const leader = createPlayer(input, true);
-        setActivePlayerId(leader.id);
-        const players = [leader];
-        setRoom({
-          code: createRoomCode(),
-          expiresAt: getSoloExpiresAt(players),
-          maxPlayers: gameRules.maxPlayers,
-          phase: 'lobby',
-          players,
-          result: undefined,
+      async createRoom(input) {
+        await runAction(async () => {
+          const snapshot = await roomService.createRoom(input);
+          applySnapshot(snapshot);
         });
       },
-      finishRound(winner = 'hiders') {
-        setRoom((currentRoom) => {
-          if (!currentRoom) return currentRoom;
-
-          return {
-            ...currentRoom,
-            phase: 'finished',
-            result: createMockResult(currentRoom.players, winner),
-          };
+      async finishRound(winner = 'hiders') {
+        const session = requireSession();
+        await runAction(async () => {
+          await roomService.finishRound(session.roomId, session.activePlayerId, session.activePlayerToken, winner);
+          await refreshRoom();
         });
       },
-      joinRoom(input) {
-        const joinedPlayer = createPlayer(input);
-
-        setRoom((currentRoom) => {
-          const targetRoom =
-            currentRoom?.code.toUpperCase() === input.code.trim().toUpperCase()
-              ? currentRoom
-              : {
-                  code: input.code.trim().toUpperCase() || gameRules.roomCode,
-                  maxPlayers: gameRules.maxPlayers,
-                  phase: 'lobby' as const,
-                  players: [{ ...demoPlayers[0], isLeader: true }, demoPlayers[1], demoPlayers[2]],
-                  result: undefined,
-                };
-
-          if (targetRoom.players.length >= targetRoom.maxPlayers) {
-            return targetRoom;
-          }
-
-          setActivePlayerId(joinedPlayer.id);
-          const players = [...targetRoom.players, joinedPlayer];
-
-          return {
-            ...targetRoom,
-            expiresAt: getSoloExpiresAt(players),
-            players,
-          };
+      async joinRoom(input) {
+        await runAction(async () => {
+          const snapshot = await roomService.joinRoom(input);
+          applySnapshot(snapshot);
         });
 
         return true;
       },
-      leaveRoom() {
-        setRoom((currentRoom) => {
-          if (!currentRoom || !activePlayerId) {
-            setActivePlayerId(undefined);
-            return undefined;
-          }
-
-          const remainingPlayers = currentRoom.players.filter((player) => player.id !== activePlayerId);
+      async leaveRoom() {
+        if (!room?.id || !activePlayerId || !activePlayerToken) {
           setActivePlayerId(undefined);
+          setActivePlayerToken(undefined);
+          setRoom(undefined);
+          return;
+        }
 
-          if (remainingPlayers.length === 0) {
-            return undefined;
-          }
-
-          const hasLeader = remainingPlayers.some((player) => player.isLeader);
-          const players = hasLeader
-            ? remainingPlayers
-            : remainingPlayers.map((player, index) => ({ ...player, isLeader: index === 0 }));
-
-          return {
-            ...currentRoom,
-            expiresAt: getSoloExpiresAt(players),
-            players,
-          };
+        await runAction(async () => {
+          await roomService.leaveRoom(room.id, activePlayerId, activePlayerToken);
+          setActivePlayerId(undefined);
+          setActivePlayerToken(undefined);
+          setRoom(undefined);
         });
       },
-      promoteLeader(playerId) {
-        setRoom((currentRoom) => {
-          if (!currentRoom) return currentRoom;
-          const currentLeader = currentRoom.players.find((player) => player.id === activePlayerId);
-
-          if (!currentLeader?.isLeader) {
-            return currentRoom;
-          }
-
-          return {
-            ...currentRoom,
-            players: currentRoom.players.map((player) => ({ ...player, isLeader: player.id === playerId })),
-          };
+      async markHidden() {
+        const session = requireSession();
+        await runAction(async () => {
+          await roomService.markHidden(session.roomId, session.activePlayerId, session.activePlayerToken);
+          await refreshRoom();
         });
       },
-      removePlayer(playerId) {
-        setRoom((currentRoom) => {
-          if (!currentRoom) return currentRoom;
-          const currentLeader = currentRoom.players.find((player) => player.id === activePlayerId);
+      async promoteLeader(playerId) {
+        if (playerId === activePlayerId) return;
 
-          if (!currentLeader?.isLeader || playerId === activePlayerId) {
-            return currentRoom;
-          }
-
-          const remainingPlayers = currentRoom.players.filter((player) => player.id !== playerId);
-
-          if (remainingPlayers.length === 0) {
-            return undefined;
-          }
-
-          const hasLeader = remainingPlayers.some((player) => player.isLeader);
-          const players = hasLeader
-            ? remainingPlayers
-            : remainingPlayers.map((player, index) => ({ ...player, isLeader: index === 0 }));
-
-          return {
-            ...currentRoom,
-            expiresAt: getSoloExpiresAt(players),
-            players,
-            result: undefined,
-          };
+        const session = requireSession();
+        await runAction(async () => {
+          await roomService.promoteLeader(session.roomId, session.activePlayerId, session.activePlayerToken, playerId);
+          await refreshRoom();
         });
       },
-      rematch() {
-        setRoom((currentRoom) => {
-          if (!currentRoom) return currentRoom;
+      async removePlayer(playerId) {
+        if (playerId === activePlayerId) return;
 
-          return {
-            ...currentRoom,
-            phase: 'lobby',
-            players: currentRoom.players.map((player) => ({ ...player, status: player.isLeader ? 'Entrou' : 'Aguardando' })),
-            result: undefined,
-          };
+        const session = requireSession();
+        await runAction(async () => {
+          await roomService.removePlayer(session.roomId, session.activePlayerId, session.activePlayerToken, playerId);
+          await refreshRoom();
         });
       },
-      startRound() {
-        setRoom((currentRoom) => {
-          if (!currentRoom || currentRoom.players.length < 2) {
-            return currentRoom;
-          }
-
-          return { ...currentRoom, phase: 'hiding', result: undefined };
+      async releaseSeeker() {
+        const session = requireSession();
+        await runAction(async () => {
+          await roomService.releaseSeeker(session.roomId, session.activePlayerId, session.activePlayerToken);
+          await refreshRoom();
         });
       },
-      toggleReady() {
-        setRoom((currentRoom) => {
-          if (!currentRoom || !activePlayerId) return currentRoom;
+      async rematch() {
+        const session = requireSession();
+        await runAction(async () => {
+          await roomService.rematch(session.roomId, session.activePlayerId, session.activePlayerToken);
+          await refreshRoom();
+        });
+      },
+      async startRound() {
+        const session = requireSession();
 
-          return {
-            ...currentRoom,
-            players: currentRoom.players.map((player) =>
-              player.id === activePlayerId
-                ? { ...player, status: player.status === 'Preparado' ? 'Entrou' : 'Preparado' }
-                : player,
-            ),
-          };
+        if ((room?.players.length ?? 0) < 2) {
+          setError('Convide pelo menos mais 1 jogador para iniciar.');
+          return false;
+        }
+
+        await runAction(async () => {
+          await roomService.startRound(session.roomId, session.activePlayerId, session.activePlayerToken);
+          await refreshRoom();
+        });
+
+        return true;
+      },
+      async simulateCapture() {
+        const session = requireSession();
+        let capturedPlayerId: string | undefined;
+
+        await runAction(async () => {
+          capturedPlayerId = await roomService.simulateCapture(session.roomId, session.activePlayerId, session.activePlayerToken);
+          await refreshRoom();
+        });
+
+        return capturedPlayerId;
+      },
+      async toggleReady() {
+        const session = requireSession();
+        await runAction(async () => {
+          await roomService.toggleReady(session.roomId, session.activePlayerId, session.activePlayerToken);
+          await refreshRoom();
         });
       },
     };
-  }, [activePlayerId, room]);
+  }, [activePlayerId, activePlayerToken, applySnapshot, error, isLoading, refreshRoom, room, roomNotice, runAction]);
 
   return <RoomContext.Provider value={store}>{children}</RoomContext.Provider>;
 }

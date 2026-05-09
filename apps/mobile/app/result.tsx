@@ -52,14 +52,22 @@ export default function ResultScreen() {
       ? t('result.summarySeeker', { name: highlightPlayer?.nickname ?? t('player.roleSeeker') })
       : t('result.summaryHiders', { name: highlightPlayer?.nickname ?? t('social.placeholder') });
 
-  const handleRematch = () => {
-    rematch();
-    router.push('/lobby');
+  const handleRematch = async () => {
+    try {
+      await rematch();
+      router.push('/lobby');
+    } catch {
+      // Keep result visible if the room cannot sync.
+    }
   };
 
-  const handleLeaveRoom = () => {
-    leaveRoom();
-    router.replace('/');
+  const handleLeaveRoom = async () => {
+    try {
+      await leaveRoom();
+      router.replace('/');
+    } catch {
+      // Keep result visible if the room cannot sync.
+    }
   };
 
   return (

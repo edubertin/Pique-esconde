@@ -55,13 +55,19 @@ export function PlayerList({ activePlayerId, canRemove, onPromote, onRemove, pla
         {orderedPlayers.map((player) => {
           const avatar = getAvatar(player.avatarId);
           const canRemovePlayer = canRemove && player.id !== activePlayerId;
+          const canPromotePlayer = Boolean(onPromote && player.id !== activePlayerId && !player.isLeader);
 
           return (
             <Pressable
               accessibilityLabel={`${player.nickname} - ${player.isLeader ? t('player.leader') : player.status}`}
-              accessibilityRole="button"
+              accessibilityRole={canPromotePlayer ? 'button' : 'text'}
               key={player.id}
-              onPress={() => onPromote?.(player.id)}
+              disabled={!canPromotePlayer}
+              onPress={() => {
+                if (canPromotePlayer) {
+                  onPromote?.(player.id);
+                }
+              }}
               style={{
                 alignItems: 'center',
                 ...(player.isLeader ? surfaces.highlightTile : surfaces.glassTile),
