@@ -46,7 +46,7 @@ async function getInitialCoords(): Promise<InitialCoords> {
 
 export default function LocationPermissionScreen() {
   const router = useRouter();
-  const { room, updatePlayerLocation } = useRoom();
+  const { leaveRoom, room, updatePlayerLocation } = useRoom();
   const [error, setError] = useState<string>();
   const [isRequesting, setIsRequesting] = useState(false);
 
@@ -59,7 +59,11 @@ export default function LocationPermissionScreen() {
 
       if (permission.status !== Location.PermissionStatus.GRANTED) {
         setIsRequesting(false);
+        if (room) {
+          await leaveRoom().catch(() => undefined);
+        }
         setError(t('location.denied'));
+        router.replace('/');
         return;
       }
 

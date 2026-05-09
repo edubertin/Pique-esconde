@@ -85,15 +85,19 @@ export default function LobbyScreen() {
     }
   };
 
+  const ensureLocationPermission = async () => {
+    const permission = await Location.getForegroundPermissionsAsync();
+    if (permission.status === Location.PermissionStatus.GRANTED) return true;
+
+    router.push('/location-permission');
+    return false;
+  };
+
   const handleStartRound = async () => {
     if (!canLeaderStart) return;
 
     try {
-      const permission = await Location.getForegroundPermissionsAsync();
-      if (permission.status !== Location.PermissionStatus.GRANTED) {
-        router.push('/location-permission');
-        return;
-      }
+      if (!(await ensureLocationPermission())) return;
 
       const started = await startRound();
       if (started) {
@@ -109,7 +113,11 @@ export default function LobbyScreen() {
   };
 
   const handleToggleReady = () => {
-    toggleReady().catch(() => undefined);
+    ensureLocationPermission()
+      .then((allowed) => {
+        if (allowed) toggleReady().catch(() => undefined);
+      })
+      .catch(() => router.push('/location-permission'));
   };
 
   const handlePromoteLeader = (playerId: string) => {
