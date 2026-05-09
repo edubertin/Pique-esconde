@@ -21,6 +21,12 @@ export default function HidePhaseScreen() {
   const hideEndsAt = room?.gameSession?.hideEndsAt;
   const remainingSeconds = hideEndsAt ? (hideEndsAt - now) / 1000 : 0;
   const timerLabel = hideEndsAt ? formatTimer(remainingSeconds) : t('hide.timerEnded');
+  const phaseTitle = isSeeker ? t('hide.seekerTitle') : t('hide.title');
+  const phaseBadge = isSeeker ? t('hide.seekerBadge') : t('hide.badge');
+  const phaseHeading = isSeeker ? t('hide.seekerHeading') : t('hide.ready');
+  const phaseBody = isSeeker
+    ? t('hide.seekerStatusText', { hidden: hiddenCount, total: totalHiders })
+    : t('hide.statusText', { hidden: hiddenCount, total: totalHiders });
 
   useEffect(() => {
     if (!room) {
@@ -74,7 +80,7 @@ export default function HidePhaseScreen() {
     <PrototypeScreen>
       <MenuPanel
         backHref="/lobby"
-        title={t('hide.title')}
+        title={phaseTitle}
         actions={
           <>
             {!isSeeker ? (
@@ -83,7 +89,7 @@ export default function HidePhaseScreen() {
             <GameButton label={t('common.exit')} onPress={handleLeaveRoom} variant="danger" />
           </>
         }>
-        <Badge label={t('hide.badge')} tone="rush" />
+        <Badge label={phaseBadge} tone="rush" />
         <Text
           selectable
           style={{
@@ -97,10 +103,10 @@ export default function HidePhaseScreen() {
         </Text>
         <View style={{ gap: 8 }}>
           <Text selectable style={{ color: colors.ink, fontSize: 18, fontWeight: '900' }}>
-            {isSeeker ? t('hide.seekerWaiting') : t('hide.ready')}
+            {phaseHeading}
           </Text>
           <Text selectable style={{ color: colors.muted, fontSize: 15, lineHeight: 22 }}>
-            {t('hide.statusText', { hidden: hiddenCount, total: totalHiders })}
+            {phaseBody}
           </Text>
         </View>
         {error ? (
