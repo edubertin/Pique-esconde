@@ -11,6 +11,7 @@ const baseLocation = {
 
 const maxDistanceMeters = 60;
 const metersPerDegreeLatitude = 111_320;
+const devGpsStorageKey = 'pe-dev-gps-active';
 
 function offsetLocation(distanceMeters: number) {
   return {
@@ -32,7 +33,15 @@ export function DevGpsControl({ defaultDistance = 0, label }: { defaultDistance?
   const percent = Math.min(100, Math.max(0, (distance / maxDistanceMeters) * 100));
 
   useEffect(() => {
-    if (!enabled || !active) return undefined;
+    if (!enabled) return undefined;
+
+    if (active) {
+      window.sessionStorage.setItem(devGpsStorageKey, 'true');
+    } else {
+      window.sessionStorage.removeItem(devGpsStorageKey);
+    }
+
+    if (!active) return undefined;
 
     let cancelled = false;
     const sync = () => {
@@ -47,6 +56,7 @@ export function DevGpsControl({ defaultDistance = 0, label }: { defaultDistance?
     return () => {
       cancelled = true;
       clearInterval(interval);
+      window.sessionStorage.removeItem(devGpsStorageKey);
     };
   }, [active, distance, enabled, updatePlayerLocation]);
 

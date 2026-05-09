@@ -37,6 +37,10 @@ export function usePlayerLocationSync(enabled: boolean): PlayerLocationSyncState
       longitude: number;
       speed?: number | null;
     }) => {
+      if (Platform.OS === 'web' && typeof window !== 'undefined' && window.sessionStorage.getItem('pe-dev-gps-active') === 'true') {
+        return;
+      }
+
       const { accuracy, heading, latitude, longitude, speed } = coords;
 
       updatePlayerLocationRef.current({

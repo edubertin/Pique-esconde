@@ -131,13 +131,19 @@ type PlayerInput = {
 const RoomContext = createContext<RoomStore | undefined>(undefined);
 
 function getErrorMessage(error: unknown) {
-  if (error instanceof Error) return error.message;
+  const cleanMessage = (message: string) => message.split('\n')[0]?.trim() || 'Nao foi possivel sincronizar a sala agora.';
+
+  if (error instanceof Error) {
+    if (error.message === 'Failed to fetch') return 'Conexao instavel. Tente novamente em alguns segundos.';
+    return cleanMessage(error.message);
+  }
+
   if (typeof error === 'object' && error) {
     const supabaseError = error as { code?: unknown; details?: unknown; hint?: unknown; message?: unknown };
     const parts = [supabaseError.message, supabaseError.details, supabaseError.hint]
       .filter((value): value is string => typeof value === 'string' && value.trim().length > 0);
 
-    if (parts.length > 0) return parts.join(' ');
+    if (parts.length > 0) return cleanMessage(parts.join(' '));
     if (typeof supabaseError.code === 'string') return `Erro Supabase: ${supabaseError.code}`;
   }
 
@@ -176,6 +182,14 @@ export function RoomProvider({ children }: { children: ReactNode }) {
     const snapshot = await roomService.fetchSnapshot(room.id, activePlayerId, activePlayerToken);
     applySnapshot(snapshot);
   }, [activePlayerId, activePlayerToken, applySnapshot, room?.id]);
+
+  const refreshRoomSoft = useCallback(async () => {
+    try {
+      await refreshRoom();
+    } catch (refreshError) {
+      console.warn('Room refresh failed after action', refreshError);
+    }
+  }, [refreshRoom]);
 
   const runAction = useCallback(
     async <T,>(action: () => Promise<T>) => {
@@ -265,7 +279,7 @@ export function RoomProvider({ children }: { children: ReactNode }) {
         const session = requireSession();
         await runAction(async () => {
           await roomService.finishRound(session.roomId, session.activePlayerId, session.activePlayerToken, winner);
-          await refreshRoom();
+          await refreshRoomSoft();
         });
       },
       async getRadarHint() {
@@ -401,7 +415,7 @@ export function RoomProvider({ children }: { children: ReactNode }) {
 
         await runAction(async () => {
           payload = await roomService.tryCaptureNearest(session.roomId, session.activePlayerId, session.activePlayerToken) ?? undefined;
-          await refreshRoom();
+          await refreshRoomSoft();
         });
 
         return payload;
@@ -411,7 +425,7 @@ export function RoomProvider({ children }: { children: ReactNode }) {
         await roomService.updatePlayerLocation(session.roomId, session.activePlayerId, session.activePlayerToken, input);
       },
     };
-  }, [activePlayerId, activePlayerToken, applySnapshot, error, isLoading, refreshRoom, room, roomNotice, runAction]);
+  }, [activePlayerId, activePlayerToken, applySnapshot, error, isLoading, refreshRoom, refreshRoomSoft, room, roomNotice, runAction]);
 
   return <RoomContext.Provider value={store}>{children}</RoomContext.Provider>;
 }
