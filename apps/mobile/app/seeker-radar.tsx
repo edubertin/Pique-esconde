@@ -1,6 +1,7 @@
+import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { DevGpsControl } from '@/src/components/dev-gps-control';
 import { GameButton } from '@/src/components/game-button';
@@ -19,6 +20,7 @@ export default function SeekerRadarScreen() {
   const router = useSafeRouter();
   const { error, finishRound, getRadarHint, leaveRoom, room, tickGameSession, tryCaptureNearest, updateDevTestDistance } = useRoom();
   const [captureMessage, setCaptureMessage] = useState<string>();
+  const [devGpsPanelOpen, setDevGpsPanelOpen] = useState(false);
   const [manualCapturePending, setManualCapturePending] = useState(false);
   const [radarHint, setRadarHint] = useState<RadarHint>();
   const [now, setNow] = useState(Date.now());
@@ -213,9 +215,7 @@ export default function SeekerRadarScreen() {
       <View
         style={{
           alignItems: 'center',
-          backgroundColor: 'rgba(18, 30, 45, 0.22)',
-          borderRadius: 28,
-          gap: 12,
+          gap: 8,
           maxWidth: 430,
           minHeight: '100%',
           padding: 10,
@@ -223,42 +223,43 @@ export default function SeekerRadarScreen() {
         }}>
         <LeaderDebugDrawer radarHint={radarHint} />
 
-        <View style={{ alignItems: 'center', width: 118 }}>
+        {__DEV__ ? (
+          <View style={{ left: -14, pointerEvents: 'box-none', position: 'absolute', top: 166, zIndex: 29 }}>
+            <Pressable
+              accessibilityLabel={devGpsPanelOpen ? 'Fechar painel DEV GPS' : 'Abrir painel DEV GPS'}
+              accessibilityRole="button"
+              onPress={() => setDevGpsPanelOpen((current) => !current)}
+              style={{
+                alignItems: 'center',
+                backgroundColor: devGpsPanelOpen ? colors.pink : colors.navy,
+                borderColor: colors.esconde,
+                borderRadius: 999,
+                borderWidth: 2,
+                height: 46,
+                justifyContent: 'center',
+                width: 46,
+              }}>
+              <Ionicons color={colors.surface} name={devGpsPanelOpen ? 'close' : 'flask-outline'} size={22} />
+            </Pressable>
+          </View>
+        ) : null}
+
+        <View style={{ alignItems: 'center', marginTop: -37, width: 248 }}>
           <Image contentFit="contain" source={require('@/assets/images/logo.png')} style={{ aspectRatio: 1, width: '100%' }} />
         </View>
 
-        <View
-          style={{
-            alignItems: 'center',
-            flexDirection: 'row',
-            gap: 10,
-            justifyContent: 'center',
-            width: '100%',
-          }}>
-          <View style={{ backgroundColor: 'rgba(255,255,255,0.84)', borderRadius: 999, paddingHorizontal: 14, paddingVertical: 7 }}>
-            <Text selectable style={{ color: colors.ink, fontSize: 20, fontVariant: ['tabular-nums'], fontWeight: '900' }}>
-              {timerLabel}
-            </Text>
-          </View>
-          <View style={{ backgroundColor: colors.pink, borderColor: colors.navy, borderRadius: 999, borderWidth: 1, paddingHorizontal: 14, paddingVertical: 7 }}>
-            <Text selectable style={{ color: colors.surface, fontSize: 13, fontWeight: '900' }}>
-              {t('radar.remaining', { count: remainingHiders })}
-            </Text>
-          </View>
-        </View>
+        <RadarView hint={radarHint} remainingCount={remainingHiders} timerLabel={timerLabel} />
 
-        <RadarView hint={radarHint} />
-
-        <DevGpsControl defaultDistance={40} />
+        {devGpsPanelOpen ? <DevGpsControl defaultDistance={40} /> : null}
 
         <View style={{ gap: 10, width: '100%' }}>
-          <GameButton label={manualCapturePending ? 'Capturando...' : t('radar.capture')} onPress={handleSimulateCapture} variant="capture" />
+          <GameButton label={manualCapturePending ? 'Capturando...' : t('radar.capture')} onPress={handleSimulateCapture} variant="primary" />
           <View style={{ flexDirection: 'row', gap: 10 }}>
             <View style={{ flex: 1 }}>
-              <GameButton label={t('radar.finishHiders')} onPress={handleFinishWithHiders} size="compact" variant="rush" />
+              <GameButton label={t('radar.finishHiders')} onPress={handleFinishWithHiders} size="compact" variant="secondary" />
             </View>
             <View style={{ flex: 1 }}>
-              <GameButton label={t('common.exit')} onPress={handleLeaveRoom} size="compact" variant="ghost" />
+              <GameButton label={t('common.exit')} onPress={handleLeaveRoom} size="compact" variant="dangerStrong" />
             </View>
           </View>
         </View>

@@ -48,6 +48,8 @@ Impactos positivos:
 - Resultado final continua usando o mesmo snapshot terminal.
 - Dados temporarios de GPS, esconderijo, captura e DEV continuam sendo limpos pelo caminho central.
 - A funcao e idempotente: chamadas repetidas nao devem duplicar resultado nem mudar vencedor.
+- Salas em partida ativa (`hiding`/`seeking`) nao devem ser removidas por `expires_at` antigo do lobby; `pe_start_round` limpa `expires_at` e o cleanup de expiradas fica restrito a `lobby`/`finished`.
+- O `Alvo DEV` e tratado como ferramenta de calibracao: pode ser auto-confirmado como `Escondido` e nao deve cair por falta de GPS real. Jogadores reais continuam sujeitos ao enforcement normal.
 
 Cuidados:
 

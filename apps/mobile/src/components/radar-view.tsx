@@ -64,7 +64,17 @@ function RadarArrow({ angle, color }: { angle: number; color: string }) {
   );
 }
 
-export function RadarView({ hint, rush = false }: { hint?: RadarHint; rush?: boolean }) {
+export function RadarView({
+  hint,
+  remainingCount,
+  rush = false,
+  timerLabel,
+}: {
+  hint?: RadarHint;
+  remainingCount?: number;
+  rush?: boolean;
+  timerLabel?: string;
+}) {
   const { width } = useWindowDimensions();
   const hasNoTarget = hint?.reason === 'no_target_signal';
   const seekerSignalLost = hint?.reason === 'seeker_signal_lost';
@@ -73,7 +83,7 @@ export function RadarView({ hint, rush = false }: { hint?: RadarHint; rush?: boo
   const confidence = Math.round((hint?.confidence ?? 0) * 100);
   const freshOutOfRange = hint?.signalStatus === 'fresh' && band === 'none' && typeof hint.distanceMetersApprox === 'number';
   const angle = hint?.angleDegrees ?? (rush ? 42 : 28);
-  const radarSize = Math.min(Math.max(width * 0.76, 258), 348);
+  const radarSize = Math.min(Math.max(width * 0.84, 284), 383);
   const targetColor = band === 'none' ? 'rgba(255,255,255,0.55)' : meta.color;
   const arrowColor = band === 'none' ? 'rgba(142, 246, 193, 0.42)' : meta.color;
   const statusLabel = hasNoTarget ? 'Sem alvo ativo' : seekerSignalLost ? 'GPS sem sinal' : freshOutOfRange ? 'Fora de alcance' : meta.label;
@@ -84,7 +94,7 @@ export function RadarView({ hint, rush = false }: { hint?: RadarHint; rush?: boo
       : hint?.targetNickname ? `${hint.targetNickname} no alvo` : 'Aguardando leitura';
 
   return (
-    <View style={{ alignItems: 'center', gap: 12, width: '100%' }}>
+    <View style={{ alignItems: 'center', gap: 10, marginTop: -10, width: '100%' }}>
       <View
         style={{
           alignItems: 'center',
@@ -124,14 +134,68 @@ export function RadarView({ hint, rush = false }: { hint?: RadarHint; rush?: boo
         </Text>
       </View>
 
-      <View style={{ alignItems: 'center', gap: 8, width: '82%' }}>
+      <View
+        style={{
+          alignItems: 'center',
+          backgroundColor: 'rgba(255, 255, 255, 0.82)',
+          borderColor: 'rgba(255, 255, 255, 0.94)',
+          borderRadius: 18,
+          borderWidth: 2,
+          boxShadow: '0 7px 0 rgba(7, 26, 61, 0.14)',
+          gap: 7,
+          paddingHorizontal: 12,
+          paddingVertical: 9,
+          width: '100%',
+        }}>
+        {timerLabel || typeof remainingCount === 'number' ? (
+          <View style={{ flexDirection: 'row', gap: 10, width: '100%' }}>
+            {timerLabel ? (
+              <View
+                style={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.82)',
+                  borderColor: colors.navy,
+                  borderRadius: 14,
+                  borderWidth: 2,
+                  flex: 1,
+                  paddingHorizontal: 10,
+                  paddingVertical: 6,
+                }}>
+                <Text selectable style={{ color: colors.navy, fontSize: 10, fontWeight: '900', textAlign: 'center' }}>
+                  TEMPO
+                </Text>
+                <Text selectable style={{ color: colors.navy, fontSize: 20, fontVariant: ['tabular-nums'], fontWeight: '900', textAlign: 'center' }}>
+                  {timerLabel}
+                </Text>
+              </View>
+            ) : null}
+            {typeof remainingCount === 'number' ? (
+              <View
+                style={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.82)',
+                  borderColor: colors.navy,
+                  borderRadius: 14,
+                  borderWidth: 2,
+                  flex: 1,
+                  paddingHorizontal: 10,
+                  paddingVertical: 6,
+                }}>
+                <Text selectable style={{ color: colors.pink, fontSize: 10, fontWeight: '900', textAlign: 'center' }}>
+                  RESTAM
+                </Text>
+                <Text selectable style={{ color: colors.navy, fontSize: 20, fontVariant: ['tabular-nums'], fontWeight: '900', textAlign: 'center' }}>
+                  {remainingCount}
+                </Text>
+              </View>
+            ) : null}
+          </View>
+        ) : null}
         <View
           style={{
-            borderColor: 'rgba(255,255,255,0.72)',
+            borderColor: colors.navy,
             borderRadius: 999,
             borderWidth: 2,
             flexDirection: 'row',
-            height: 18,
+            height: 16,
             overflow: 'hidden',
             width: '100%',
           }}>
@@ -153,10 +217,10 @@ export function RadarView({ hint, rush = false }: { hint?: RadarHint; rush?: boo
             }}
           />
         </View>
-        <Text selectable style={{ color: meta.color, fontSize: 22, fontWeight: '900', textAlign: 'center' }}>
+        <Text selectable style={{ color: band === 'none' ? colors.ink : meta.color, fontSize: 20, fontWeight: '900', textAlign: 'center' }}>
           {statusLabel} {confidence > 0 && !hasNoTarget ? `${confidence}%` : ''}
         </Text>
-        <Text selectable style={{ color: 'rgba(255,255,255,0.86)', fontSize: 13, fontWeight: '800', textAlign: 'center' }}>
+        <Text selectable style={{ color: colors.ink, fontSize: 12, fontWeight: '900', textAlign: 'center' }}>
           {statusBody}
         </Text>
       </View>

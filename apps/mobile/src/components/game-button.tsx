@@ -8,7 +8,7 @@ type GameButtonProps = {
   label: string;
   onPress?: () => void;
   size?: 'default' | 'compact';
-  variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'capture' | 'rush';
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'dangerStrong' | 'capture' | 'rush';
 };
 
 type GameLinkButtonProps = Omit<GameButtonProps, 'onPress'> & {

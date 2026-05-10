@@ -44,6 +44,12 @@ Definir o fluxo jogável principal do Pique Esconde no MVP.
 20. Ao jogar novamente, todos voltam para o lobby.
 21. No lobby, o líder pode manter ou promover outro jogador como próximo procurador.
 
+Nota DEV:
+
+- O fluxo `Alvo DEV` é exceção de desenvolvimento: o backend pode marcar esse alvo sintético como `Escondido` ao iniciar a rodada.
+- A fase `hiding` continua existindo para preservar o botão `DEV liberar busca`.
+- Jogadores reais continuam precisando confirmar "estou escondido" para seguir ativos.
+
 ## Jogar Novamente
 
 - O botão "Jogar novamente" leva para o lobby da mesma sala.

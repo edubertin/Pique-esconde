@@ -449,6 +449,68 @@ Notas:
 - `Compartilhar` fica reservado para resultado/card social.
 - Futuramente o líder pode tocar em um jogador do lobby para promover como líder/procurador.
 
+## Atualizacao 2026-05-10 - Lobby
+
+```txt
++-----------------------------+
+| [ STORE COVER / BANNER ]    |
++-----------------------------+
+
++-----------------------------+
+| Regras               Medio  |
+| [Medio] [1min] [3min]       |
+|                             |
+| Lobby: ABCD [copy]     4/8 |
+| + tabela jogadores rosa +   |
+| | [A1] Dudu       Lider |   |
+| | [A2] Ana        Pronto|   |
+| | [A3] Rafa       Espera|   |
+| | [A4] Bia        Pronto|   |
+| + scroll ate 8 jogadores +  |
++-----------------------------+
+
++-----------------------------+
+| [ Iniciar partida ]         |
+| [ Convidar ]       [ Sair ] |
++-----------------------------+
+```
+
+Notas:
+
+- O banner fica fora do painel branco translucido, mas usa a mesma largura.
+- O painel branco translucido cobre apenas regras e tabela de jogadores.
+- A caixa inteira de regras funciona como botao para `/rules`.
+- O lobby nao usa botao de voltar no topo; `Sair` e a saida explicita da sala.
+- A lista de jogadores usa fundo rosa claro translucido e linhas compactas para mostrar cerca de 4 jogadores antes do scroll.
+- A acao principal ocupa uma linha inteira; `Convidar` e `Sair` ficam juntos na linha abaixo.
+
+## Atualizacao 2026-05-10 - Radar
+
+```txt
++-----------------------------+
+|        [ LOGO OFICIAL ]      |
+|                             |
+|          ( RADAR )           |
+|                             |
+| + HUD branco translucido +   |
+| | Tempo 02:18  Restam 3 |   |
+| | [frio][morno][quente] |   |
+| | Quente 40%            |   |
+| | Alvo DEV no alvo      |   |
+| +-----------------------+   |
+|                             |
+| [ Capturar ]                |
+| [ Rush final ]    [ Sair ]  |
++-----------------------------+
+```
+
+Notas:
+
+- O radar e a peca visual principal, grande e central.
+- O HUD branco translucido agrupa tempo, quantidade restante, barra de calor, status e alvo.
+- Os chips internos do HUD usam branco translucido para nao competir com os botoes coloridos.
+- `Capturar` usa o rosa principal, `Rush final` usa o verde da marca e `Sair` usa vermelho forte.
+
 ## Atualização - Resultado
 
 ```txt

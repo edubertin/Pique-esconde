@@ -38,6 +38,12 @@ export const patterns = {
       color: colors.danger,
       shadow: '0 4px 0 rgba(7, 26, 61, 0.08)',
     },
+    dangerStrong: {
+      backgroundColor: colors.danger,
+      borderColor: colors.navy,
+      color: colors.surface,
+      shadow: '0 5px 0 rgba(7, 26, 61, 0.18)',
+    },
   },
   panel: {
     default: {

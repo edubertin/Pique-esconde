@@ -397,3 +397,30 @@ Decisao:
 
 Link para test run:
 - `docs/qa/test-runs/2026-05-10-atomic-room-snapshot.md`
+
+## L-011 - Alvo DEV era removido ao fim do tempo de esconder
+
+Status: Resolvido em backend dev
+Severidade: Media
+Area: DEV GPS / Timer / Backend
+Detectado em: 2026-05-10
+Commit/versao: worktree local / migrations `202605100006_auto_hide_dev_target_on_start`, `202605100007_skip_dev_target_gps_elimination`, `202605100008_keep_dev_hide_screen_and_clear_active_expiry`
+
+Descricao:
+- Ao iniciar uma rodada com apenas lider + `Alvo DEV`, o alvo sintetico entrava como `Escondendo`.
+- Como o bot nao tem cliente proprio para tocar em `Estou escondido`, a manutencao removia esse player ao fim do timer com `not_hidden_in_time`.
+- Com apenas o lider restante, a sala voltava para lobby com `closed_reason = not_enough_players`.
+
+Impacto:
+- O modo DEV podia parecer que o bot tinha quitado.
+- A rodada nao chegava ao radar sem apertar manualmente `DEV liberar busca`.
+
+Decisao:
+- Manter a regra normal para jogadores reais.
+- Auto-confirmar somente players com `nickname = 'Alvo DEV'` ao iniciar a rodada.
+- Manter a fase de esconder para preservar o controle manual `DEV liberar busca`.
+- Ignorar eliminacao por sinal GPS ausente apenas para `Alvo DEV`, mantendo enforcement normal para jogadores reais.
+- Limpar `expires_at` ao iniciar rodada e restringir cleanup de salas expiradas para `lobby`/`finished`, evitando queda de partida ativa por expiracao antiga de lobby.
+
+Link para test run:
+- `docs/qa/test-runs/2026-05-10-dev-target-auto-hide.md`

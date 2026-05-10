@@ -33,17 +33,20 @@ Sem login completo no MVP.
 O lobby mostra:
 
 - Código/link da sala.
-- Botão de convidar por link/código.
+- Ícone de copiar código da sala.
+- Botão de convidar por link/código nas ações inferiores.
 - Lista de jogadores.
 - Avatar e apelido.
 - Status de cada jogador.
 - Quem é o procurador/líder.
 - A lista de jogadores permite promover outro jogador como líder/procurador.
 - Botão "preparado".
-- Configuração de regras para o líder.
 - Resumo compacto das regras atuais: ambiente, esconder e busca.
+- Caixa de regras clicável que abre a tela de configuração.
 - Botão iniciar para o líder.
 - Botão sair da sala.
+- Banner visual fora do painel principal.
+- Tabela de jogadores em área própria com até 4 linhas visíveis antes do scroll.
 
 Regra de início:
 
@@ -77,6 +80,14 @@ Congelamento:
 - `pe_rooms` guarda a configuracao editavel enquanto a sala esta no lobby.
 - `pe_game_sessions` recebe um snapshot das regras quando a rodada inicia.
 - Depois que a rodada comeca, mudar a sala nao altera a sessao ativa.
+- Ao iniciar uma rodada ativa, `expires_at` da sala é limpo para evitar que o cleanup de lobby apague uma partida em andamento.
+- O cleanup de salas expiradas remove apenas salas em `lobby` ou `finished`.
+
+Atalho DEV:
+
+- Em modo DEV, o player sintético `Alvo DEV` pode ser marcado automaticamente como `Escondido` ao iniciar a rodada.
+- Esse atalho é limitado ao `Alvo DEV`; jogadores reais continuam precisando tocar em `Estou escondido`.
+- `Alvo DEV` não é eliminado por falta de sinal GPS real durante busca DEV.
 
 ## Status
 

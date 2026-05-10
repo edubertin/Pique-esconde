@@ -37,6 +37,8 @@ Sinais possíveis:
 Decisão de produto:
 
 - O radar deve ser uma mistura de radar circular, ponteiro/direção aproximada, som e vibração.
+- A tela do procurador usa o logo oficial no topo, radar grande no centro e HUD branco translucido abaixo do radar.
+- O HUD agrupa tempo restante, escondidos restantes, barra de calor, status e alvo aproximado.
 - O ponteiro não precisa ser perfeitamente estável o tempo todo.
 - Em alguns momentos ele pode "se perder" ou oscilar para manter a brincadeira divertida e compensar imprecisão natural de GPS/bússola.
 - Quando o procurador estiver mais perto, o sinal pode ficar mais claro e confiante.
@@ -55,8 +57,8 @@ O backend calcula a pista do radar a partir das coordenadas reais e devolve apen
 
 Regra inicial:
 
-- Raio de captura: 5 metros.
-- Confirmar proximidade por 2 segundos continuos antes da captura automatica.
+- Raio de captura e tempo de confirmação são derivados do preset congelado da rodada.
+- No preset médio atual: 5 metros por 2 segundos contínuos.
 - O botao de captura deve chamar a mesma validacao de GPS do backend.
 - Evitar captura por uma única leitura instável de GPS.
 - Ao capturar, avisar procurador e escondido com feedback visual, som e vibração.
@@ -64,6 +66,8 @@ Regra inicial:
 ## Ponto De Esconderijo
 
 Quando o jogador toca em "Estou escondido", o backend salva o ponto GPS atual como ancora do esconderijo.
+
+Exceção DEV: `Alvo DEV` não depende de ponto GPS real; ele é alvo sintético de calibração.
 
 Regra inicial:
 
@@ -78,6 +82,7 @@ Regra inicial:
 - 15 segundos sem GPS: estado de aviso/sinal instavel.
 - 30 segundos sem GPS: remocao da rodada por sinal perdido.
 - A remocao deve voltar o jogador para a tela inicial com aviso especifico.
+- Exceção DEV: `Alvo DEV` não é eliminado por perda de sinal GPS real. Jogadores reais continuam sujeitos à regra.
 
 ## Tela Dos Escondidos
 
@@ -118,5 +123,5 @@ Implementacao MVP:
 
 ## Pendencias De Design
 
-- Tela principal do radar deve funcionar como HUD de caca: logo pequeno, timer/restantes em chips, radar escuro/cartoon central e barra termica compacta em vez de caixas flutuantes.
+- Testar o HUD do radar em telas pequenas e celulares reais, garantindo que os botoes nao fiquem cortados.
 - Desenhar tela do escondido com coracao/pulso para sinalizar proximidade do procurador.

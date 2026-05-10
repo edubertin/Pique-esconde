@@ -3,16 +3,16 @@ import * as Location from 'expo-location';
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
-import { ActionGrid } from '@/src/components/action-grid';
 import { Badge } from '@/src/components/badge';
 import { CoverBanner } from '@/src/components/cover-banner';
 import { GameButton } from '@/src/components/game-button';
 import { PlayerList } from '@/src/components/player-list';
-import { MenuPanel, PrototypeScreen } from '@/src/components/prototype-screen';
+import { Panel, PrototypeScreen } from '@/src/components/prototype-screen';
 import { useSafeRouter } from '@/src/hooks/use-safe-router';
 import { t } from '@/src/i18n';
 import { useRoom } from '@/src/state/room-store';
 import { colors } from '@/src/theme/colors';
+import { patterns } from '@/src/theme/patterns';
 import { surfaces } from '@/src/theme/surfaces';
 import { isDevGpsEnabled } from '@/src/utils/dev-gps';
 
@@ -127,62 +127,15 @@ export default function LobbyScreen() {
 
   return (
     <PrototypeScreen>
-      <MenuPanel
-        title={t('lobby.title', { code: room?.code ?? '----' })}
-        meta={
-          copied ? (
-            <Text selectable style={{ color: colors.green, fontSize: 12, fontWeight: '800' }}>
-              {t('common.codeCopied')}
-            </Text>
-          ) : null
-        }
-        headerAction={
-          <Pressable
-            accessibilityLabel={t('lobby.copyCode')}
-            accessibilityRole="button"
-            onPress={handleCopyCode}
-            style={{
-              ...(copied ? surfaces.iconButton : surfaces.iconButtonActive),
-              alignItems: 'center',
-              borderColor: copied ? colors.green : surfaces.iconButtonActive.borderColor,
-              borderRadius: 14,
-              height: 40,
-              justifyContent: 'center',
-              width: 40,
-            }}>
-            <Ionicons color={copied ? colors.green : colors.navy} name={copied ? 'checkmark' : 'copy-outline'} size={21} />
-          </Pressable>
-        }
-        actions={
-          <>
-            {isLeader ? (
-              <GameButton
-                disabled={!canLeaderStart || isLoading}
-                label={canLeaderStart ? (isLoading ? 'Sincronizando...' : t('lobby.start')) : t('lobby.startWaiting')}
-                onPress={handleStartRound}
-                variant="secondary"
-              />
-            ) : (
-              <GameButton label={readyLabel} onPress={handleToggleReady} variant="secondary" />
-            )}
-            <ActionGrid
-              actions={
-                isLeader
-                  ? [
-                      { href: '/rules', label: t('lobby.rules'), variant: 'ghost' },
-                      { label: t('lobby.invite'), onPress: handleAddDemoPlayer, variant: 'ghost' },
-                    ]
-                  : [
-                      { href: '/rules', label: t('lobby.rules'), variant: 'ghost' },
-                      { label: t('common.exit'), onPress: handleLeaveRoom, variant: 'danger' },
-                    ]
-              }
-            />
-            {isLeader ? <GameButton label={t('common.exit')} onPress={handleLeaveRoom} variant="danger" /> : null}
-          </>
-        }>
+      <View style={{ maxWidth: patterns.layout.panelMaxWidth, width: '100%' }}>
         <CoverBanner />
-        <View
+      </View>
+
+      <Panel>
+        <Pressable
+          accessibilityLabel={t('lobby.rules')}
+          accessibilityRole="button"
+          onPress={() => router.push('/rules')}
           style={{
             ...surfaces.glassTile,
             borderRadius: 18,
@@ -191,10 +144,16 @@ export default function LobbyScreen() {
             width: '100%',
           }}>
           <View style={{ alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }}>
-            <Text selectable style={{ color: colors.ink, fontSize: 15, fontWeight: '900' }}>
-              {t('rules.title')}
-            </Text>
-            <Badge label={environmentLabel(room?.rules.environmentPreset)} tone="leader" />
+            <View style={{ alignItems: 'center', flexDirection: 'row', gap: 8 }}>
+              <Ionicons color={colors.navy} name="options-outline" size={20} />
+              <Text selectable style={{ color: colors.ink, fontSize: 16, fontWeight: '900' }}>
+                {t('rules.title')}
+              </Text>
+            </View>
+            <View style={{ alignItems: 'center', flexDirection: 'row', gap: 8 }}>
+              <Badge label={environmentLabel(room?.rules.environmentPreset)} tone="leader" />
+              <Ionicons color={colors.navy} name="chevron-forward" size={20} />
+            </View>
           </View>
           <View style={{ flexDirection: 'row', gap: 8 }}>
             <View style={{ flex: 1 }}>
@@ -207,23 +166,53 @@ export default function LobbyScreen() {
               <Badge label={secondsToLabel(room?.rules.seekDurationSeconds ?? 180)} tone="ready" />
             </View>
           </View>
+        </Pressable>
+
+        <View style={{ gap: 10, width: '100%' }}>
+          <View style={{ alignItems: 'center', flexDirection: 'row', gap: 8, justifyContent: 'space-between' }}>
+            <View style={{ alignItems: 'center', flexDirection: 'row', gap: 8, minWidth: 0 }}>
+              <Text selectable style={{ color: colors.ink, fontSize: 19, fontWeight: '900' }}>
+                Lobby:
+              </Text>
+              <Text selectable style={{ color: colors.pink, fontSize: 19, fontWeight: '900' }}>
+                {room?.code ?? '----'}
+              </Text>
+              <Pressable
+                aria-label={t('lobby.copyCode')}
+                accessibilityLabel={t('lobby.copyCode')}
+                accessibilityRole="button"
+                onPress={handleCopyCode}
+                testID="lobby-copy-code"
+                style={{
+                  ...(copied ? surfaces.iconButton : surfaces.iconButtonActive),
+                  alignItems: 'center',
+                  borderColor: copied ? colors.green : surfaces.iconButtonActive.borderColor,
+                  borderRadius: 12,
+                  height: 34,
+                  justifyContent: 'center',
+                  width: 34,
+                }}>
+                <Ionicons color={copied ? colors.green : colors.navy} name={copied ? 'checkmark' : 'copy-outline'} size={18} />
+              </Pressable>
+            </View>
+            <Badge label={`${players.length}/${room?.maxPlayers ?? 8}`} tone="rush" />
+          </View>
+          {copied ? (
+            <Text selectable style={{ color: colors.green, fontSize: 12, fontWeight: '800' }}>
+              {t('common.codeCopied')}
+            </Text>
+          ) : null}
+          <PlayerList
+            activePlayerId={activePlayer?.id}
+            canRemove={activePlayer?.isLeader}
+            onPromote={activePlayer?.isLeader ? handlePromoteLeader : undefined}
+            onRemove={handleRemovePlayer}
+            players={players}
+          />
         </View>
-        <View style={{ alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }}>
-          <Text selectable style={{ color: colors.ink, fontSize: 18, fontWeight: '900' }}>
-            {t('lobby.players')}
-          </Text>
-          <Badge label={`${players.length}/${room?.maxPlayers ?? 8}`} tone="rush" />
-        </View>
-        {room?.expiresAt ? (
-          <Text selectable style={{ color: colors.muted, fontSize: 13, fontWeight: '800', textAlign: 'center' }}>
-            {t('lobby.soloExpires')}
-          </Text>
-        ) : null}
-        {activePlayer?.isLeader && players.length > 1 ? (
-          <Text selectable style={{ color: colors.muted, fontSize: 13, fontWeight: '800', textAlign: 'center' }}>
-            {t('lobby.leaderHint')}
-          </Text>
-        ) : null}
+      </Panel>
+
+      <View style={{ gap: 10, maxWidth: patterns.layout.panelMaxWidth, width: '100%' }}>
         {lobbyNoticeNames.length > 0 ? (
           <View
             style={{
@@ -263,14 +252,26 @@ export default function LobbyScreen() {
             {error}
           </Text>
         ) : null}
-        <PlayerList
-          activePlayerId={activePlayer?.id}
-          canRemove={activePlayer?.isLeader}
-          onPromote={activePlayer?.isLeader ? handlePromoteLeader : undefined}
-          onRemove={handleRemovePlayer}
-          players={players}
-        />
-      </MenuPanel>
+
+        {isLeader ? (
+          <GameButton
+            disabled={!canLeaderStart || isLoading}
+            label={canLeaderStart ? (isLoading ? 'Sincronizando...' : t('lobby.start')) : t('lobby.startWaiting')}
+            onPress={handleStartRound}
+            variant="primary"
+          />
+        ) : (
+          <GameButton label={readyLabel} onPress={handleToggleReady} variant="secondary" />
+        )}
+        <View style={{ flexDirection: 'row', gap: 10 }}>
+          <View style={{ flex: 1 }}>
+            <GameButton label={t('lobby.invite')} onPress={handleAddDemoPlayer} size="compact" variant="secondary" />
+          </View>
+          <View style={{ flex: 1 }}>
+            <GameButton label={t('common.exit')} onPress={handleLeaveRoom} size="compact" variant="dangerStrong" />
+          </View>
+        </View>
+      </View>
     </PrototypeScreen>
   );
 }

@@ -112,9 +112,10 @@ Use estes valores como contrato ate decisao em contrario:
 - Hider danger polling: cerca de 1.5s a 3s, a validar em bateria/rede.
 - Aviso de sinal: 15s sem GPS.
 - Remocao por sinal perdido: 30s sem GPS.
-- Captura: ate 5m.
-- Confirmacao de captura: 3s continuos.
+- Captura: derivada do preset congelado da sessao; medio atual usa 5m.
+- Confirmacao de captura: derivada do preset congelado da sessao; medio atual usa 2s.
 - DEV GPS: nunca deve brigar com GPS real e deve desligar tambem no servidor.
+- `Alvo DEV`: alvo sintetico isolado, pode ser auto-escondido no start e nao deve cair por perda de GPS real.
 
 Quando sugerir mudancas nesses tempos, explique impacto em UX, bateria, latencia percebida, custo no Supabase e risco de falso positivo/negativo.
 
@@ -153,6 +154,7 @@ Prioridade media:
 Monitore estes pontos:
 
 - DEV GPS salvo no banco e nao desligado no servidor.
+- `Alvo DEV` afetar regra de jogadores reais por engano.
 - Jogador marcar `Estou escondido` sem GPS recente.
 - Fiscalizacao de sinal perdido depender apenas de updates de GPS.
 - RPCs `security definer` com grants amplos para anon.

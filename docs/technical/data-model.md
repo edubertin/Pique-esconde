@@ -78,9 +78,9 @@ Campos sugeridos:
 | `status` | enum | `setup`, `hiding`, `seeking`, `rush_final`, `finished`. |
 | `hide_duration_seconds` | int | Padrão 60, máximo inicial 60. |
 | `seek_duration_seconds` | int | Padrão 180. |
-| `capture_radius_meters` | numeric | Sugestão inicial 8m. |
-| `capture_confirm_seconds` | int | Sugestão inicial 3s. |
-| `environment_preset` | enum | `default`, futuro: `open`, `mixed`, `small`. |
+| `capture_radius_meters` | numeric | Derivado do ambiente; padrão atual 5m. |
+| `capture_confirm_seconds` | numeric | Derivado do ambiente; padrão atual 2s. |
+| `environment_preset` | enum | `small`, `medium`, `large`. |
 | `started_at` | timestamp | Início da rodada. |
 | `seek_started_at` | timestamp | Momento em que procurador foi liberado. |
 | `rush_started_at` | timestamp | Início do rush final. |
@@ -100,11 +100,14 @@ Campos sugeridos:
 
 Quando a rodada inicia, `pe_start_round` copia esses valores para `pe_game_sessions`. A partir dai, radar, captura, timers e resultado leem a sessao ativa. Isso evita que uma mudanca no lobby altere uma rodada em andamento.
 
+Ao iniciar uma rodada ativa, `pe_start_round` tambem limpa `pe_rooms.expires_at`. A limpeza de salas expiradas deve remover apenas salas em `lobby` ou `finished`, evitando apagar uma partida em `hiding` ou `seeking` por causa de uma expiracao antiga do lobby.
+
 Notas:
 
 - A sala pode ter várias rodadas.
 - O grupo pode jogar novamente sem criar nova sala.
 - Ao jogar novamente, o grupo volta para o lobby da mesma sala.
+- Em modo DEV, o jogador sintetico `Alvo DEV` pode ser auto-confirmado como `Escondido` ao iniciar a rodada e e ignorado pelo enforcement de GPS real. Esse atalho nao se aplica a jogadores reais.
 
 ### `game_events`
 
@@ -217,10 +220,10 @@ Política:
 - Uma sala tem um líder ativo.
 - Uma rodada tem um procurador.
 - O próximo líder/procurador pode ser promovido pelo lobby.
-- Jogador sem permissão de localização não pode ficar como `hider` ou `seeker`.
+- Jogador sem permissão de localização não pode ficar como `hider` ou `seeker`, exceto o alvo sintético `Alvo DEV` em fluxo de desenvolvimento.
 - Jogador capturado não aparece como alvo ativo do radar.
 - Ao finalizar a rodada, localização deixa de ser usada.
-- Ao expirar sala, jogadores e estados temporários devem ser encerrados.
+- Ao expirar sala em `lobby` ou `finished`, jogadores e estados temporários devem ser encerrados.
 
 ## Manutencao Server-Side
 
@@ -237,6 +240,7 @@ A rotina:
 - encerra a busca quando o tempo de procurar vence;
 - fecha a rodada pelo mesmo caminho terminal usado pelo cliente, `pe_close_round`;
 - limpa salas expiradas e dados temporarios via `pe_cleanup_expired_state`;
+- preserva salas ativas em `hiding` ou `seeking`, mesmo quando existe `expires_at` antigo;
 - retorna apenas dados derivados, sem latitude/longitude.
 
 As funcoes de manutencao nao sao expostas para `anon`; devem ser chamadas por conexao server-side, SQL administrativo ou job agendado.

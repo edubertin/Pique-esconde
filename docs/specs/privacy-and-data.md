@@ -41,6 +41,7 @@ Política inicial proposta:
 - Eventos da partida: manter por até 24 horas para depuração básica do MVP.
 - Sala temporária: expira quando todos saem.
 - Se restar apenas 1 jogador ativo, expira após 6 minutos sem novos jogadores.
+- Rodadas ativas não expiram por `expires_at` antigo do lobby; o backend limpa essa expiração ao iniciar e o cleanup de salas expiradas atua apenas em `lobby` ou `finished`.
 - Apelido e avatar da sala: manter enquanto a sala estiver ativa ou dentro da janela curta de reconexão.
 - Card social: gerado sem GPS, mapa real, rota, endereço ou coordenadas.
 - Dados agregados anônimos: podem ser mantidos para métricas de produto, como partidas criadas, partidas concluídas e quantidade de jogadores, desde que não identifiquem pessoas nem trajetos.

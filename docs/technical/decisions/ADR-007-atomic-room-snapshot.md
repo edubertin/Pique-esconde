@@ -31,6 +31,8 @@ When the room is back in `lobby`, the returned player statuses are defensively n
 
 The normalization is a presentation guard in the snapshot response. The canonical backend transitions still happen through round, rematch and maintenance functions.
 
+`Alvo DEV` is a development-only synthetic target. In lobby snapshots it should look ready, while round-start logic may mark it as `Escondido` automatically so the DEV radar flow can be tested without a second physical device. This exception must not expose GPS fields or apply to real players.
+
 ## Consequences
 
 Positive:

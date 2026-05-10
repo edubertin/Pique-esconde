@@ -38,20 +38,20 @@ export function PlayerList({ activePlayerId, canRemove, onPromote, onRemove, pla
     <View
       testID="player-list-frame"
       style={{
-        backgroundColor: 'rgba(255, 255, 255, 0.36)',
-        borderColor: 'rgba(255, 255, 255, 0.74)',
-        borderRadius: 20,
-        borderWidth: 1,
-        maxHeight: 310,
+        backgroundColor: 'rgba(255, 45, 141, 0.16)',
+        borderColor: 'rgba(255, 45, 141, 0.48)',
+        borderRadius: 18,
+        borderWidth: 2,
+        maxHeight: 272,
         overflow: 'hidden',
         padding: 4,
       }}>
       <ScrollView
-        contentContainerStyle={{ gap: 10 }}
+        contentContainerStyle={{ gap: 8 }}
         nestedScrollEnabled
         showsVerticalScrollIndicator={false}
         testID="player-list-scroll"
-        style={{ maxHeight: 302 }}>
+        style={{ maxHeight: 264 }}>
         {orderedPlayers.map((player) => {
           const avatar = getAvatar(player.avatarId);
           const canRemovePlayer = canRemove && player.id !== activePlayerId;
@@ -65,18 +65,18 @@ export function PlayerList({ activePlayerId, canRemove, onPromote, onRemove, pla
                   borderColor: colors.surface,
                   borderRadius: 20,
                   borderWidth: 2,
-                  height: 40,
+                  height: 36,
                   justifyContent: 'center',
                   overflow: 'hidden',
-                  width: 40,
+                  width: 36,
                 }}>
-                <Image contentFit="cover" source={avatar.faceImage} style={{ height: 40, width: 40 }} />
+                <Image contentFit="cover" source={avatar.faceImage} style={{ height: 36, width: 36 }} />
               </View>
               <View style={{ flex: 1, gap: 2, minWidth: 0 }}>
-                <Text numberOfLines={1} style={{ color: colors.ink, fontSize: 16, fontWeight: '800' }}>
+                <Text numberOfLines={1} style={{ color: colors.ink, fontSize: 15, fontWeight: '800' }}>
                   {player.nickname}
                 </Text>
-                <Text numberOfLines={1} style={{ color: colors.muted, fontSize: 13 }}>
+                <Text numberOfLines={1} style={{ color: colors.muted, fontSize: 12 }}>
                   {player.isLeader ? t('player.roleLeaderSeeker') : player.id === activePlayerId ? t('player.roleYou') : t('player.rolePlayer')}
                 </Text>
               </View>
@@ -94,9 +94,9 @@ export function PlayerList({ activePlayerId, canRemove, onPromote, onRemove, pla
                 borderWidth: player.isLeader ? 2 : surfaces.glassTile.borderWidth,
                 boxShadow: player.isLeader ? '0 5px 0 rgba(255, 45, 141, 0.16)' : surfaces.glassTile.boxShadow,
                 flexDirection: 'row',
-                gap: 10,
-                height: 66,
-                padding: 10,
+                gap: 8,
+                height: 58,
+                padding: 8,
               }}>
               {canPromotePlayer ? (
                 <Pressable
@@ -109,7 +109,7 @@ export function PlayerList({ activePlayerId, canRemove, onPromote, onRemove, pla
                     alignItems: 'center',
                     flex: 1,
                     flexDirection: 'row',
-                    gap: 10,
+                    gap: 8,
                     minWidth: 0,
                   }}>
                   {content}
@@ -122,7 +122,7 @@ export function PlayerList({ activePlayerId, canRemove, onPromote, onRemove, pla
                     alignItems: 'center',
                     flex: 1,
                     flexDirection: 'row',
-                    gap: 10,
+                    gap: 8,
                     minWidth: 0,
                   }}>
                   {content}
@@ -141,9 +141,9 @@ export function PlayerList({ activePlayerId, canRemove, onPromote, onRemove, pla
                     borderColor: colors.danger,
                     borderRadius: 14,
                     borderWidth: 2,
-                    height: 36,
+                    height: 34,
                     justifyContent: 'center',
-                    width: 36,
+                    width: 34,
                   }}>
                   <Ionicons color={colors.danger} name="person-remove-outline" size={18} />
                 </Pressable>

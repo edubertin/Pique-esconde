@@ -311,13 +311,14 @@ fontWeight 900
 
 O lobby é a tela social mais importante.
 
-Recomendação de estrutura:
+Estrutura atual recomendada:
 
-1. Topo com código da sala e contador `4/8`.
-2. Botão de convidar por link/código.
-3. Bloco do procurador/líder.
-4. Lista de jogadores.
+1. Banner visual fora do painel branco translucido.
+2. Painel com caixa de regras clicavel.
+3. Header `Lobby: CODIGO`, copiar e contador `4/8`.
+4. Tabela de jogadores em rosa claro translucido, com linhas compactas.
 5. Ação principal no fim.
+6. Linha secundaria com `Convidar` e `Sair`.
 
 Hierarquia:
 
@@ -327,10 +328,11 @@ Hierarquia:
 
 Pattern recomendado:
 
-- Jogadores em cards horizontais.
+- Jogadores em tabela/cartas horizontais compactas.
 - Avatar à esquerda.
 - Nome/status no centro.
 - Badge à direita.
+- A caixa de regras inteira deve parecer tocavel, com icone e chevron.
 
 ## Radar
 
@@ -339,11 +341,12 @@ O radar deve ser o momento mais memorável do app.
 Pattern recomendado:
 
 - Radar circular grande no centro.
-- Tempo no topo.
-- Restantes no topo ou lateral.
-- Sinal abaixo: `frio`, `morno`, `quente`, `muito perto`.
+- Logo oficial no topo.
+- HUD branco translucido abaixo do radar com tempo, restantes, barra de calor, status e alvo.
+- Sinal no HUD: `frio`, `morno`, `quente`, `muito perto`.
 - Ponteiro aproximado, com pequena oscilação.
 - Pulso visual quando o sinal aumenta.
+- Botões seguem a hierarquia: `Capturar` rosa, `Rush final` verde e `Sair` vermelho.
 
 Importante:
 
@@ -475,7 +478,8 @@ Atualização aplicada:
 - Incluir banner com a store cover no topo.
 - Manter pouco texto.
 - Destacar código da sala e contador `4/8`.
-- Preservar ações essenciais: compartilhar, preparado, iniciar, editar regras e sair da sala.
+- Preservar ações essenciais: convidar, preparado/iniciar, editar regras e sair da sala.
+- Reservar `Compartilhar` para resultado/card social.
 
 Prioridade:
 
