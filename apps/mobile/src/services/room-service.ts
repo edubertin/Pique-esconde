@@ -2,7 +2,7 @@ import type { RealtimeChannel } from '@supabase/supabase-js';
 
 import { gameRules } from '@/src/constants/game';
 import { assertSupabase } from '@/src/services/supabase-client';
-import type { CaptureAttempt, DevGpsDirection, FinalResultSnapshot, GameResult, GameSession, HiderDangerHint, LobbyNotice, PlayerLocationInput, PlayerStatus, RadarHint, RoomDebugSnapshot, RoomPlayer } from '@/src/state/room-store';
+import type { CaptureAttempt, DevGpsDirection, EnvironmentPreset, FinalResultSnapshot, GameResult, GameSession, HiderDangerHint, LobbyNotice, PlayerLocationInput, PlayerStatus, RadarHint, RoomDebugSnapshot, RoomPlayer, RoomRules } from '@/src/state/room-store';
 
 export type RemoteRoomPhase = 'lobby' | 'hiding' | 'seeking' | 'finished';
 
@@ -21,6 +21,7 @@ export type RemoteRoomSnapshot = {
     phase: RemoteRoomPhase;
     players: RoomPlayer[];
     result?: GameResult;
+    rules: RoomRules;
   };
 };
 
@@ -30,17 +31,25 @@ type PlayerInput = {
 };
 
 type RemoteRoomRow = {
+  capture_confirm_seconds: number | null;
+  capture_radius_meters: number | null;
   closed_reason: 'not_enough_players' | 'seeker_left' | null;
   code: string;
+  environment_preset: EnvironmentPreset | null;
   expires_at: string | null;
+  hide_duration_seconds: number | null;
   id: string;
   lobby_notice: RemoteLobbyNotice | null;
   max_players: number;
   phase: RemoteRoomPhase;
   result: RemoteResult | null;
+  seek_duration_seconds: number | null;
 };
 
 type RemoteGameSessionRow = {
+  capture_confirm_seconds?: number | null;
+  capture_radius_meters?: number | null;
+  environment_preset?: EnvironmentPreset | null;
   hide_duration_seconds: number;
   id: string;
   seek_duration_seconds: number;
@@ -115,6 +124,8 @@ type TickPayload = {
 type StartRoundPayload = {
   started?: boolean;
 };
+
+type UpdateRoomRulesInput = Pick<RoomRules, 'environmentPreset' | 'hideDurationSeconds' | 'seekDurationSeconds'>;
 
 type RoomSubscription = {
   unsubscribe: () => Promise<void>;
@@ -205,14 +216,28 @@ function mapLobbyNotice(notice?: RemoteLobbyNotice | null): LobbyNotice | undefi
   };
 }
 
+function mapRoomRules(row: RemoteRoomRow): RoomRules {
+  return {
+    captureConfirmSeconds: row.capture_confirm_seconds ?? 2,
+    captureRadiusMeters: row.capture_radius_meters ?? 5,
+    environmentPreset: row.environment_preset ?? 'medium',
+    hideDurationSeconds: row.hide_duration_seconds ?? 60,
+    seekDurationSeconds: row.seek_duration_seconds ?? 180,
+  };
+}
+
 async function fetchSnapshot(roomId: string, activePlayerId?: string, activePlayerToken?: string): Promise<RemoteRoomSnapshot> {
   const client = assertSupabase();
 
-  const roomQuery = client.from('pe_rooms').select('id, code, phase, max_players, expires_at, result, closed_reason, lobby_notice').eq('id', roomId).single();
+  const roomQuery = client
+    .from('pe_rooms')
+    .select('id, code, phase, max_players, expires_at, result, closed_reason, lobby_notice, environment_preset, hide_duration_seconds, seek_duration_seconds, capture_radius_meters, capture_confirm_seconds')
+    .eq('id', roomId)
+    .single();
   const playersQuery = client.from('pe_players').select('id, nickname, avatar_id, status, is_leader').eq('room_id', roomId).order('joined_at');
   const gameSessionsQuery = client
     .from('pe_game_sessions')
-    .select('id, seeker_player_id, status, hide_duration_seconds, seek_duration_seconds, started_at, seek_started_at')
+    .select('id, seeker_player_id, status, hide_duration_seconds, seek_duration_seconds, environment_preset, capture_radius_meters, capture_confirm_seconds, started_at, seek_started_at')
     .eq('room_id', roomId)
     .order('created_at', { ascending: false })
     .limit(1);
@@ -258,6 +283,7 @@ async function fetchSnapshot(roomId: string, activePlayerId?: string, activePlay
       phase: roomRow.phase,
       players: mappedPlayers,
       result: mapResult(roomRow.result),
+      rules: mapRoomRules(roomRow),
     },
   };
 }
@@ -514,6 +540,19 @@ export const roomService = {
       ...payload,
       finalSnapshot: mapFinalResultSnapshot(payload.finalSnapshot),
     };
+  },
+  async updateRoomRules(roomId: string, activePlayerId: string, activePlayerToken: string, rules: UpdateRoomRulesInput) {
+    const client = assertSupabase();
+    const { error } = await client.rpc('pe_update_room_rules', {
+      actor_player_id: activePlayerId,
+      environment_preset: rules.environmentPreset,
+      hide_duration_seconds: rules.hideDurationSeconds,
+      player_session_token: activePlayerToken,
+      seek_duration_seconds: rules.seekDurationSeconds,
+      target_room_id: roomId,
+    });
+
+    if (error) throw error;
   },
   async updateDevTestDistance(
     roomId: string,

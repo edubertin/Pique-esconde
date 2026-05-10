@@ -108,6 +108,14 @@ Presets de pistas:
 - Medio: quente 10m, morno 30m, frio 40m.
 - Grande: quente 15m, morno 45m, frio 90m.
 
+Implementacao MVP:
+
+- O lider escolhe o ambiente no lobby.
+- O backend congela o preset na rodada ativa.
+- O radar usa o preset congelado da sessao, nao o argumento enviado pelo cliente.
+- A captura tambem usa raio/confirmacao derivados do preset congelado.
+- Pequeno usa captura mais conservadora; Medio mantem 5m/2s; Grande facilita teste em area aberta.
+
 ## Pendencias De Design
 
 - Tela principal do radar deve funcionar como HUD de caca: logo pequeno, timer/restantes em chips, radar escuro/cartoon central e barra termica compacta em vez de caixas flutuantes.

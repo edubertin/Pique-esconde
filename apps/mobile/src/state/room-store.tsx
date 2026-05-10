@@ -61,6 +61,15 @@ export type PlayerLocationInput = {
 };
 
 export type DevGpsDirection = 'E' | 'N' | 'S' | 'W';
+export type EnvironmentPreset = 'large' | 'medium' | 'small';
+
+export type RoomRules = {
+  captureConfirmSeconds: number;
+  captureRadiusMeters: number;
+  environmentPreset: EnvironmentPreset;
+  hideDurationSeconds: number;
+  seekDurationSeconds: number;
+};
 
 export type RadarHint = {
   angleDegrees?: number;
@@ -71,6 +80,7 @@ export type RadarHint = {
   confirmRemainingSeconds?: number;
   devOverride?: boolean;
   distanceMetersApprox?: number;
+  environmentPreset?: EnvironmentPreset;
   reason?: 'no_active_search' | 'no_target_signal' | 'seeker_signal_lost';
   signalStatus: 'fresh' | 'lost' | 'warning';
   targetNickname?: string;
@@ -154,6 +164,7 @@ type Room = {
   phase: 'lobby' | 'hiding' | 'seeking' | 'finished';
   players: RoomPlayer[];
   result?: GameResult;
+  rules: RoomRules;
 };
 
 type RoomStore = {
@@ -186,6 +197,7 @@ type RoomStore = {
   toggleReady: () => Promise<void>;
   tryCaptureNearest: () => Promise<CaptureAttempt | undefined>;
   updateDevTestDistance: (distanceMeters: number, bearingDegrees?: number, cardinal?: DevGpsDirection) => Promise<void>;
+  updateRoomRules: (rules: Pick<RoomRules, 'environmentPreset' | 'hideDurationSeconds' | 'seekDurationSeconds'>) => Promise<void>;
   updatePlayerLocation: (input: PlayerLocationInput) => Promise<void>;
 };
 
@@ -265,6 +277,13 @@ export function RoomProvider({ children }: { children: ReactNode }) {
         phase: 'finished',
         players: snapshot.players,
         result: snapshot.result,
+        rules: currentRoom?.rules ?? {
+          captureConfirmSeconds: 2,
+          captureRadiusMeters: 5,
+          environmentPreset: 'medium',
+          hideDurationSeconds: 60,
+          seekDurationSeconds: 180,
+        },
       };
     });
   }, []);
@@ -612,6 +631,13 @@ export function RoomProvider({ children }: { children: ReactNode }) {
       async updateDevTestDistance(distanceMeters, bearingDegrees, cardinal) {
         const session = requireSession();
         await roomService.updateDevTestDistance(session.roomId, session.activePlayerId, session.activePlayerToken, distanceMeters, bearingDegrees, cardinal);
+      },
+      async updateRoomRules(nextRules) {
+        const session = requireSession();
+        await runAction(async () => {
+          await roomService.updateRoomRules(session.roomId, session.activePlayerId, session.activePlayerToken, nextRules);
+          await refreshRoom();
+        });
       },
       async updatePlayerLocation(input) {
         const session = requireSession();

@@ -88,6 +88,18 @@ Campos sugeridos:
 | `winner` | enum | `seeker`, `hiders`, `none`. |
 | `highlight_player_id` | uuid | Jogador exibido como destaque do resultado. Procurador se ele vencer; escondido que ficou mais tempo sem ser capturado se os escondidos vencerem. |
 
+### Regras configuraveis de sala
+
+`pe_rooms` guarda a versao editavel das regras enquanto a sala esta no lobby:
+
+- `environment_preset`: `small`, `medium` ou `large`.
+- `hide_duration_seconds`: 30, 45 ou 60.
+- `seek_duration_seconds`: 120, 180 ou 300.
+- `capture_radius_meters`: derivado do ambiente.
+- `capture_confirm_seconds`: derivado do ambiente.
+
+Quando a rodada inicia, `pe_start_round` copia esses valores para `pe_game_sessions`. A partir dai, radar, captura, timers e resultado leem a sessao ativa. Isso evita que uma mudanca no lobby altere uma rodada em andamento.
+
 Notas:
 
 - A sala pode ter várias rodadas.

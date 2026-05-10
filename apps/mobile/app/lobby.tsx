@@ -16,6 +16,16 @@ import { colors } from '@/src/theme/colors';
 import { surfaces } from '@/src/theme/surfaces';
 import { isDevGpsEnabled } from '@/src/utils/dev-gps';
 
+function secondsToLabel(seconds: number) {
+  return seconds >= 60 ? `${Math.round(seconds / 60)}min` : `${seconds}s`;
+}
+
+function environmentLabel(preset?: string) {
+  if (preset === 'small') return t('rules.environmentSmall');
+  if (preset === 'large') return t('rules.environmentLarge');
+  return t('rules.environmentMedium');
+}
+
 export default function LobbyScreen() {
   const router = useSafeRouter();
   const { activePlayer, addDemoPlayer, addDevTargetPlayer, error, isLoading, leaveRoom, promoteLeader, removePlayer, room, startRound, toggleReady } = useRoom();
@@ -172,6 +182,32 @@ export default function LobbyScreen() {
           </>
         }>
         <CoverBanner />
+        <View
+          style={{
+            ...surfaces.glassTile,
+            borderRadius: 18,
+            gap: 10,
+            padding: 12,
+            width: '100%',
+          }}>
+          <View style={{ alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }}>
+            <Text selectable style={{ color: colors.ink, fontSize: 15, fontWeight: '900' }}>
+              {t('rules.title')}
+            </Text>
+            <Badge label={environmentLabel(room?.rules.environmentPreset)} tone="leader" />
+          </View>
+          <View style={{ flexDirection: 'row', gap: 8 }}>
+            <View style={{ flex: 1 }}>
+              <Badge label={environmentLabel(room?.rules.environmentPreset)} tone="neutral" />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Badge label={secondsToLabel(room?.rules.hideDurationSeconds ?? 60)} tone="waiting" />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Badge label={secondsToLabel(room?.rules.seekDurationSeconds ?? 180)} tone="ready" />
+            </View>
+          </View>
+        </View>
         <View style={{ alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }}>
           <Text selectable style={{ color: colors.ink, fontSize: 18, fontWeight: '900' }}>
             {t('lobby.players')}

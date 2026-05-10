@@ -41,6 +41,7 @@ O lobby mostra:
 - A lista de jogadores permite promover outro jogador como líder/procurador.
 - Botão "preparado".
 - Configuração de regras para o líder.
+- Resumo compacto das regras atuais: ambiente, esconder e busca.
 - Botão iniciar para o líder.
 - Botão sair da sala.
 
@@ -53,6 +54,29 @@ Regra de início:
 - Jogadores já prontos veem que estão aguardando os pendentes.
 - Não há expulsão automática por demora no lobby.
 - O líder pode remover manualmente jogadores que estejam travando a sala.
+- O líder pode alterar regras apenas no lobby.
+- Ao alterar regras, jogadores que estavam `Preparado` voltam para `Aguardando`.
+- Jogadores que não são líderes podem ver as regras, mas não editar.
+
+## Regras Da Sala
+
+Configuração editável no MVP:
+
+- Ambiente: Pequeno, Medio ou Grande.
+- Tempo para esconder: 30s, 45s ou 60s.
+- Tempo para procurar: 2min, 3min ou 5min.
+
+Regras derivadas:
+
+- O ambiente ajusta alcance de radar e captura no backend.
+- A captura continua sendo validada no servidor.
+- O app nunca envia latitude/longitude de outros jogadores para configurar regras.
+
+Congelamento:
+
+- `pe_rooms` guarda a configuracao editavel enquanto a sala esta no lobby.
+- `pe_game_sessions` recebe um snapshot das regras quando a rodada inicia.
+- Depois que a rodada comeca, mudar a sala nao altera a sessao ativa.
 
 ## Status
 

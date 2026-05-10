@@ -16,6 +16,9 @@ Definir o fluxo jogável principal do Pique Esconde no MVP.
 - Duração padrão: 60 segundos para esconder e 3 minutos para procurar.
 - O criador pode configurar a duração da partida.
 - O tempo para esconder pode ser configurado, com máximo inicial de 60 segundos.
+- O lider pode configurar presets simples no lobby: ambiente, tempo de esconder e tempo de busca.
+- Ao iniciar a rodada, as regras escolhidas sao congeladas em `pe_game_sessions`.
+- Mudancas de regra no lobby fazem jogadores prontos confirmarem novamente.
 
 ## Fluxo
 
@@ -52,6 +55,7 @@ Definir o fluxo jogável principal do Pique Esconde no MVP.
 ## Preparado no Lobby
 
 - Todos os jogadores não-líderes precisam marcar `Preparado` para o líder iniciar a partida.
+- Se o lider mudar regras, jogadores nao-lideres que estavam `Preparado` voltam para `Aguardando`.
 - Se alguém ainda não estiver preparado, o líder recebe aviso com os nomes que faltam.
 - O app não remove automaticamente quem demora para preparar no lobby.
 - Se alguém estiver travando a sala, o líder pode remover manualmente.
