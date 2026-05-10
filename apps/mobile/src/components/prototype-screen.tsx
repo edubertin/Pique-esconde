@@ -18,10 +18,11 @@ export function PrototypeScreen({ centered = false, children }: PrototypeScreenP
   const { height, width } = useWindowDimensions();
 
   return (
-    <View style={{ backgroundColor: patterns.screen.baseBackground, minHeight: height }}>
+    <View style={{ backgroundColor: patterns.screen.baseBackground, flex: 1, minHeight: height, position: 'relative' }}>
       <Image
         source={require('@/assets/images/pique-esconde-background.png')}
         contentFit="cover"
+        pointerEvents="none"
         style={{
           height,
           left: 0,
@@ -30,11 +31,12 @@ export function PrototypeScreen({ centered = false, children }: PrototypeScreenP
           right: 0,
           top: 0,
           width,
+          zIndex: 0,
         }}
       />
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
-        style={{ height }}
+        style={{ flex: 1, minHeight: height, zIndex: 1 }}
         contentContainerStyle={{
           alignItems: 'center',
           gap: 18,
