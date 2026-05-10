@@ -224,7 +224,7 @@ export default function SeekerRadarScreen() {
         <LeaderDebugDrawer radarHint={radarHint} />
 
         <View style={{ alignItems: 'center', width: 118 }}>
-          <Image contentFit="contain" source={require('@/assets/images/pique-esconde-logo.png')} style={{ aspectRatio: 1.14, width: '100%' }} />
+          <Image contentFit="contain" source={require('@/assets/images/logo.png')} style={{ aspectRatio: 1, width: '100%' }} />
         </View>
 
         <View

@@ -276,7 +276,7 @@ Impacto:
 - Risco de privacidade e perda de confianca.
 
 Decisao:
-- Card deve conter somente logo, placar simples, texto promocional e possivelmente QR code/link da loja no futuro.
+- Card deve conter somente logo oficial, vencedor, avatar, texto promocional e possivelmente QR code/link da loja no futuro.
 
 ## Atualizacao 2026-05-09 - L-001 GPS real
 

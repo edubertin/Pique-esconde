@@ -22,7 +22,7 @@ Passou para bundle web e validacao tecnica. Compartilhamento nativo precisa ser 
 ## Casos Executados
 
 - Card social redesenhado em formato vertical `9:16`.
-- Preview usa imagem de fundo, avatar de destaque, resultado, estatisticas e marca do jogo.
+- Preview usa logo oficial, imagem de fundo, avatar comemorando, vencedor e frase curta de resultado.
 - Botao `Compartilhar imagem` captura a view em PNG `1080x1920` e abre `expo-sharing` em iOS/Android instalado.
 - Web mostra fallback quando compartilhamento local de imagem nao esta disponivel.
 - Botao secundario volta ao resultado sem disputar com o route guard.
@@ -38,4 +38,5 @@ Passou para bundle web e validacao tecnica. Compartilhamento nativo precisa ser 
 
 - Esta fase nao usa Supabase Storage e nao grava imagem no backend.
 - O card nao contem GPS, mapa, rota ou coordenadas.
+- O ajuste visual final deixou o logo fora da caixa do card, com a caixa terminando logo depois da frase de vitória.
 - Proximo teste necessario: abrir em build nativo/Expo Go, chegar no resultado, tocar em `Compartilhar imagem` e confirmar Instagram/WhatsApp no share sheet.

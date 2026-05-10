@@ -145,4 +145,5 @@ export const enUS = {
   'social.title': 'Social card',
   'social.titleHiders': 'I survived the final rush',
   'social.titleSeeker': '{name} won in Pique Esconde',
+  'social.winnerTitle': 'Winner',
 } satisfies TranslationDictionary;

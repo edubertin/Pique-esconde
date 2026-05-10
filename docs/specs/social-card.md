@@ -8,19 +8,16 @@ Definir o card social de resultado para divulgação do jogo sem expor localiza�
 
 - `Convidar` é usado no lobby para chamar amigos por link/código da sala.
 - `Compartilhar` é usado no resultado/card social.
-- O card social divulga o placar ou resultado, não a localização da partida.
+- O card social divulga o resultado visual da rodada, não a localização da partida.
 
 ## Conteúdo Permitido
 
 - Logo/nome Pique Esconde.
 - Resultado da partida.
-- Vencedor: procurador ou escondidos.
-- Placar da pessoa.
+- Vencedor da rodada.
 - Avatares dos vencedores.
 - Apelidos.
-- Tempo da partida.
-- Número de capturas.
-- Frase curta.
+- Frase curta de vitória.
 - Chamada simples de disponibilidade na loja.
 - QR code ou link de instalação, a definir no design.
 
@@ -28,7 +25,7 @@ Definir o card social de resultado para divulgação do jogo sem expor localiza�
 
 - Se o procurador vencer, o card pode destacar o procurador com seu avatar comemorando.
 - Se os escondidos vencerem, o card deve destacar o escondido que ficou mais tempo sem ser capturado.
-- O card precisa deixar claro o motivo do destaque. Exemplo: `Ficou mais tempo escondido`.
+- O card atual prioriza leitura de marketing: logo oficial, `Vencedor`, avatar comemorando e `{nome} venceu no Pique-Esconde`.
 - Quando houver vários escondidos vencedores, o card pode citar a vitória do grupo, mas o avatar principal representa o destaque individual da rodada.
 - O card social continua proibido de mostrar localização, mapa, rota, endereço ou coordenadas.
 

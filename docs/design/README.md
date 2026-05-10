@@ -14,6 +14,7 @@ Imagens de referência ficam em [`referencias/`](referencias/).
 
 Referências principais atuais:
 
+- `apps/mobile/assets/images/logo.png` como logo oficial do app
 - `referencias/pique-esconde-referencia.png`
 - `referencias/pique-esconde-logo.png`
 - `referencias/pique-esconde-store-cover.png`

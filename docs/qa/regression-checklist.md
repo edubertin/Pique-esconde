@@ -19,7 +19,7 @@ Observacoes:
 ## Checklist Geral
 
 - [ ] App abre sem erro.
-- [ ] Tela inicial exibe logo, botoes principais e especificacoes essenciais.
+- [ ] Tela inicial exibe logo oficial e botoes principais.
 - [ ] Criar sala continua acessivel.
 - [ ] Entrar com codigo continua acessivel.
 - [ ] Navegacao entre telas principais funciona.
@@ -68,6 +68,7 @@ Observacoes:
 - [ ] Nenhuma tela mostra endereco real.
 - [ ] Nenhuma tela mostra mapa exato dos escondidos.
 - [ ] Card social nao mostra GPS, mapa, rota, endereco ou coordenadas.
+- [ ] Card social exibe logo oficial, vencedor e avatar sem cortar botoes ou conteudo.
 - [ ] Textos deixam claro que localizacao e temporaria durante a partida.
 
 ## Radar e Captura

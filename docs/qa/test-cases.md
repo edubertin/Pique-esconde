@@ -268,7 +268,7 @@ Passos:
 3. Compartilhar ou simular compartilhamento.
 
 Resultado esperado:
-- Card mostra logo e placar simples.
+- Card mostra logo oficial, vencedor, avatar comemorando e frase curta de resultado.
 - Card nao mostra GPS, mapa, rota, endereco ou coordenadas.
 - Card e entendivel fora do app.
 

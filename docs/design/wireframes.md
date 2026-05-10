@@ -13,8 +13,6 @@ Objetivo: iniciar uma partida com pouca fricção.
 │        [ Criar sala ]        │
 │      [ Entrar com código ]   │
 │                              │
-│  2-8 jogadores · sala temp.  │
-│       GPS só na partida      │
 └─────────────────────────────┘
 ```
 
@@ -23,7 +21,6 @@ Elementos:
 - Logo.
 - Botão principal: criar sala.
 - Ação secundária: entrar com código.
-- Especificações curtas.
 - Entrada automática por link de convite.
 
 ## 2. Criar Sala

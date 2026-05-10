@@ -34,11 +34,11 @@ Decisões aplicadas:
 - Home limpa, sem header e sem texto institucional longo.
 - Logo maior, centralizado e alinhado com os botões.
 - Botões principais com largura alinhada ao logo.
-- Especificações mínimas na home: `2-8 jogadores · sala temporária · GPS só na partida`.
+- Home sem texto auxiliar fixo: logo oficial grande e dois botões principais.
 - Lobby com banner visual usando `pique-esconde-store-cover.png`.
 - Background ilustrado padrão usando `pique-esconde-menu-reference.png` nas telas do app.
 - Background responsivo cobrindo a tela toda, calculado a partir do tamanho da janela.
-- Home com painel central translúcido (`glass`) em vez de card branco sólido.
+- Home sem painel central fixo; logo e botões ficam direto sobre o background ilustrado.
 - Páginas com menos texto auxiliar e mais foco na ação principal.
 - Cards, badges, botões e radar padronizados com o pattern Arcade Card UI.
 
@@ -46,7 +46,7 @@ Decisões aplicadas:
 
 Decisões aplicadas na UI navegável:
 
-- Home continua como tela especial, com logo grande, botões e texto mínimo.
+- Home continua como tela especial, com logo oficial grande e botões diretos sobre o background.
 - Telas internas usam o pattern `GameScreen > MenuPanel`.
 - O background ilustrado fica full-screen e é redimensionado pela janela atual.
 - A rolagem acontece sobre o background, evitando cortes estranhos em telas longas.
@@ -59,12 +59,13 @@ Decisões aplicadas na UI navegável:
 - O termo `Convidar` é usado no lobby para convite por link/código.
 - O termo `Compartilhar` fica reservado para resultado/card social.
 - A tela de resultado deixou de usar radar e passou a ter avatar, card de vencedor, estatísticas e resumo da partida.
+- O card social usa composição de story: logo oficial solto no topo, caixa curta com `Vencedor`, avatar comemorando e frase `{nome} venceu no Pique-Esconde`.
 - `Jogar novamente` volta para o lobby da mesma sala.
 - A tela de resultado oferece `Sair` para quem não quiser continuar.
 
 Assets usados no app:
 
-- `apps/mobile/assets/images/pique-esconde-logo.png`
+- `apps/mobile/assets/images/logo.png`
 - `apps/mobile/assets/images/pique-esconde-store-cover.png`
 - `apps/mobile/assets/images/pique-esconde-menu-reference.png`
 - `apps/mobile/assets/images/pique-esconde-background.png`
@@ -411,6 +412,8 @@ Pattern:
 ### Home
 
 Usar o logo como sinal principal, em tamanho médio/forte e alinhado com os botões. A home não deve virar store cover nem landing page.
+
+Atualização: o logo oficial atual é `apps/mobile/assets/images/logo.png`, com fundo transparente real. A home usa o logo grande sem painel branco fixo.
 
 Atualização aplicada:
 

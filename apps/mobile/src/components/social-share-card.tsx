@@ -4,35 +4,22 @@ import { Text, View, type ImageSourcePropType } from 'react-native';
 import { colors } from '@/src/theme/colors';
 
 type SocialShareCardProps = {
-  capturedCount: number;
   highlightAvatar: ImageSourcePropType;
-  highlightLabel: string;
-  highlightName: string;
-  playerCount: number;
-  score: string;
-  time: string;
   title: string;
-  winnerLabel: string;
+  winnerName: string;
 };
 
 export function SocialShareCard({
-  capturedCount,
   highlightAvatar,
-  highlightLabel,
-  highlightName,
-  playerCount,
-  score,
-  time,
   title,
-  winnerLabel,
+  winnerName,
 }: SocialShareCardProps) {
   return (
     <View
       collapsable={false}
       style={{
-        aspectRatio: 9 / 16,
         backgroundColor: colors.backgroundDeep,
-        borderRadius: 28,
+        borderRadius: 24,
         overflow: 'hidden',
         position: 'relative',
         width: '100%',
@@ -63,132 +50,41 @@ export function SocialShareCard({
       <View
         style={{
           alignItems: 'center',
-          gap: 16,
-          height: '100%',
-          justifyContent: 'space-between',
-          paddingBottom: 96,
-          paddingHorizontal: 34,
-          paddingTop: 104,
+          gap: 18,
+          justifyContent: 'flex-start',
+          paddingBottom: 26,
+          paddingHorizontal: 30,
+          paddingTop: 42,
         }}>
-        <View style={{ alignItems: 'center', gap: 16, width: '100%' }}>
-          <View
-            style={{
-              backgroundColor: colors.surface,
-              borderColor: colors.navy,
-              borderRadius: 999,
-              borderWidth: 3,
-              paddingHorizontal: 18,
-              paddingVertical: 8,
-            }}>
-            <Text selectable style={{ color: colors.navy, fontSize: 16, fontWeight: '900', textAlign: 'center' }}>
-              {winnerLabel}
-            </Text>
-          </View>
-
+        <View style={{ alignItems: 'center', paddingTop: 8, width: '100%' }}>
           <Text
             selectable
             style={{
-              color: colors.ink,
-              fontSize: 42,
+              color: colors.pink,
+              fontFamily: 'serif',
+              fontSize: 58,
               fontWeight: '900',
-              lineHeight: 46,
+              lineHeight: 62,
               textAlign: 'center',
+              textShadowColor: 'rgba(7, 26, 61, 0.16)',
+              textShadowOffset: { height: 4, width: 0 },
+              textShadowRadius: 0,
             }}>
             {title}
           </Text>
         </View>
 
-        <View style={{ alignItems: 'center', gap: 14, width: '100%' }}>
-          <View
-            style={{
-              alignItems: 'center',
-              backgroundColor: colors.surface,
-              borderColor: colors.pink,
-              borderRadius: 999,
-              borderWidth: 5,
-              height: 226,
-              justifyContent: 'center',
-              width: 226,
-            }}>
-            <Image contentFit="contain" source={highlightAvatar} style={{ height: 198, width: 198 }} />
-          </View>
+        <View style={{ alignItems: 'center', gap: 8, paddingTop: 0, width: '100%' }}>
+          <Image contentFit="contain" source={highlightAvatar} style={{ height: 246, width: 246 }} />
 
-          <Text selectable style={{ color: colors.ink, fontSize: 30, fontWeight: '900', textAlign: 'center' }}>
-            {highlightName}
+          <Text selectable style={{ color: colors.ink, fontSize: 24, fontWeight: '900', lineHeight: 30, textAlign: 'center' }}>
+            {winnerName} venceu
           </Text>
-          <View
-            style={{
-              backgroundColor: colors.successSoft,
-              borderColor: colors.green,
-              borderRadius: 999,
-              borderWidth: 2,
-              paddingHorizontal: 16,
-              paddingVertical: 7,
-            }}>
-            <Text selectable style={{ color: colors.limeDark, fontSize: 15, fontWeight: '900', textAlign: 'center' }}>
-              {highlightLabel}
-            </Text>
-          </View>
-          <Text selectable style={{ color: colors.muted, fontSize: 18, fontWeight: '800', lineHeight: 24, textAlign: 'center' }}>
-            {score}
+          <Text selectable style={{ color: colors.muted, fontSize: 18, fontWeight: '900', lineHeight: 24, textAlign: 'center' }}>
+            no Pique-Esconde
           </Text>
-        </View>
-
-        <View style={{ gap: 14, width: '100%' }}>
-          <View style={{ flexDirection: 'row', gap: 10 }}>
-            <ShareStat label="Tempo" value={time} />
-            <ShareStat label="Jogadores" value={`${playerCount}`} />
-            <ShareStat label="Achados" value={`${capturedCount}`} />
-          </View>
-
-          <View
-            style={{
-              alignItems: 'center',
-              backgroundColor: colors.navy,
-              borderColor: colors.pink,
-              borderRadius: 22,
-              borderWidth: 3,
-              flexDirection: 'row',
-              gap: 12,
-              justifyContent: 'space-between',
-              paddingHorizontal: 18,
-              paddingVertical: 14,
-            }}>
-            <Image
-              contentFit="contain"
-              source={require('@/assets/images/pique-esconde-logo.png')}
-              style={{ height: 42, width: 132 }}
-            />
-            <Text selectable style={{ color: colors.surface, flex: 1, fontSize: 16, fontWeight: '900', textAlign: 'right' }}>
-              Jogue com sua turma
-            </Text>
-          </View>
         </View>
       </View>
-    </View>
-  );
-}
-
-function ShareStat({ label, value }: { label: string; value: string }) {
-  return (
-    <View
-      style={{
-        alignItems: 'center',
-        backgroundColor: 'rgba(255, 255, 255, 0.78)',
-        borderColor: 'rgba(255, 255, 255, 0.92)',
-        borderRadius: 16,
-        borderWidth: 2,
-        flex: 1,
-        gap: 4,
-        paddingHorizontal: 8,
-        paddingVertical: 10,
-      }}>
-      <Text selectable style={{ color: colors.muted, fontSize: 11, fontWeight: '900', textAlign: 'center' }}>
-        {label}
-      </Text>
-      <Text selectable style={{ color: colors.ink, fontSize: 20, fontWeight: '900', textAlign: 'center' }}>
-        {value}
-      </Text>
     </View>
   );
 }

@@ -14,9 +14,9 @@ export function BrandLogo() {
           width: '100%',
         }}>
         <Image
-          source={require('@/assets/images/pique-esconde-logo.png')}
-          contentFit="cover"
-          style={{ aspectRatio: 1.14, width: '100%' }}
+          source={require('@/assets/images/logo.png')}
+          contentFit="contain"
+          style={{ aspectRatio: 1, maxWidth: 360, width: '100%' }}
         />
       </View>
     </View>

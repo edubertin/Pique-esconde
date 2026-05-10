@@ -141,4 +141,5 @@ export const ptBR = {
   'social.title': 'Card social',
   'social.titleHiders': 'Sobrevivi ao rush final',
   'social.titleSeeker': '{name} venceu no Pique Esconde',
+  'social.winnerTitle': 'Vencedor',
 } as const;

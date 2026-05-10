@@ -1,10 +1,11 @@
 import * as Sharing from 'expo-sharing';
+import { Image } from 'expo-image';
 import { useRef, useState } from 'react';
 import { Text, View } from 'react-native';
 import { captureRef } from 'react-native-view-shot';
 
 import { GameButton, GameLinkButton } from '@/src/components/game-button';
-import { MenuPanel, PrototypeScreen } from '@/src/components/prototype-screen';
+import { PrototypeScreen } from '@/src/components/prototype-screen';
 import { SocialShareCard } from '@/src/components/social-share-card';
 import { avatars } from '@/src/constants/game';
 import { t } from '@/src/i18n';
@@ -32,17 +33,9 @@ export default function SocialCardScreen() {
   const highlightAvatar = avatars.find((avatar) => avatar.id === highlightAvatarId) ?? avatars[0];
   const highlightName = result?.highlightNickname ?? highlightPlayer?.nickname ?? t('social.placeholder');
   const winner = result?.winner ?? 'hiders';
-  const survivorCount = result?.survivorPlayerIds.length ?? Math.max(1, hiders.length - 2);
-  const capturedCount = result?.capturedPlayerIds.length ?? Math.min(2, hiders.length);
-  const playerCount = result?.playerCount ?? players.length;
   const seekerName = result?.seekerNickname ?? seeker?.nickname;
-  const title = winner === 'seeker' ? t('social.titleSeeker', { name: seekerName ?? t('player.roleLeaderSeeker') }) : t('social.titleHiders');
-  const highlightLabel = winner === 'seeker' ? t('social.highlightSeeker') : t('social.highlightHiders');
-  const time = result?.durationLabel ?? '3min';
-  const score =
-    winner === 'seeker'
-      ? t('social.scoreSeeker', { name: seekerName ?? t('player.roleLeaderSeeker'), time })
-      : t('social.scoreHiders', { count: survivorCount, suffix: survivorCount === 1 ? '' : 's', time });
+  const winnerName = winner === 'seeker' ? (seekerName ?? t('player.roleLeaderSeeker')) : highlightName;
+  const title = t('social.winnerTitle');
 
   const handleShareImage = async () => {
     if (!cardRef.current || isSharing) return;
@@ -81,26 +74,17 @@ export default function SocialCardScreen() {
 
   return (
     <PrototypeScreen>
-      <MenuPanel
-        backHref="/result"
-        title={t('social.title')}
-        actions={
-          <>
-            <GameButton disabled={isSharing} label={isSharing ? t('social.sharing') : t('social.shareImage')} onPress={handleShareImage} />
-            <GameLinkButton href="/result" label={t('social.backToResult')} replace variant="ghost" />
-          </>
-        }>
-        <View ref={cardRef} collapsable={false} style={{ alignSelf: 'center', maxWidth: 360, width: '100%' }}>
+      <View style={{ alignItems: 'center', gap: 10, maxWidth: 390, width: '100%' }}>
+        <View ref={cardRef} collapsable={false} style={{ alignItems: 'center', gap: 10, width: '100%' }}>
+          <Image
+            contentFit="contain"
+            source={require('@/assets/images/logo.png')}
+            style={{ height: 238, width: 238 }}
+          />
           <SocialShareCard
-            capturedCount={capturedCount}
             highlightAvatar={highlightAvatar.celebrateImage}
-            highlightLabel={highlightLabel}
-            highlightName={highlightName}
-            playerCount={playerCount}
-            score={score}
-            time={time}
             title={title}
-            winnerLabel={t('result.winner')}
+            winnerName={winnerName}
           />
         </View>
 
@@ -109,7 +93,12 @@ export default function SocialCardScreen() {
             {shareError}
           </Text>
         ) : null}
-      </MenuPanel>
+
+        <View style={{ gap: 10, maxWidth: 360, width: '100%' }}>
+          <GameButton disabled={isSharing} label={isSharing ? t('social.sharing') : t('social.shareImage')} onPress={handleShareImage} />
+          <GameLinkButton href="/result" label={t('social.backToResult')} replace variant="secondary" />
+        </View>
+      </View>
     </PrototypeScreen>
   );
 }
