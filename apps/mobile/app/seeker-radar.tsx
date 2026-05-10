@@ -1,5 +1,5 @@
 import { Image } from 'expo-image';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Text, View } from 'react-native';
 
 import { DevGpsControl } from '@/src/components/dev-gps-control';
@@ -12,12 +12,12 @@ import { useSafeRouter } from '@/src/hooks/use-safe-router';
 import { t } from '@/src/i18n';
 import { type RadarHint, useRoom } from '@/src/state/room-store';
 import { colors } from '@/src/theme/colors';
-import { getStoredDevGpsDistance, isDevGpsEnabled } from '@/src/utils/dev-gps';
+import { getBearingForDevDirection, getStoredDevGpsDirection, getStoredDevGpsDistance, isDevGpsEnabled } from '@/src/utils/dev-gps';
 import { formatTimer } from '@/src/utils/format-timer';
 
 export default function SeekerRadarScreen() {
   const router = useSafeRouter();
-  const { error, finishRound, getRadarHint, leaveRoom, room, tickGameSession, tryCaptureNearest } = useRoom();
+  const { error, finishRound, getRadarHint, leaveRoom, room, tickGameSession, tryCaptureNearest, updateDevTestDistance } = useRoom();
   const [captureMessage, setCaptureMessage] = useState<string>();
   const [manualCapturePending, setManualCapturePending] = useState(false);
   const [radarHint, setRadarHint] = useState<RadarHint>();
@@ -32,6 +32,14 @@ export default function SeekerRadarScreen() {
   const timerLabel = seekEndsAt ? formatTimer(remainingSeconds) : t('radar.timerEnded');
   const autoCaptureEnabled = !__DEV__;
   usePlayerLocationSync(room?.phase === 'seeking');
+
+  const syncDevRadarOverride = useCallback(async () => {
+    if (room?.phase !== 'seeking' || !isDevGpsEnabled()) return;
+
+    const direction = getStoredDevGpsDirection('N');
+    const distance = Math.min(Math.max(getStoredDevGpsDistance(40), 0), 40);
+    await updateDevTestDistance(distance, getBearingForDevDirection(direction), direction);
+  }, [room?.phase, updateDevTestDistance]);
 
   useEffect(() => {
     if (room?.phase !== 'seeking' || remainingHiders > 0 || tickRequestedRef.current) return;
@@ -71,9 +79,14 @@ export default function SeekerRadarScreen() {
     const stableHintGraceMs = 8000;
 
     const refreshHint = () => {
-      getRadarHint()
+      syncDevRadarOverride()
+        .then(() => getRadarHint())
         .then((hint) => {
           if (cancelled || !hint) return;
+
+          if (isDevGpsEnabled() && !hint.devOverride) {
+            return;
+          }
 
           const isFreshHint = hint.signalStatus === 'fresh';
           if (isFreshHint) {
@@ -96,7 +109,7 @@ export default function SeekerRadarScreen() {
       cancelled = true;
       clearInterval(interval);
     };
-  }, [getRadarHint, remainingHiders, room?.phase]);
+  }, [getRadarHint, remainingHiders, room?.phase, syncDevRadarOverride]);
 
   useEffect(() => {
     if (!autoCaptureEnabled || room?.phase !== 'seeking' || !radarHint?.canCapture || captureRequestedRef.current) return undefined;
@@ -143,6 +156,7 @@ export default function SeekerRadarScreen() {
     try {
       setCaptureMessage(undefined);
       setManualCapturePending(true);
+      await syncDevRadarOverride();
 
       if (isDevGpsEnabled() && getStoredDevGpsDistance() > 5) {
         const hint = await getRadarHint();
