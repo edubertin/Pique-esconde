@@ -57,7 +57,20 @@ export default function HomeScreen() {
             </Text>
           </View>
         ) : null}
-        <View style={{ alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap', gap: 10, justifyContent: 'center', paddingTop: 2 }}>
+        <View
+          style={{
+            alignItems: 'center',
+            backgroundColor: 'rgba(255, 255, 255, 0.42)',
+            borderColor: 'rgba(7, 26, 61, 0.08)',
+            borderRadius: 999,
+            borderWidth: 1,
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            gap: 10,
+            justifyContent: 'center',
+            paddingHorizontal: 12,
+            paddingVertical: 7,
+          }}>
           <HomeLegalLink href="/privacy" label="Privacidade" />
           <HomeLegalLink href="/terms" label="Termos" />
           <HomeLegalLink href="/support" label="Suporte" />
