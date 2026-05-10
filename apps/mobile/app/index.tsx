@@ -32,6 +32,7 @@ export default function HomeScreen() {
           alignSelf: 'center',
           gap: 18,
           maxWidth: 360,
+          transform: [{ translateY: -16 }],
           width: '100%',
         }}>
         <BrandLogo />
