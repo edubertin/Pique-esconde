@@ -79,22 +79,24 @@ Link para test run:
 
 ## Limitações Aceitas Nesta Fase
 
-## L-001 - GPS real ainda não implementado
+## L-001 - GPS real base implementada, em calibracao
 
-Status: Aceito no MVP atual
+Status: Resolvido parcialmente / Em calibracao
 Severidade: Alta
 Area: Localizacao
 Detectado em: 2026-05-08
-Commit/versao: 8bec69f
+Commit/versao: base original 8bec69f; atualizado em 2026-05-10
 
 Descricao:
-- O prototipo ainda nao solicita nem usa GPS real.
+- O prototipo original ainda nao solicitava nem usava GPS real.
+- A base atual ja solicita permissao, envia localizacao temporaria, usa radar derivado e valida captura por proximidade.
 
 Impacto:
-- Radar, captura automatica e permissao de localizacao ainda sao fluxos visuais/simulados.
+- O risco deixou de ser "nao existe GPS" e passou a ser calibracao em celular real.
 
 Decisao:
-- Implementar estado de sala antes de conectar GPS real.
+- Manter este item como historico resolvido parcialmente.
+- Acompanhar calibracao em `L-008`.
 
 Link para test run:
 - `docs/qa/test-runs/2026-05-08-privacidade-compartilhamento.md`
@@ -183,27 +185,31 @@ Link para test run:
 
 ## L-006 - Tick de timer depende de cliente ativo
 
-Status: Aceito no MVP atual
+Status: Parcialmente resolvido no backend dev
 Severidade: Media
 Area: Timer/Regras
 Detectado em: 2026-05-09
-Commit/versao: e7accf0
+Commit/versao: e7accf0; migration `202605100001_server_side_maintenance_tick`
 
 Descricao:
 - O timer real de rodada existe no Supabase, mas a transição é acordada por chamada do app para `pe_tick_game_session`.
-- Ainda não há job server-side/agendado garantindo transição sem nenhum cliente ativo.
+- Agora existe `pe_run_maintenance_tick`, uma entrada server-side/manual/cron-safe para acordar timers, aplicar regras de GPS e limpar estado expirado sem token de jogador.
+- Ainda falta configurar o agendamento real no ambiente, como Supabase Cron.
 
 Impacto:
 - Em testes normais com jogadores na sala, o timer funciona.
-- Se todos os clientes travarem ou fecharem exatamente durante uma fase, a transição pode aguardar o próximo cliente ativo.
+- Com a RPC de manutencao, o backend ja consegue executar a transicao sem cliente ativo quando chamado por SQL/cron.
+- Sem o cron configurado, a garantia automatica ainda depende de execucao manual/admin.
 
 Decisao:
-- Aceito para o MVP atual.
-- Reavaliar com rotina agendada, Edge Function ou outra estratégia server-side antes de piloto/producao.
+- Manter `pe_run_maintenance_tick` sem grant para `anon`.
+- Configurar Supabase Cron antes de piloto/producao.
+- Usar chamadas manuais da RPC para QA e debug ate o cron ser ligado.
 
 Link para test run:
 - `docs/qa/test-runs/2026-05-09-round-timers-web.md`
 - `docs/qa/test-runs/2026-05-09-room-round-polish-manual-web.md`
+- `docs/qa/test-runs/2026-05-10-server-side-maintenance-tick.md`
 
 ## Riscos do MVP
 
@@ -305,19 +311,36 @@ Decisao:
 
 ## L-008 - Radar e captura ainda precisam calibracao em campo
 
-Status: Aberto
+Status: Aberto / Proxima prioridade
 Severidade: Alta
 Area: Gameplay / GPS
 
 Descricao:
 - A base do radar existe, mas direcao, instabilidade proposital, quente/morno/frio e captura automatica ainda precisam de teste fisico.
 - O comportamento em web desktop pode parecer estranho por falta de sensor real.
+- A captura oficial esta calibrada no backend como 5m por 2s, mas ainda precisa prova em campo.
 
 Impacto:
 - Pode haver falso positivo, falso negativo ou leitura visual confusa.
 
 Decisao:
 - Rodar QA pesado com pelo menos dois celulares reais antes de seguir para novas features grandes.
+
+## Atualizacao 2026-05-10 - Estado Geral de Riscos
+
+Status:
+- Fluxo principal e modo DEV estao funcionando.
+- GPS/radar/captura existem no backend e no app, mas seguem em calibracao para piloto.
+- Resultado final foi estabilizado com snapshot congelado e navegacao terminal.
+
+Riscos que continuam relevantes:
+- GPS em ambiente fechado ou com sinal ruim.
+- Captura automatica em movimento real.
+- Timer/limpeza sem cliente ativo, que ainda pede rotina server-side antes de producao.
+- Convite/share nativo, ainda pendente para reduzir atrito de entrada.
+
+Decisao:
+- A proxima etapa deve ser QA em celular real e calibracao, antes de abrir novas features grandes.
 
 ## L-009 - Resultado final ainda depende de confirmacao realtime para preencher instantaneamente
 

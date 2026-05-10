@@ -9,4 +9,4 @@ ADRs capture important technical decisions and their tradeoffs.
 - [ADR-003 - Temporary Location](ADR-003-temporary-location.md)
 - [ADR-004 - No Full Auth in MVP](ADR-004-no-full-auth-in-mvp.md)
 - [ADR-005 - No Exact Map](ADR-005-no-exact-map.md)
-
+- [ADR-006 - Server-Side Maintenance Tick](ADR-006-server-side-maintenance-tick.md)

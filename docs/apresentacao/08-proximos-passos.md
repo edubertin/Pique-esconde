@@ -4,7 +4,7 @@
 
 - Texto final de permissão de localização.
 - Nome e comportamento dos presets de ambiente.
-- Limpeza automática de salas expiradas no backend.
+- Job agendado para limpeza/tick server-side sem depender de cliente ativo.
 - Formato visual final do card social.
 - Critério exato para considerar uma sala abandonada fora do app aberto.
 
@@ -32,15 +32,18 @@ Decisões já encaminhadas:
 - Se uma saída deixa menos de 2 jogadores, a rodada volta ao lobby com aviso.
 - A interface usa o nickname de quem vai procurar sempre que possível; "escondidos" permanece como nome do grupo vencedor.
 - Resultado é uma tela terminal: sem voltar no topo, com ações de jogar novamente, sair e compartilhar.
+- Captura oficial calibrada em backend para 5m por 2s continuos.
+- Salas finalizadas ficam disponiveis por 2 minutos para compartilhar ou jogar novamente.
+- Limpeza oportunistica de salas expiradas e dados temporarios ja existe no backend.
 
 ## Tarefas Imediatas
 
-Pausa atual: não avançar para a próxima grande camada até fechar documentação, QA e revisão do fluxo já implementado.
+Pausa atual: não avançar para a próxima grande camada até fechar documentação, QA em celular real e revisão do fluxo já implementado.
 
 1. Revisar documentação e QA do fluxo atual de salas/rodada sem GPS.
 2. Repetir smoke manual curto em duas abas quando houver alteração de UI ou regra.
 3. Manter as migrations aplicadas no Supabase alinhadas com o repositório.
-4. Só depois iniciar a próxima camada grande: localização, radar real e captura automática por proximidade.
+4. Só depois iniciar a próxima camada grande de produto: convite/deep link, feedback sensorial e piloto.
 
 Concluído nesta etapa:
 
@@ -65,6 +68,9 @@ Concluído nesta etapa:
 - Linguagem do fluxo atualizada para destacar o nickname de quem vai procurar.
 - Validação manual assistida confirmou os fluxos principais funcionando.
 - QA técnico e smoke visual web.
+- GPS/radar/captura por proximidade com Supabase dev.
+- Snapshot final de resultado retornado pelas RPCs terminais.
+- Modo DEV de GPS estabilizado para repeticao de rodadas.
 
 ## Materiais Necessários
 
@@ -213,3 +219,29 @@ Proxima atualizacao recomendada:
 
 - Rodar o mesmo fluxo pelo app com dois clientes para confirmar que Resultado abre instantaneamente no UI.
 - Testar em celulares reais via HTTPS tunnel ou build nativo para calibrar radar/direcao/captura em campo.
+
+## Atualizacao 2026-05-10 - Estado Consolidado e Foco Seguinte
+
+Marco atual:
+
+- O fluxo principal esta funcionando em modo DEV: sala, lobby, rodada, GPS simulado, radar, captura, resultado, jogar novamente e sair.
+- O backend dev ja possui regras reais de rodada, captura 5m/2s, snapshot final, expiracao curta de sala finalizada e limpeza oportunistica.
+- O radar DEV foi estabilizado para nao misturar override salvo com leitura real entre rodadas.
+- A experiencia ainda precisa ser validada em campo, porque GPS, permissao, direcao e captura mudam bastante entre desktop, mobile web e build nativo.
+
+Proximo ciclo recomendado:
+
+1. QA em celulares reais via HTTPS tunnel ou build nativo.
+2. Calibracao do radar: direcao, ruido, faixas quente/morno/frio, confianca e texto de sinal.
+3. Validacao da captura em campo: evitar falso positivo e falso negativo.
+4. Implementar convite/share nativo para reduzir atrito de entrada na sala.
+5. Melhorar feedback de jogo: som, haptics e estados visuais do radar/escondido.
+6. Preparar piloto com 4 a 6 pessoas em ambiente aberto ou misto.
+
+Backlog tecnico antes de producao:
+
+- Configurar Supabase Cron para chamar `pe_run_maintenance_tick`.
+- Monitorar a rotina server-side de timer/limpeza durante QA.
+- Revisao de politica de dados temporarios de GPS.
+- Monitoramento basico de erros e logs de rodada.
+- Build nativo e teste em iOS/Android reais.

@@ -59,7 +59,7 @@ Critério de avanço:
 
 Objetivo: construir uma primeira versão jogável em celular real.
 
-Status: em andamento.
+Status: base funcional concluida; em calibracao para piloto.
 
 Decisões:
 
@@ -69,8 +69,8 @@ Decisões:
 - Supabase Postgres como banco inicial.
 - Sessão temporária por sala, sem login completo.
 - Captura automática por proximidade.
-- Raio inicial sugerido de captura: 8m para testes.
-- Confirmação de proximidade por cerca de 3 segundos.
+- Raio oficial de captura: 5m.
+- Confirmacao de proximidade por 2 segundos continuos.
 - Radar com intensidade e direção aproximada.
 - Sem mapa exato dos escondidos.
 - Escondido vê status e alertas, não localização do procurador.
@@ -99,16 +99,28 @@ Já implementado nesta fase:
 - Proteção visual para não deixar jogador preso em tela de partida quando a sala fica com menos de 2 pessoas.
 - QA com testes RPC reais no Supabase e smoke visual web em Playwright.
 - QA manual assistido pelo usuário confirmou os fluxos principais de sala, lobby, partida, saída e resultado no app web local.
+- Permissao de localizacao antes de acoes ativas.
+- Envio temporario de GPS durante a rodada.
+- Confirmacao de esconderijo com GPS recente.
+- Radar por proximidade com sinal, direcao aproximada, confianca e estado de leitura.
+- Captura por proximidade validada no backend com regra 5m/2s.
+- Resultado final com snapshot congelado retornado pelas RPCs terminais.
+- Sala finalizada disponivel por 2 minutos para compartilhar ou jogar novamente.
+- Limpeza oportunistica de salas expiradas e dados temporarios de GPS/captura/DEV.
+- RPC server-side `pe_run_maintenance_tick` para timers, GPS enforcement e limpeza sem token de jogador.
+- Ferramenta DEV de GPS/radar para calibracao local no web/DEV.
+- Correcoes de navegacao final: captura terminal vai direto para Resultado, sem tela intermediaria.
+- Radar DEV estabilizado entre rodadas, sem alternar com leitura real enquanto o override esta ativo.
 
 Ainda pendente nesta fase:
 
-- Permissão de localização real no dispositivo.
-- Envio temporário de posição durante a rodada.
-- Radar real por proximidade aproximada.
-- Captura automática por proximidade.
+- Calibrar direcao, faixa de distancia, ruido visual e confianca do radar em celulares reais.
+- Validar captura automatica em campo com pelo menos dois celulares reais.
 - Feedback de som/haptics calibrado em celular real.
 - Convite por link/deep link e compartilhamento nativo.
 - Teste em celulares reais no mesmo espaço físico.
+- Configurar Supabase Cron para chamar a rotina server-side de manutencao.
+- Revisao final de privacidade, textos de permissao e comportamento quando o GPS oscila.
 
 Critério de avanço:
 
@@ -179,5 +191,20 @@ Ainda pendente antes do piloto:
 
 Decisao:
 
-- A fase de GPS saiu de "nao iniciada" para "base funcional em calibracao".
+- A fase de GPS saiu do planejamento e virou base funcional em calibracao.
 - O proximo bloco deve ser limpeza, QA pesado e calibracao, nao uma nova camada grande.
+
+## Atualizacao 2026-05-10 - Marco de Estabilizacao
+
+Estado atual:
+
+- O ciclo principal `Criar sala -> Lobby -> Esconder -> Radar -> Captura -> Resultado -> Jogar novamente/Sair` esta funcionando.
+- Backend de sala, rodada, GPS temporario, radar, captura, resultado congelado e limpeza oportunistica esta implementado no Supabase dev.
+- O modo DEV de GPS foi mantido para calibracao rapida e estabilizado entre rodadas.
+- O app ja nao deve depender do Realtime para montar o Resultado imediatamente apos encerramento.
+
+Proximo foco:
+
+- Nao abrir uma feature grande nova antes de QA em celular real.
+- Priorizar calibracao de campo, convite/share nativo, feedback sensorial e robustez operacional.
+- Preparar piloto com 4 a 6 pessoas em ambiente aberto ou misto.

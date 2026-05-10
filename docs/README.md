@@ -21,9 +21,10 @@ This folder contains the product, design and technical planning for Pique Escond
 6. `apresentacao/06-arquitetura.md`
 7. `apresentacao/07-roadmap.md`
 8. `apresentacao/08-proximos-passos.md`
-9. `specs/`
-10. `technical/decisions/`
-11. `design/wireframes.md`
-12. `design/game-ui-design-report.md`
-13. `agents/`
-14. `qa/`
+9. `apresentacao/09-relatorio-geral-futuras-implementacoes.md`
+10. `specs/`
+11. `technical/decisions/`
+12. `design/wireframes.md`
+13. `design/game-ui-design-report.md`
+14. `agents/`
+15. `qa/`

@@ -292,6 +292,8 @@ Implementacao atual:
 - `finalSnapshot` contem `roomId`, `roomCode`, `gameSessionId`, `finishedAt`, `expiresAt`, `result` e `players`.
 - O cliente aplica esse snapshot imediatamente e usa Realtime posterior apenas como confirmacao.
 - A sala finalizada expira em 2 minutos; dados brutos de GPS, esconderijo, confirmacao de captura e DEV GPS sao limpos no encerramento/cleanup.
+- `pe_run_maintenance_tick` pode executar o mesmo tipo de transicao pelo backend/cron quando nenhum cliente esta ativo. O Realtime continua refletindo alteracoes nas tabelas principais.
+- A manutencao server-side nao retorna nem transmite coordenadas brutas; ela usa apenas estado derivado e snapshots terminais.
 
 ### `game.rematch_requested`
 

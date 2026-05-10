@@ -210,6 +210,24 @@ Política:
 - Ao finalizar a rodada, localização deixa de ser usada.
 - Ao expirar sala, jogadores e estados temporários devem ser encerrados.
 
+## Manutencao Server-Side
+
+O backend possui uma rotina de manutencao para reduzir dependencia de cliente ativo:
+
+- `pe_run_maintenance_tick(target_room_id uuid default null, max_rooms integer default 50)`: entrada para SQL manual ou Supabase Cron.
+- `pe_maintenance_tick_room(target_room_id uuid)`: helper interno por sala.
+
+A rotina:
+
+- aplica regras de GPS/sinal perdido via `pe_enforce_location_rules`;
+- libera o procurador quando o tempo de esconder vence;
+- encerra a busca quando o tempo de procurar vence;
+- fecha a rodada pelo mesmo caminho terminal usado pelo cliente, `pe_close_round`;
+- limpa salas expiradas e dados temporarios via `pe_cleanup_expired_state`;
+- retorna apenas dados derivados, sem latitude/longitude.
+
+As funcoes de manutencao nao sao expostas para `anon`; devem ser chamadas por conexao server-side, SQL administrativo ou job agendado.
+
 ## Métricas Agregadas
 
 Métricas futuras podem ser anônimas/agregadas:

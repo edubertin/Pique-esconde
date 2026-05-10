@@ -56,7 +56,7 @@ O backend calcula a pista do radar a partir das coordenadas reais e devolve apen
 Regra inicial:
 
 - Raio de captura: 5 metros.
-- Confirmar proximidade por cerca de 3 segundos antes da captura automatica.
+- Confirmar proximidade por 2 segundos continuos antes da captura automatica.
 - O botao de captura deve chamar a mesma validacao de GPS do backend.
 - Evitar captura por uma única leitura instável de GPS.
 - Ao capturar, avisar procurador e escondido com feedback visual, som e vibração.
