@@ -127,6 +127,7 @@ export const ptBR = {
   'rules.standard': 'Padrão',
   'rules.title': 'Regras',
   'rules.viewOnlyBadge': 'So ver',
+  'social.backToResult': 'Voltar ao resultado',
   'social.backToRoom': 'Voltar para sala',
   'social.highlightHiders': 'Ficou mais tempo escondido',
   'social.highlightSeeker': 'Encontrou todos',

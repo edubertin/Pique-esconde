@@ -131,6 +131,7 @@ export const enUS = {
   'rules.standard': 'Standard',
   'rules.title': 'Rules',
   'rules.viewOnlyBadge': 'View only',
+  'social.backToResult': 'Back to result',
   'social.backToRoom': 'Back to room',
   'social.highlightHiders': 'Stayed hidden the longest',
   'social.highlightSeeker': 'Found everyone',

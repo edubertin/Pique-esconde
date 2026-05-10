@@ -373,3 +373,27 @@ Decisao:
 Link para test run:
 - `docs/qa/test-runs/2026-05-09-result-route-guard-web.md`
 - `docs/qa/test-runs/2026-05-09-final-snapshot-backend.md`
+
+## L-010 - Snapshot de sala podia misturar fases em transicoes rapidas
+
+Status: Resolvido em backend dev
+Severidade: Media
+Area: Estado / Realtime / Lobby
+Detectado em: 2026-05-10
+Commit/versao: worktree local / migration `202605100005_atomic_room_snapshot`
+
+Descricao:
+- Em transicoes rapidas de resultado, rematch, cron ou Realtime atrasado, o cliente podia montar snapshot com leituras paralelas de momentos diferentes.
+- O sintoma observado foi sala ja voltando para `lobby` enquanto o bot DEV ainda aparecia com tag `Escondido`, alem de mensagem antiga de regras na tela de resultado.
+
+Impacto:
+- Visualmente poderia afetar bot DEV e jogadores reais, principalmente logo depois de finalizar rodada ou jogar novamente.
+- O backend de regras continuava correto, mas a UI podia exibir um estado transitorio incoerente.
+
+Decisao:
+- Centralizar leitura em `pe_get_room_snapshot`.
+- Normalizar status de lobby na resposta da RPC.
+- Limpar erro global antigo ao entrar em `finished`, `lobby` ou apos rematch bem-sucedido.
+
+Link para test run:
+- `docs/qa/test-runs/2026-05-10-atomic-room-snapshot.md`

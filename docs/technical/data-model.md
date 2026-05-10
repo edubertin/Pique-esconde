@@ -241,6 +241,22 @@ A rotina:
 
 As funcoes de manutencao nao sao expostas para `anon`; devem ser chamadas por conexao server-side, SQL administrativo ou job agendado.
 
+## Snapshot Atomico de Sala
+
+O app le a sala atual por `pe_get_room_snapshot(target_room_id, actor_player_id, player_session_token)`.
+
+A RPC devolve, em uma unica chamada:
+
+- sala;
+- jogadores;
+- sessao ativa ou mais recente, quando a sala nao esta no lobby;
+- jogador ativo validado por token;
+- aviso de saida do jogador ativo, quando existir.
+
+Esse contrato substitui a montagem de snapshot no cliente com leituras paralelas de `pe_rooms`, `pe_players`, `pe_game_sessions` e `pe_player_exit_notices`. A mudanca reduz janelas em que o cliente poderia combinar uma fase nova de sala com jogadores vindos de uma leitura antiga.
+
+Quando a sala esta no lobby, a resposta normaliza status de rodada apenas para exibicao do snapshot: lider aparece como `Entrou`, jogadores reais como `Aguardando` e `Alvo DEV` como `Preparado`. A RPC nao retorna latitude, longitude ou campos brutos de GPS.
+
 ## Métricas Agregadas
 
 Métricas futuras podem ser anônimas/agregadas:

@@ -40,7 +40,7 @@ export default function SocialCardScreen() {
 
   return (
     <PrototypeScreen>
-      <MenuPanel backHref="/result" title={t('social.title')} actions={<GameLinkButton href="/lobby" label={t('social.backToRoom')} />}>
+      <MenuPanel backHref="/result" title={t('social.title')} actions={<GameLinkButton href="/result" label={t('social.backToResult')} replace />}>
         <View
           style={{
             alignItems: 'center',

@@ -315,6 +315,7 @@ export function RoomProvider({ children }: { children: ReactNode }) {
       }
 
       if (snapshot.room.phase === 'finished' && snapshot.room.result) {
+        setError(undefined);
         if (!currentFinalResult || !isSameFinishedRound) {
           const nextFinalResult: FinalResultSnapshot = {
             capturedAtClient: Date.now(),
@@ -330,6 +331,7 @@ export function RoomProvider({ children }: { children: ReactNode }) {
           setFinalResultSnapshot(nextFinalResult);
         }
       } else if (snapshot.room.phase === 'lobby') {
+        setError(undefined);
         clearFinalResultSnapshot();
       }
 
@@ -572,6 +574,7 @@ export function RoomProvider({ children }: { children: ReactNode }) {
           }
 
           await roomService.rematch(session.roomId, session.activePlayerId, session.activePlayerToken);
+          setError(undefined);
           clearFinalResultSnapshot();
           await refreshRoom();
         });

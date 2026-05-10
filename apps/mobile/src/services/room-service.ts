@@ -65,10 +65,6 @@ type RemoteLobbyNotice = {
   type?: 'players_not_ready';
 };
 
-type RemotePlayerExitNoticeRow = {
-  reason: 'left_hide_area' | 'not_hidden_in_time' | 'signal_lost';
-};
-
 type RemotePlayerRow = {
   avatar_id: string;
   id: string;
@@ -126,6 +122,15 @@ type StartRoundPayload = {
 };
 
 type UpdateRoomRulesInput = Pick<RoomRules, 'environmentPreset' | 'hideDurationSeconds' | 'seekDurationSeconds'>;
+
+type RemoteAtomicRoomSnapshot = {
+  activePlayer?: RemotePlayerRow | null;
+  activePlayerExitReason?: 'left_hide_area' | 'not_hidden_in_time' | 'signal_lost' | null;
+  activePlayerToken?: string | null;
+  gameSession?: RemoteGameSessionRow | null;
+  players?: RemotePlayerRow[] | null;
+  room?: RemoteRoomRow | null;
+};
 
 type RoomSubscription = {
   unsubscribe: () => Promise<void>;
@@ -229,49 +234,25 @@ function mapRoomRules(row: RemoteRoomRow): RoomRules {
 async function fetchSnapshot(roomId: string, activePlayerId?: string, activePlayerToken?: string): Promise<RemoteRoomSnapshot> {
   const client = assertSupabase();
 
-  const roomQuery = client
-    .from('pe_rooms')
-    .select('id, code, phase, max_players, expires_at, result, closed_reason, lobby_notice, environment_preset, hide_duration_seconds, seek_duration_seconds, capture_radius_meters, capture_confirm_seconds')
-    .eq('id', roomId)
-    .single();
-  const playersQuery = client.from('pe_players').select('id, nickname, avatar_id, status, is_leader').eq('room_id', roomId).order('joined_at');
-  const gameSessionsQuery = client
-    .from('pe_game_sessions')
-    .select('id, seeker_player_id, status, hide_duration_seconds, seek_duration_seconds, environment_preset, capture_radius_meters, capture_confirm_seconds, started_at, seek_started_at')
-    .eq('room_id', roomId)
-    .order('created_at', { ascending: false })
-    .limit(1);
-  const exitNoticeQuery = activePlayerId
-    ? client.from('pe_player_exit_notices').select('reason').eq('player_id', activePlayerId).order('created_at', { ascending: false }).limit(1)
-    : Promise.resolve({ data: [], error: null });
+  const { data, error } = await client.rpc('pe_get_room_snapshot', {
+    actor_player_id: activePlayerId ?? null,
+    player_session_token: activePlayerToken ?? null,
+    target_room_id: roomId,
+  });
 
-  const [
-    { data: room, error: roomError },
-    { data: players, error: playersError },
-    { data: gameSessions, error: gameSessionError },
-    { data: exitNotices, error: exitNoticeError },
-  ] = await Promise.all([
-    roomQuery,
-    playersQuery,
-    gameSessionsQuery,
-    exitNoticeQuery,
-  ]);
+  if (error) throw error;
 
-  if (roomError) throw roomError;
-  if (playersError) throw playersError;
-  if (gameSessionError) throw gameSessionError;
-  if (exitNoticeError) throw exitNoticeError;
+  const payload = data as RemoteAtomicRoomSnapshot | null;
+  if (!payload?.room) throw new Error('Supabase room function returned an invalid snapshot.');
 
-  const mappedPlayers = ((players ?? []) as RemotePlayerRow[]).map(mapPlayer);
-  const roomRow = room as RemoteRoomRow;
-  const latestGameSession = mapGameSession(((gameSessions ?? []) as RemoteGameSessionRow[])[0]);
-  const gameSession = roomRow.phase === 'lobby' ? undefined : latestGameSession;
-  const exitNotice = ((exitNotices ?? []) as RemotePlayerExitNoticeRow[])[0];
+  const mappedPlayers = (payload.players ?? []).map(mapPlayer);
+  const roomRow = payload.room;
+  const gameSession = mapGameSession(payload.gameSession);
 
   return {
-    activePlayer: mappedPlayers.find((player) => player.id === activePlayerId),
-    activePlayerExitReason: exitNotice?.reason,
-    activePlayerToken,
+    activePlayer: payload.activePlayer ? mapPlayer(payload.activePlayer) : mappedPlayers.find((player) => player.id === activePlayerId),
+    activePlayerExitReason: payload.activePlayerExitReason ?? undefined,
+    activePlayerToken: payload.activePlayerToken ?? activePlayerToken,
     room: {
       closedReason: roomRow.closed_reason ?? undefined,
       code: roomRow.code,

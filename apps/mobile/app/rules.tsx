@@ -44,6 +44,12 @@ function environmentBadge(preset: EnvironmentPreset) {
   return t('rules.environmentMedium');
 }
 
+function capturePreviewForPreset(preset: EnvironmentPreset) {
+  if (preset === 'small') return { confirmSeconds: 2.5, radiusMeters: 4.5 };
+  if (preset === 'large') return { confirmSeconds: 2, radiusMeters: 6 };
+  return { confirmSeconds: 2, radiusMeters: 5 };
+}
+
 function RulePicker<T extends number | string>({
   disabled,
   icon,
@@ -129,17 +135,34 @@ export default function RulesScreen() {
   const { activePlayer, error, isLoading, room, updateRoomRules } = useRoom();
   const roomRules = room?.rules;
   const isLeader = Boolean(activePlayer?.isLeader);
+  const savedEnvironmentPreset = roomRules?.environmentPreset;
+  const savedHideDurationSeconds = roomRules?.hideDurationSeconds;
+  const savedSeekDurationSeconds = roomRules?.seekDurationSeconds;
   const [environmentPreset, setEnvironmentPreset] = useState<EnvironmentPreset>(roomRules?.environmentPreset ?? 'medium');
   const [hideDurationSeconds, setHideDurationSeconds] = useState(roomRules?.hideDurationSeconds ?? 60);
   const [seekDurationSeconds, setSeekDurationSeconds] = useState(roomRules?.seekDurationSeconds ?? 180);
+  const [draftRoomId, setDraftRoomId] = useState(room?.id);
+  const [hasLocalChanges, setHasLocalChanges] = useState(false);
 
   useEffect(() => {
-    if (!roomRules) return;
+    if (!savedEnvironmentPreset || !savedHideDurationSeconds || !savedSeekDurationSeconds) return;
+    const roomChanged = draftRoomId !== room?.id;
 
-    setEnvironmentPreset(roomRules.environmentPreset);
-    setHideDurationSeconds(roomRules.hideDurationSeconds);
-    setSeekDurationSeconds(roomRules.seekDurationSeconds);
-  }, [roomRules]);
+    if (!hasLocalChanges || roomChanged) {
+      setEnvironmentPreset(savedEnvironmentPreset);
+      setHideDurationSeconds(savedHideDurationSeconds);
+      setSeekDurationSeconds(savedSeekDurationSeconds);
+      setDraftRoomId(room?.id);
+      setHasLocalChanges(false);
+    }
+  }, [
+    draftRoomId,
+    hasLocalChanges,
+    room?.id,
+    savedEnvironmentPreset,
+    savedHideDurationSeconds,
+    savedSeekDurationSeconds,
+  ]);
 
   const changed = useMemo(() => {
     return Boolean(
@@ -150,6 +173,23 @@ export default function RulesScreen() {
     );
   }, [environmentPreset, hideDurationSeconds, roomRules, seekDurationSeconds]);
 
+  const capturePreview = capturePreviewForPreset(environmentPreset);
+
+  const handleEnvironmentChange = (nextPreset: EnvironmentPreset) => {
+    setHasLocalChanges(true);
+    setEnvironmentPreset(nextPreset);
+  };
+
+  const handleHideDurationChange = (nextSeconds: number) => {
+    setHasLocalChanges(true);
+    setHideDurationSeconds(nextSeconds);
+  };
+
+  const handleSeekDurationChange = (nextSeconds: number) => {
+    setHasLocalChanges(true);
+    setSeekDurationSeconds(nextSeconds);
+  };
+
   const handleSave = async () => {
     if (!changed || !isLeader) {
       router.replace('/lobby');
@@ -158,6 +198,7 @@ export default function RulesScreen() {
 
     try {
       await updateRoomRules({ environmentPreset, hideDurationSeconds, seekDurationSeconds });
+      setHasLocalChanges(false);
       router.replace('/lobby');
     } catch {
       // Error is shown from room store state.
@@ -171,9 +212,9 @@ export default function RulesScreen() {
         meta={<Badge label={isLeader ? t('rules.leaderBadge') : t('rules.viewOnlyBadge')} tone={isLeader ? 'leader' : 'neutral'} />}
         title={t('rules.title')}
         actions={<GameButton disabled={isLeader && (!changed || isLoading)} label={isLeader ? t('common.save') : t('common.back')} onPress={handleSave} />}>
-        <RulePicker disabled={!isLeader || isLoading} icon="map-outline" onChange={setEnvironmentPreset} options={environmentOptions} title={t('rules.environment')} value={environmentPreset} />
-        <RulePicker disabled={!isLeader || isLoading} icon="timer-outline" onChange={setHideDurationSeconds} options={hideOptions} title={t('rules.hideTime')} value={hideDurationSeconds} />
-        <RulePicker disabled={!isLeader || isLoading} icon="radio-outline" onChange={setSeekDurationSeconds} options={seekOptions} title={t('rules.seekTime')} value={seekDurationSeconds} />
+        <RulePicker disabled={!isLeader || isLoading} icon="map-outline" onChange={handleEnvironmentChange} options={environmentOptions} title={t('rules.environment')} value={environmentPreset} />
+        <RulePicker disabled={!isLeader || isLoading} icon="timer-outline" onChange={handleHideDurationChange} options={hideOptions} title={t('rules.hideTime')} value={hideDurationSeconds} />
+        <RulePicker disabled={!isLeader || isLoading} icon="radio-outline" onChange={handleSeekDurationChange} options={seekOptions} title={t('rules.seekTime')} value={seekDurationSeconds} />
 
         <View
           style={{
@@ -186,7 +227,7 @@ export default function RulesScreen() {
             <Text selectable style={{ color: colors.ink, fontSize: 14, fontWeight: '900' }}>
               {t('rules.capture')}
             </Text>
-            <Badge label={`${roomRules?.captureRadiusMeters ?? 5}m / ${roomRules?.captureConfirmSeconds ?? 2}s`} tone="ready" />
+            <Badge label={`${capturePreview.radiusMeters}m / ${capturePreview.confirmSeconds}s`} tone="ready" />
           </View>
           <View style={{ alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }}>
             <Text selectable style={{ color: colors.muted, fontSize: 13, fontWeight: '800' }}>
