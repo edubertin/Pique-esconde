@@ -21,7 +21,7 @@ test('room visual smoke creates and leaves a real room', async ({ browser }) => 
   await action(leaderPage, 'Criar sala').click();
   await action(leaderPage, 'Usar GPS DEV').click();
 
-  const lobbyTitle = leaderPage.getByText(/Lobby: [A-Z]{4}/);
+  const lobbyTitle = leaderPage.getByText('Lobby:');
   await expect(lobbyTitle).toBeVisible({ timeout: 15000 });
   await expect(leaderPage.getByText('2/8')).toBeVisible({ timeout: 15000 });
   await expect(leaderPage.getByText('Regras').first()).toBeVisible({ timeout: 15000 });

@@ -1,5 +1,5 @@
-import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
 import { Text, TextInput } from 'react-native';
 
 import { AvatarChoice } from '@/src/components/avatar-choice';
@@ -25,10 +25,17 @@ const inputStyle = {
 
 export default function JoinRoomScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams<{ code?: string }>();
   const { error, isLoading, joinRoom } = useRoom();
   const [avatarId, setAvatarId] = useState('avatar_02');
-  const [code, setCode] = useState('ABCD');
+  const [code, setCode] = useState(params.code?.toUpperCase() ?? 'ABCD');
   const [nickname, setNickname] = useState('Ana');
+
+  useEffect(() => {
+    if (params.code) {
+      setCode(params.code.toUpperCase());
+    }
+  }, [params.code]);
 
   const handleSelectAvatar = (nextAvatarId: string) => {
     setAvatarId(nextAvatarId);
@@ -53,7 +60,7 @@ export default function JoinRoomScreen() {
         <TextInput
           placeholder={t('join.code')}
           placeholderTextColor={colors.muted}
-          onChangeText={setCode}
+          onChangeText={(nextCode) => setCode(nextCode.toUpperCase())}
           value={code}
           style={{
             ...inputStyle,

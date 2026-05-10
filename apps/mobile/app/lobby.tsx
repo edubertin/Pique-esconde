@@ -1,19 +1,21 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
-import { useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { useMemo, useState } from 'react';
+import { Pressable, Share, Text, View } from 'react-native';
 
 import { Badge } from '@/src/components/badge';
 import { CoverBanner } from '@/src/components/cover-banner';
 import { GameButton } from '@/src/components/game-button';
 import { PlayerList } from '@/src/components/player-list';
 import { Panel, PrototypeScreen } from '@/src/components/prototype-screen';
+import { RoomQrModal } from '@/src/components/room-qr-modal';
 import { useSafeRouter } from '@/src/hooks/use-safe-router';
 import { t } from '@/src/i18n';
 import { useRoom } from '@/src/state/room-store';
 import { colors } from '@/src/theme/colors';
 import { patterns } from '@/src/theme/patterns';
 import { surfaces } from '@/src/theme/surfaces';
+import { buildRoomInviteUrl } from '@/src/utils/invite-link';
 import { isDevGpsEnabled } from '@/src/utils/dev-gps';
 
 function secondsToLabel(seconds: number) {
@@ -28,9 +30,12 @@ function environmentLabel(preset?: string) {
 
 export default function LobbyScreen() {
   const router = useSafeRouter();
-  const { activePlayer, addDemoPlayer, addDevTargetPlayer, error, isLoading, leaveRoom, promoteLeader, removePlayer, room, startRound, toggleReady } = useRoom();
+  const { activePlayer, error, isLoading, leaveRoom, promoteLeader, removePlayer, room, startRound, toggleReady } = useRoom();
   const [copied, setCopied] = useState(false);
+  const [inviteFeedback, setInviteFeedback] = useState<string>();
+  const [qrOpen, setQrOpen] = useState(false);
   const players = room?.players ?? [];
+  const inviteUrl = useMemo(() => (room?.code ? buildRoomInviteUrl(room.code) : ''), [room?.code]);
   const isLeader = Boolean(activePlayer?.isLeader);
   const notReadyPlayers = players.filter((player) => !player.isLeader && player.status !== 'Preparado');
   const canLeaderStart = isLeader && players.length >= 2 && notReadyPlayers.length === 0;
@@ -64,6 +69,38 @@ export default function LobbyScreen() {
 
     setCopied(true);
     setTimeout(() => setCopied(false), 1600);
+  };
+
+  const handleShareInvite = async () => {
+    if (!room?.code || !inviteUrl) return;
+
+    const message = t('lobby.inviteMessage', { code: room.code, url: inviteUrl });
+
+    try {
+      if (typeof navigator !== 'undefined' && 'share' in navigator) {
+        await navigator.share({
+          text: message,
+          title: t('lobby.inviteTitle'),
+          url: inviteUrl,
+        });
+      } else {
+        await Share.share({
+          message,
+          title: t('lobby.inviteTitle'),
+          url: inviteUrl,
+        });
+      }
+      setInviteFeedback(undefined);
+    } catch {
+      if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(inviteUrl);
+        setInviteFeedback(t('common.codeCopied'));
+        setTimeout(() => setInviteFeedback(undefined), 1800);
+        return;
+      }
+
+      setInviteFeedback(t('lobby.shareUnavailable'));
+    }
   };
 
   const handleLeaveRoom = async () => {
@@ -100,15 +137,6 @@ export default function LobbyScreen() {
     }
   };
 
-  const handleAddDemoPlayer = () => {
-    if (isDevGpsEnabled() && isLeader) {
-      addDevTargetPlayer().catch(() => undefined);
-      return;
-    }
-
-    addDemoPlayer().catch(() => undefined);
-  };
-
   const handleToggleReady = () => {
     ensureLocationPermission()
       .then((allowed) => {
@@ -127,6 +155,10 @@ export default function LobbyScreen() {
 
   return (
     <PrototypeScreen>
+      {room?.code && inviteUrl ? (
+        <RoomQrModal inviteUrl={inviteUrl} onClose={() => setQrOpen(false)} roomCode={room.code} visible={qrOpen} />
+      ) : null}
+
       <View style={{ maxWidth: patterns.layout.panelMaxWidth, width: '100%' }}>
         <CoverBanner />
       </View>
@@ -191,8 +223,24 @@ export default function LobbyScreen() {
                   height: 34,
                   justifyContent: 'center',
                   width: 34,
-                }}>
+              }}>
                 <Ionicons color={copied ? colors.green : colors.navy} name={copied ? 'checkmark' : 'copy-outline'} size={18} />
+              </Pressable>
+              <Pressable
+                aria-label={t('lobby.openQr')}
+                accessibilityLabel={t('lobby.openQr')}
+                accessibilityRole="button"
+                onPress={() => setQrOpen(true)}
+                testID="lobby-open-qr"
+                style={{
+                  ...surfaces.iconButtonActive,
+                  alignItems: 'center',
+                  borderRadius: 12,
+                  height: 34,
+                  justifyContent: 'center',
+                  width: 34,
+                }}>
+                <Ionicons color={colors.navy} name="qr-code-outline" size={18} />
               </Pressable>
             </View>
             <Badge label={`${players.length}/${room?.maxPlayers ?? 8}`} tone="rush" />
@@ -200,6 +248,11 @@ export default function LobbyScreen() {
           {copied ? (
             <Text selectable style={{ color: colors.green, fontSize: 12, fontWeight: '800' }}>
               {t('common.codeCopied')}
+            </Text>
+          ) : null}
+          {inviteFeedback ? (
+            <Text selectable style={{ color: colors.green, fontSize: 12, fontWeight: '800' }}>
+              {inviteFeedback}
             </Text>
           ) : null}
           <PlayerList
@@ -265,7 +318,7 @@ export default function LobbyScreen() {
         )}
         <View style={{ flexDirection: 'row', gap: 10 }}>
           <View style={{ flex: 1 }}>
-            <GameButton label={t('lobby.invite')} onPress={handleAddDemoPlayer} size="compact" variant="secondary" />
+            <GameButton label={t('lobby.invite')} onPress={handleShareInvite} size="compact" variant="secondary" />
           </View>
           <View style={{ flex: 1 }}>
             <GameButton label={t('common.exit')} onPress={handleLeaveRoom} size="compact" variant="dangerStrong" />

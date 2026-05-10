@@ -8,6 +8,7 @@ import { GameButton } from '@/src/components/game-button';
 import { LeaderDebugDrawer } from '@/src/components/leader-debug-drawer';
 import { PrototypeScreen } from '@/src/components/prototype-screen';
 import { RadarView } from '@/src/components/radar-view';
+import { useDeviceHeading } from '@/src/hooks/use-device-heading';
 import { usePlayerLocationSync } from '@/src/hooks/use-player-location-sync';
 import { useSafeRouter } from '@/src/hooks/use-safe-router';
 import { t } from '@/src/i18n';
@@ -33,6 +34,7 @@ export default function SeekerRadarScreen() {
   const remainingSeconds = seekEndsAt ? (seekEndsAt - now) / 1000 : 0;
   const timerLabel = seekEndsAt ? formatTimer(remainingSeconds) : t('radar.timerEnded');
   const autoCaptureEnabled = !__DEV__;
+  const deviceHeading = useDeviceHeading(room?.phase === 'seeking');
   usePlayerLocationSync(room?.phase === 'seeking');
 
   const syncDevRadarOverride = useCallback(async () => {
@@ -154,6 +156,14 @@ export default function SeekerRadarScreen() {
     };
   }, [autoCaptureEnabled, radarHint?.canCapture, room?.phase, router, tryCaptureNearest]);
 
+  useEffect(() => {
+    if (radarHint?.signalStatus !== 'fresh' || radarHint.band !== 'hot') return;
+
+    import('expo-haptics')
+      .then((Haptics) => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light))
+      .catch(() => undefined);
+  }, [radarHint?.band, radarHint?.signalStatus, radarHint?.targetPlayerId]);
+
   const handleSimulateCapture = async () => {
     try {
       setCaptureMessage(undefined);
@@ -248,7 +258,7 @@ export default function SeekerRadarScreen() {
           <Image contentFit="contain" source={require('@/assets/images/logo.png')} style={{ aspectRatio: 1, width: '100%' }} />
         </View>
 
-        <RadarView hint={radarHint} remainingCount={remainingHiders} timerLabel={timerLabel} />
+        <RadarView deviceHeading={deviceHeading} hint={radarHint} remainingCount={remainingHiders} timerLabel={timerLabel} />
 
         {devGpsPanelOpen ? <DevGpsControl defaultDistance={40} /> : null}
 
