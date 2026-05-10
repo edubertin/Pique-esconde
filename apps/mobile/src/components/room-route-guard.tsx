@@ -17,8 +17,8 @@ function getTargetPath({
   pathname: string;
   room: ReturnType<typeof useRoom>['room'];
 }) {
-  if (finalResultSnapshot && (pathname === '/result' || pathname === '/social-card')) {
-    return undefined;
+  if (finalResultSnapshot) {
+    return pathname === '/result' || pathname === '/social-card' ? undefined : '/result';
   }
 
   if (!room) {

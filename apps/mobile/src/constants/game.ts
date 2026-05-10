@@ -57,7 +57,7 @@ export const gameRules = {
   hideSeconds: 60,
   seekSeconds: 180,
   captureRadiusMeters: 5,
-  captureConfirmSeconds: 3,
+  captureConfirmSeconds: 2,
   hiddenAnchorRadiusMeters: 10,
   locationWarningSeconds: 15,
   locationEliminationSeconds: 30,

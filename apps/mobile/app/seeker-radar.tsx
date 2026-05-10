@@ -110,7 +110,11 @@ export default function SeekerRadarScreen() {
           if (cancelled) return;
 
           if (payload?.capturedPlayerId) {
-            router.push('/capture');
+            if (payload.finalSnapshot || payload.remainingHiders === 0) {
+              router.replace('/result');
+            } else {
+              router.push('/capture');
+            }
             return;
           }
 
@@ -154,7 +158,11 @@ export default function SeekerRadarScreen() {
       }
 
       if (payload?.capturedPlayerId) {
-        router.push('/capture');
+        if (payload.finalSnapshot || payload.remainingHiders === 0) {
+          router.replace('/result');
+        } else {
+          router.push('/capture');
+        }
         return;
       }
 

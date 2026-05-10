@@ -65,9 +65,11 @@ export type DevGpsDirection = 'E' | 'N' | 'S' | 'W';
 export type RadarHint = {
   angleDegrees?: number;
   band: 'cold' | 'hot' | 'none' | 'warm';
+  cardinal?: DevGpsDirection;
   canCapture?: boolean;
   confidence: number;
   confirmRemainingSeconds?: number;
+  devOverride?: boolean;
   distanceMetersApprox?: number;
   reason?: 'no_active_search' | 'no_target_signal' | 'seeker_signal_lost';
   signalStatus: 'fresh' | 'lost' | 'warning';
