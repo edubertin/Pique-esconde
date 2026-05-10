@@ -1,4 +1,5 @@
-import { Text, View } from 'react-native';
+import { Link } from 'expo-router';
+import { Pressable, Text, View } from 'react-native';
 
 import { BrandLogo } from '@/src/components/brand-logo';
 import { GameLinkButton } from '@/src/components/game-button';
@@ -56,7 +57,22 @@ export default function HomeScreen() {
             </Text>
           </View>
         ) : null}
+        <View style={{ alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap', gap: 10, justifyContent: 'center', paddingTop: 2 }}>
+          <HomeLegalLink href="/privacy" label="Privacidade" />
+          <HomeLegalLink href="/terms" label="Termos" />
+          <HomeLegalLink href="/support" label="Suporte" />
+        </View>
       </View>
     </PrototypeScreen>
+  );
+}
+
+function HomeLegalLink({ href, label }: { href: '/privacy' | '/support' | '/terms'; label: string }) {
+  return (
+    <Link href={href} asChild>
+      <Pressable accessibilityLabel={label} accessibilityRole="link">
+        <Text style={{ color: colors.navy, fontSize: 12, fontWeight: '900', opacity: 0.82 }}>{label}</Text>
+      </Pressable>
+    </Link>
   );
 }

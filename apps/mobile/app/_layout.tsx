@@ -31,6 +31,10 @@ export default function RootLayout() {
           <Stack.Screen name="capture" options={{ title: 'Captura' }} />
           <Stack.Screen name="result" options={{ title: 'Resultado' }} />
           <Stack.Screen name="social-card" options={{ title: 'Card social' }} />
+          <Stack.Screen name="privacy" options={{ title: 'Privacidade' }} />
+          <Stack.Screen name="terms" options={{ title: 'Termos' }} />
+          <Stack.Screen name="support" options={{ title: 'Suporte' }} />
+          <Stack.Screen name="data-deletion" options={{ title: 'Exclusao de dados' }} />
         </Stack>
         <StatusBar style="dark" />
       </RoomProvider>
