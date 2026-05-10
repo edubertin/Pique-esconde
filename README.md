@@ -1,90 +1,153 @@
 # Pique Esconde
 
-Pique Esconde is a mobile-first MVP for a physical-digital hide-and-seek game. The app uses temporary rooms, realtime state, GPS-based proximity, sound and haptics to bring groups back into the physical world using the phone as a playful tool.
+<p align="center">
+  <img src="docs/design/referencias/pique-esconde-logo.png" alt="Pique Esconde logo" width="220" />
+</p>
 
-## Product Thesis
+<p align="center">
+  <strong>Um jogo mobile-first de pique-esconde fisico-digital com salas temporarias, radar por proximidade e privacidade por design.</strong>
+</p>
 
-The problem is not the lack of a new game. Hide-and-seek is already familiar across generations. The problem is that the physical world has been abandoned by digital habits.
+<p align="center">
+  <a href="https://pique-esconde.eduardobertin.com.br">Site oficial</a>
+  ·
+  <a href="https://pique-esconde.eduardobertin.com.br/privacy">Privacidade</a>
+  ·
+  <a href="https://pique-esconde.eduardobertin.com.br/terms">Termos</a>
+  ·
+  <a href="https://pique-esconde.eduardobertin.com.br/support">Suporte</a>
+</p>
 
-Pique Esconde uses digital interaction to improve physical play: create a room, invite friends, hide, run, search with radar, and play again.
+![MVP](https://img.shields.io/badge/status-MVP-ff2d8d)
+![Expo](https://img.shields.io/badge/Expo-54-000020)
+![React Native](https://img.shields.io/badge/React%20Native-0.81-61dafb)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178c6)
+![Supabase](https://img.shields.io/badge/Supabase-Realtime-3ecf8e)
+![Vercel](https://img.shields.io/badge/Vercel-Web-000000)
+![Privacy by Design](https://img.shields.io/badge/privacy-by%20design-b6f000)
+![License](https://img.shields.io/badge/license-All%20rights%20reserved-lightgrey)
 
-## MVP Scope
+## Visao Geral
 
-Core MVP features:
+Pique Esconde ajuda grupos presenciais a criarem uma sala, convidarem amigos, escolherem quem procura e jogarem uma rodada de pique-esconde usando o celular como ferramenta de jogo.
 
-- Temporary rooms with invite link and code.
-- 2 to 8 players per room.
-- Simple nickname and prebuilt avatar selection.
-- Creator starts as the first seeker.
-- Manual seeker selection for new rounds.
-- Lobby with player statuses.
-- Configurable match duration.
-- Default timing: 60 seconds to hide and 3 minutes to seek.
-- GPS permission required for active players.
-- Radar/proximity experience without exact map visibility.
-- Automatic capture by proximity.
-- Rush final with increased radar range.
-- Same-room rematch flow.
-- Social result card without GPS, map, route, address or coordinates.
+O app usa Supabase Realtime para sincronizar sala e rodada, Expo/React Native para mobile e web, e GPS apenas durante partidas ativas para calcular pistas derivadas de radar e captura por proximidade.
 
-## Technical Direction
+O produto evita transformar localizacao em monitoramento: o procurador nao ve mapa exato dos escondidos, cards sociais nao incluem GPS, e salas/dados de partida sao temporarios.
 
-Initial stack decisions:
+## Links Rapidos
 
-- App: Expo, React Native, Expo Router and TypeScript.
-- Realtime: Supabase Realtime.
-- Database: Supabase Postgres.
-- Auth: temporary room session for MVP, no full account required.
-- Location: `expo-location`.
-- Feedback: sound, haptics/vibration and animation.
+- [App web](https://pique-esconde.eduardobertin.com.br)
+- [Documentacao](docs/README.md)
+- [Specs do produto](docs/specs/README.md)
+- [Arquitetura e ADRs](docs/technical/README.md)
+- [Plano de QA](docs/qa/test-plan.md)
+- [Politica de Privacidade](https://pique-esconde.eduardobertin.com.br/privacy)
+- [Termos de Uso](https://pique-esconde.eduardobertin.com.br/terms)
+- [Suporte](https://pique-esconde.eduardobertin.com.br/support)
+- [Exclusao de dados](https://pique-esconde.eduardobertin.com.br/data-deletion)
 
-## Privacy Position
+## Escopo do MVP
 
-Location is a temporary game mechanic, not a monitoring product.
+- Salas temporarias com codigo, link de convite e QR code.
+- Entrada com apelido simples e avatar pre-pronto.
+- Lobby realtime com lista de jogadores, lider/procurador e status de preparo.
+- Regras configuraveis no lobby: ambiente, tempo para esconder e tempo de busca.
+- Rodada com fase de esconder, busca, captura e resultado.
+- Radar de proximidade com sinais derivados, animacao e direcao aproximada.
+- Sincronizacao via Supabase Realtime e snapshot atomico de sala.
+- Manutencao server-side para timers, limpeza e transicoes criticas.
+- Card social sem GPS, mapa, rota, endereco ou coordenadas.
+- Paginas publicas de privacidade, termos, suporte e exclusao de dados.
 
-The MVP should:
+## Stack
 
-- Use location only during active matches.
-- Avoid showing exact maps of hidden players.
-- Avoid storing permanent route history.
-- Stop location usage when a match ends.
-- Never include GPS, real maps, routes, addresses or coordinates in social cards.
-- Keep only short-lived technical events for debugging and anonymous aggregate metrics.
+- **App:** Expo, React Native, Expo Router, TypeScript.
+- **Web:** Expo static export hospedado na Vercel.
+- **Backend:** Supabase Postgres, RPCs, Realtime e migrations SQL.
+- **Localizacao:** `expo-location`, pistas derivadas e captura validada no backend.
+- **Compartilhamento:** invite link, codigo de sala, QR code e card social.
+- **QA:** Playwright smoke test, checklist manual e registros em `docs/qa`.
 
-## Documentation
+## Desenvolvimento Local
 
-The project is currently in product/specification phase.
+```bash
+cd apps/mobile
+npm ci
+npm run web:local
+```
 
-- [Mobile App](apps/mobile/README.md)
-- [Presentation](docs/apresentacao/README.md)
-- [Specs](docs/specs/README.md)
-- [Data Model](docs/technical/data-model.md)
-- [Realtime Events](docs/technical/realtime-events.md)
-- [Architecture Decisions](docs/technical/decisions/README.md)
-- [Visual References](docs/design/referencias-visuais.md)
-- [Wireframes](docs/design/wireframes.md)
-- [Game UI Design Report](docs/design/game-ui-design-report.md)
-- [Agents](docs/agents/README.md)
+URL local recomendada:
 
-## Current Status
+```txt
+http://localhost:8086
+```
 
-The MVP is now in implementation.
+Validacoes principais:
 
-Done:
+```bash
+cd apps/mobile
+npm run lint
+npx tsc --noEmit
+npm run build:web
+```
 
-- Expo app scaffold with navigable game flow.
-- Polished prototype UI for home, room creation, lobby, hiding, seeking, capture, result and social card.
-- Supabase project connected through local environment variables.
-- Realtime temporary rooms with room code, player list, ready state, leader promotion and leader removal.
-- Real game session layer without GPS yet: start round, hide phase, seek phase, simulated capture, result and rematch.
-- Real synchronized round timers for hiding/seeking. Hiders who do not confirm in time leave the round with a local notice.
-- Match-exit rules in Supabase:
-  - if a regular hider leaves and at least 2 players remain, the match continues;
-  - if the seeker leaves, the round returns to lobby and a new leader is promoted;
-  - if fewer than 2 players remain, the round returns to lobby with a warning.
-- QA reports and a Playwright web smoke test for the room flow.
+Teste smoke web:
 
-Next implementation slice:
+```bash
+cd apps/mobile
+npm run qa:web
+```
 
-- GPS/location permission.
-- Temporary position updates, approximate radar and proximity capture.
+## Variaveis de Ambiente
+
+Copie `apps/mobile/.env.example` para `.env` e preencha:
+
+```txt
+EXPO_PUBLIC_SUPABASE_URL=
+EXPO_PUBLIC_SUPABASE_ANON_KEY=
+EXPO_PUBLIC_WEB_BASE_URL=
+```
+
+`EXPO_PUBLIC_WEB_BASE_URL` deve apontar para a URL publica usada em convites, por exemplo:
+
+```txt
+https://pique-esconde.eduardobertin.com.br
+```
+
+## Privacidade
+
+Localizacao e mecanica temporaria de jogo, nao produto de vigilancia.
+
+Compromissos do MVP:
+
+- usar localizacao apenas durante partidas ativas;
+- nao mostrar mapa exato dos escondidos;
+- nao manter historico permanente de rotas;
+- nao incluir GPS, rota, mapa real, endereco ou coordenadas em cards sociais;
+- manter salas, eventos e dados operacionais pelo menor tempo necessario;
+- expor ao app sinais derivados como frio, morno, quente, direcao aproximada e confianca.
+
+## Status Atual
+
+O MVP esta em implementacao ativa. Ja existem app Expo, fluxo web/mobile, Supabase conectado, lobby realtime, regras de sala, rodada real, radar/GPS base, QR/link de convite, paginas legais e export web para Vercel.
+
+Antes de piloto publico, ainda e necessario validar em celulares reais, ajustar documentos de loja, revisar requisitos de idade/classificacao e estabilizar QA de GPS em campo.
+
+## Documentos Importantes
+
+- [Visao geral da documentacao](docs/README.md)
+- [Game loop](docs/specs/game-loop.md)
+- [Radar e GPS](docs/specs/location-radar.md)
+- [Salas e lobby](docs/specs/rooms-and-lobby.md)
+- [Privacidade e dados](docs/specs/privacy-and-data.md)
+- [Modelo de dados](docs/technical/data-model.md)
+- [Eventos realtime](docs/technical/realtime-events.md)
+- [Decisoes de arquitetura](docs/technical/decisions/README.md)
+- [QA](docs/qa/test-plan.md)
+
+## Licenca
+
+Copyright (c) 2026 Eduardo Bertin. Todos os direitos reservados.
+
+Este repositorio nao concede permissao para copiar, redistribuir, sublicenciar, vender ou reutilizar o codigo, marca, assets, documentos ou identidade visual sem autorizacao expressa.

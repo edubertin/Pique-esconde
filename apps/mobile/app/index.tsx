@@ -1,5 +1,6 @@
 import { Link } from 'expo-router';
-import { Pressable, Text, View } from 'react-native';
+import { Platform, Pressable, Text, View } from 'react-native';
+import type { ViewStyle } from 'react-native';
 
 import { BrandLogo } from '@/src/components/brand-logo';
 import { GameLinkButton } from '@/src/components/game-button';
@@ -11,6 +12,7 @@ import { surfaces } from '@/src/theme/surfaces';
 
 export default function HomeScreen() {
   const { roomNotice } = useRoom();
+  const heroOffset = (Platform.OS === 'web' ? '-10vh' : -48) as ViewStyle['marginTop'];
   const noticeText =
     roomNotice === 'removed'
       ? { body: t('home.removedBody'), title: t('home.removedTitle') }
@@ -31,8 +33,8 @@ export default function HomeScreen() {
           alignItems: 'center',
           alignSelf: 'center',
           gap: 18,
+          marginTop: heroOffset,
           maxWidth: 360,
-          transform: [{ translateY: -16 }],
           width: '100%',
         }}>
         <BrandLogo />

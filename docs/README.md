@@ -1,30 +1,41 @@
-# Documentation
+# Pique Esconde Documentation
 
-This folder contains the product, design and technical planning for Pique Esconde.
+This folder is the source of truth for product, design, technical, QA and release documentation.
 
-## Sections
+## Official Links
 
-- `apresentacao/`: high-level MVP presentation and product narrative.
-- `specs/`: behavior specifications for core product areas.
-- `technical/decisions/`: ADRs explaining important technical choices.
-- `design/`: visual references and future wireframes/design artifacts.
-- `agents/`: specialized agent prompts and role briefings.
-- `qa/`: test plan, manual cases, regression checklist and test run reports.
+- App: https://pique-esconde.eduardobertin.com.br
+- Privacy: https://pique-esconde.eduardobertin.com.br/privacy
+- Terms: https://pique-esconde.eduardobertin.com.br/terms
+- Support: https://pique-esconde.eduardobertin.com.br/support
+- Data deletion: https://pique-esconde.eduardobertin.com.br/data-deletion
 
 ## Recommended Reading Order
 
-1. `apresentacao/01-visao-geral.md`
-2. `apresentacao/02-problema-e-publico.md`
-3. `apresentacao/03-solucao.md`
-4. `apresentacao/04-fluxo-do-produto.md`
-5. `apresentacao/05-escopo-do-mvp.md`
-6. `apresentacao/06-arquitetura.md`
-7. `apresentacao/07-roadmap.md`
-8. `apresentacao/08-proximos-passos.md`
-9. `apresentacao/09-relatorio-geral-futuras-implementacoes.md`
-10. `specs/`
-11. `technical/decisions/`
-12. `design/wireframes.md`
-13. `design/game-ui-design-report.md`
-14. `agents/`
-15. `qa/`
+1. [Project Overview](00-visao-geral.md)
+2. [How to Play](01-como-jogar.md)
+3. [Game Flow](02-fluxo-do-jogo.md)
+4. [Radar and GPS](03-radar-gps.md)
+5. [Lobby and Invites](04-lobby-convites.md)
+6. [Supabase and Realtime](05-supabase-realtime.md)
+7. [Web and Vercel](06-web-vercel.md)
+8. [Store Readiness](07-app-store-play-store.md)
+9. [Privacy and Safety](08-privacidade-seguranca.md)
+10. [Roadmap](09-roadmap.md)
+
+## Existing Detailed Sections
+
+- `apresentacao/`: product narrative and MVP presentation.
+- `specs/`: behavior specifications for core product areas.
+- `technical/`: data model, realtime contracts and architecture decisions.
+- `design/`: visual references, wireframes and UI direction.
+- `agents/`: role briefings for specialized agents.
+- `qa/`: test plan, manual cases, regression checklist and test run reports.
+
+## Documentation Principles
+
+- Be accurate before being impressive.
+- Do not claim app-store approval, legal review or field validation before it happens.
+- Treat location as a temporary game mechanic, not monitoring.
+- Keep code, Supabase migrations, legal pages and docs aligned.
+- Update docs when changing room flow, GPS behavior, invite links, privacy text, Vercel config or store metadata.

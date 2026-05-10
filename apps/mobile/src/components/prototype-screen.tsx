@@ -2,7 +2,8 @@ import type { ReactNode } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { Link, type Href } from 'expo-router';
-import { Pressable, ScrollView, Text, useWindowDimensions, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import type { ViewStyle } from 'react-native';
 
 import { colors } from '@/src/theme/colors';
 import { t } from '@/src/i18n';
@@ -15,33 +16,29 @@ type PrototypeScreenProps = {
 };
 
 export function PrototypeScreen({ centered = false, children }: PrototypeScreenProps) {
-  const { height, width } = useWindowDimensions();
+  const { height } = useWindowDimensions();
+  const minScreenHeight = (height || '100vh') as ViewStyle['minHeight'];
 
   return (
-    <View style={{ backgroundColor: patterns.screen.baseBackground, flex: 1, minHeight: height, position: 'relative' }}>
+    <View style={{ backgroundColor: patterns.screen.baseBackground, flex: 1, minHeight: minScreenHeight, position: 'relative' }}>
       <Image
         source={require('@/assets/images/pique-esconde-background.png')}
         contentFit="cover"
         pointerEvents="none"
         style={{
-          height,
-          left: 0,
+          ...StyleSheet.absoluteFillObject,
           opacity: 1,
-          position: 'absolute',
-          right: 0,
-          top: 0,
-          width,
           zIndex: 0,
         }}
       />
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
-        style={{ flex: 1, minHeight: height, zIndex: 1 }}
+        style={{ flex: 1, minHeight: minScreenHeight, zIndex: 1 }}
         contentContainerStyle={{
           alignItems: 'center',
           gap: 18,
           justifyContent: centered ? 'center' : 'flex-start',
-          minHeight: height,
+          minHeight: minScreenHeight,
           padding: 20,
           paddingBottom: 40,
         }}>
