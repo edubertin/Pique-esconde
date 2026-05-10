@@ -18,6 +18,7 @@
   <a href="https://pique-esconde.eduardobertin.com.br/support">Suporte</a>
 </p>
 
+[![Mobile CI](https://github.com/edubertin/Pique-esconde/actions/workflows/mobile-ci.yml/badge.svg)](https://github.com/edubertin/Pique-esconde/actions/workflows/mobile-ci.yml)
 ![MVP](https://img.shields.io/badge/status-MVP-ff2d8d)
 ![Expo](https://img.shields.io/badge/Expo-54-000020)
 ![React Native](https://img.shields.io/badge/React%20Native-0.81-61dafb)
