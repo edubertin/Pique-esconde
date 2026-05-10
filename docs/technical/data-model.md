@@ -216,6 +216,7 @@ O backend possui uma rotina de manutencao para reduzir dependencia de cliente at
 
 - `pe_run_maintenance_tick(target_room_id uuid default null, max_rooms integer default 50)`: entrada para SQL manual ou Supabase Cron.
 - `pe_maintenance_tick_room(target_room_id uuid)`: helper interno por sala.
+- `pe-maintenance-tick-every-minute`: job Supabase Cron dev que chama a rotina a cada 1 minuto.
 
 A rotina:
 

@@ -3,7 +3,10 @@
 Data: 2026-05-10
 Ambiente: Supabase dev via conexao SQL direta
 Branch: `codex/final-snapshot-cleanup`
-Migration: `202605100001_server_side_maintenance_tick`
+Migrations:
+
+- `202605100001_server_side_maintenance_tick`
+- `202605100002_schedule_maintenance_cron`
 
 ## Objetivo
 
@@ -31,12 +34,15 @@ Passou.
 - Limpeza de sala expirada: sala com `expires_at` vencido foi removida.
 - Grants: `anon` nao possui `execute` em `pe_run_maintenance_tick(uuid, integer)` nem em `pe_cleanup_expired_state()`.
 - Privacidade: payload serializado da manutencao nao contem `lat` nem `lng`.
+- Supabase Cron: job `pe-maintenance-tick-every-minute` registrado com agenda `* * * * *`.
+- Smoke do cron: sala expirada criada artificialmente foi removida pelo job, sem chamada manual de `pe_run_maintenance_tick`.
+- Historico do cron: `cron.job_run_details` registrou execucao `succeeded`.
 
 ## Observacoes
 
-- A RPC esta pronta para chamada manual/admin e para ser plugada em Supabase Cron.
-- O cron ainda nao foi configurado automaticamente nesta etapa.
-- O intervalo recomendado inicial e 30s ou 60s, a validar com custo e necessidade do piloto.
+- A RPC segue disponivel para chamada manual/admin.
+- O cron foi configurado no Supabase dev com intervalo de 1 minuto.
+- O intervalo de 1 minuto e conservador para MVP; se a experiencia pedir transicoes mais imediatas, avaliar agenda em segundos conforme suporte do Postgres/Supabase do ambiente.
 
 ## Referencias
 

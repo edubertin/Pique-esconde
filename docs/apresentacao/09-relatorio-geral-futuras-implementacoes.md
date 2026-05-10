@@ -49,7 +49,8 @@ Captura automatica:
 Dependencia de cliente ativo:
 
 - A rotina server-side `pe_run_maintenance_tick` ja existe e foi validada manualmente no Supabase dev.
-- Ainda falta configurar o agendamento automatico, como Supabase Cron, e monitorar execucoes.
+- O Supabase Cron dev ja chama a rotina a cada 1 minuto.
+- Ainda e preciso monitorar execucoes e confirmar o job no ambiente de piloto/producao.
 
 Entrada na sala:
 
@@ -132,7 +133,7 @@ Objetivo: preparar o sistema para piloto e futura producao.
 
 Escopo:
 
-- Configurar Supabase Cron para chamar `pe_run_maintenance_tick`.
+- Confirmar Supabase Cron ativo no ambiente de piloto/producao.
 - Monitorar execucoes da rotina server-side de timers e limpeza.
 - Regras de retencao de GPS temporario.
 - Logs de eventos importantes de rodada.

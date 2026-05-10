@@ -108,6 +108,7 @@ Já implementado nesta fase:
 - Sala finalizada disponivel por 2 minutos para compartilhar ou jogar novamente.
 - Limpeza oportunistica de salas expiradas e dados temporarios de GPS/captura/DEV.
 - RPC server-side `pe_run_maintenance_tick` para timers, GPS enforcement e limpeza sem token de jogador.
+- Supabase Cron dev `pe-maintenance-tick-every-minute` chamando a manutencao a cada 1 minuto.
 - Ferramenta DEV de GPS/radar para calibracao local no web/DEV.
 - Correcoes de navegacao final: captura terminal vai direto para Resultado, sem tela intermediaria.
 - Radar DEV estabilizado entre rodadas, sem alternar com leitura real enquanto o override esta ativo.
@@ -119,7 +120,8 @@ Ainda pendente nesta fase:
 - Feedback de som/haptics calibrado em celular real.
 - Convite por link/deep link e compartilhamento nativo.
 - Teste em celulares reais no mesmo espaço físico.
-- Configurar Supabase Cron para chamar a rotina server-side de manutencao.
+- Confirmar Supabase Cron ativo no ambiente de piloto/producao.
+- Monitorar execucoes do cron durante QA.
 - Revisao final de privacidade, textos de permissao e comportamento quando o GPS oscila.
 
 Critério de avanço:

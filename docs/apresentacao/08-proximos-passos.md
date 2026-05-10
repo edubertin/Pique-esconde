@@ -240,8 +240,8 @@ Proximo ciclo recomendado:
 
 Backlog tecnico antes de producao:
 
-- Configurar Supabase Cron para chamar `pe_run_maintenance_tick`.
-- Monitorar a rotina server-side de timer/limpeza durante QA.
+- Confirmar Supabase Cron ativo no ambiente de piloto/producao.
+- Monitorar `cron.job_run_details` durante QA e piloto.
 - Revisao de politica de dados temporarios de GPS.
 - Monitoramento basico de erros e logs de rodada.
 - Build nativo e teste em iOS/Android reais.

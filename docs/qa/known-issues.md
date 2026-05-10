@@ -185,26 +185,27 @@ Link para test run:
 
 ## L-006 - Tick de timer depende de cliente ativo
 
-Status: Parcialmente resolvido no backend dev
+Status: Resolvido no backend dev
 Severidade: Media
 Area: Timer/Regras
 Detectado em: 2026-05-09
-Commit/versao: e7accf0; migration `202605100001_server_side_maintenance_tick`
+Commit/versao: e7accf0; migrations `202605100001_server_side_maintenance_tick`, `202605100002_schedule_maintenance_cron`
 
 Descricao:
 - O timer real de rodada existe no Supabase, mas a transição é acordada por chamada do app para `pe_tick_game_session`.
 - Agora existe `pe_run_maintenance_tick`, uma entrada server-side/manual/cron-safe para acordar timers, aplicar regras de GPS e limpar estado expirado sem token de jogador.
-- Ainda falta configurar o agendamento real no ambiente, como Supabase Cron.
+- O Supabase Cron dev chama a rotina a cada 1 minuto pelo job `pe-maintenance-tick-every-minute`.
 
 Impacto:
 - Em testes normais com jogadores na sala, o timer funciona.
 - Com a RPC de manutencao, o backend ja consegue executar a transicao sem cliente ativo quando chamado por SQL/cron.
-- Sem o cron configurado, a garantia automatica ainda depende de execucao manual/admin.
+- A garantia automatica existe no ambiente dev. Para producao/piloto, confirmar que a migration de cron foi aplicada e que o job esta ativo.
 
 Decisao:
 - Manter `pe_run_maintenance_tick` sem grant para `anon`.
-- Configurar Supabase Cron antes de piloto/producao.
-- Usar chamadas manuais da RPC para QA e debug ate o cron ser ligado.
+- Manter `pe_run_maintenance_tick` sem grant para `anon`.
+- Monitorar `cron.job_run_details` antes e durante piloto.
+- Usar chamadas manuais da RPC apenas para QA e debug.
 
 Link para test run:
 - `docs/qa/test-runs/2026-05-09-round-timers-web.md`

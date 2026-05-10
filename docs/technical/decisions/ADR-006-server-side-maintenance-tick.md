@@ -30,7 +30,15 @@ Essas funcoes:
   - `pe_close_round(...)`;
   - `pe_final_round_snapshot(...)`.
 
-O cron/agendamento ainda deve ser configurado no ambiente, mas a funcao autoritativa e testavel ja existe no banco.
+O Supabase Cron no ambiente dev chama a rotina a cada minuto:
+
+```sql
+select cron.schedule(
+  'pe-maintenance-tick-every-minute',
+  '* * * * *',
+  $$select public.pe_run_maintenance_tick(null::uuid, 50);$$
+);
+```
 
 ## Consequences
 
@@ -44,7 +52,7 @@ Impactos positivos:
 Cuidados:
 
 - O retorno da manutencao nao deve expor latitude/longitude.
-- O agendamento deve usar intervalo conservador no MVP, como 30s ou 60s.
+- O agendamento inicial usa intervalo conservador de 1 minuto.
 - O job precisa ser monitorado antes de piloto/producao.
 - A funcao usa locks por sala com `FOR UPDATE SKIP LOCKED` para reduzir disputa entre execucoes concorrentes.
 
