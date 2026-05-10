@@ -27,6 +27,7 @@ Passou.
 - Lider alterou regras no lobby para ambiente `large`, esconder `45s`, busca `5min`.
 - Jogador nao lider falhou ao tentar alterar regras.
 - Jogadores que estavam `Preparado` voltaram para `Aguardando` depois da mudanca de regra.
+- `Alvo DEV` permaneceu `Preparado` depois da mudanca de regra, para manter o fluxo de calibracao rapido.
 - Iniciar rodada congelou as regras em `pe_game_sessions`.
 - Alterar regras fora do lobby falhou.
 - Chamada maliciosa de radar com `area_preset='small'` nao alterou o preset congelado `large` da sessao.
