@@ -1,9 +1,12 @@
+import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Animated, Platform, Text, useWindowDimensions, View } from 'react-native';
 import { useEffect, useMemo, useRef } from 'react';
 
 import type { RadarHint } from '@/src/state/room-store';
 import { colors } from '@/src/theme/colors';
 import type { DeviceHeadingState } from '@/src/hooks/use-device-heading';
+import { patterns } from '@/src/theme/patterns';
 
 const bandMeta: Record<RadarHint['band'], { color: string; label: string; markerLeft: `${number}%` }> = {
   cold: { color: '#5AB8FF', label: 'Frio', markerLeft: '17%' },
@@ -356,22 +359,27 @@ export function RadarView({
         </Text>
       </View>
 
-      <View
-        style={{
-          alignItems: 'center',
-          backgroundColor: 'rgba(190, 225, 255, 0.50)',
-          borderColor: 'rgba(255, 255, 255, 0.90)',
-          borderRadius: 18,
-          borderWidth: 1,
-          boxShadow: Platform.select({
-            web: 'inset 0 1px 0 rgba(255,255,255,0.90), 0 8px 32px rgba(7, 26, 61, 0.18)',
-            default: '0 8px 32px rgba(7, 26, 61, 0.18)',
-          }),
-          gap: 7,
-          paddingHorizontal: 12,
-          paddingVertical: 9,
-          width: '100%',
-        }}>
+      <LinearGradient
+        colors={['rgba(255,255,255,1.0)', 'rgba(255,255,255,0.0)']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0.4, y: 1 }}
+        style={{ borderRadius: 19, padding: 1, width: '100%' }}>
+        {Platform.OS === 'web' ? (
+          <View
+            style={{
+              alignItems: 'center',
+              backgroundColor: 'rgba(190, 225, 255, 0.50)',
+              borderRadius: 18,
+              boxShadow: patterns.panel.glass.shadow,
+              backdropFilter: 'blur(20px)',
+              // @ts-expect-error webkit vendor prefix not in RN ViewStyle but forwarded on web
+              WebkitBackdropFilter: 'blur(20px)',
+              gap: 7,
+              overflow: 'hidden',
+              paddingHorizontal: 12,
+              paddingVertical: 9,
+              width: '100%',
+            }}>
         {timerLabel || typeof remainingCount === 'number' ? (
           <View style={{ flexDirection: 'row', gap: 10, width: '100%' }}>
             {timerLabel ? (
@@ -452,7 +460,55 @@ export function RadarView({
           {directionLabel}
           {deviceHeading?.status === 'active' && deviceHeading.accuracy > 0 ? ` - bussola ${deviceHeading.accuracy}/3` : ''}
         </Text>
-      </View>
+          </View>
+        ) : (
+          <View style={{ borderRadius: 18, boxShadow: patterns.panel.glass.shadow, width: '100%' }}>
+            <BlurView
+              intensity={55}
+              tint="light"
+              style={{
+                alignItems: 'center',
+                borderRadius: 18,
+                gap: 7,
+                overflow: 'hidden',
+                paddingHorizontal: 12,
+                paddingVertical: 9,
+                width: '100%',
+              }}>
+              {timerLabel || typeof remainingCount === 'number' ? (
+                <View style={{ flexDirection: 'row', gap: 10, width: '100%' }}>
+                  {timerLabel ? (
+                    <View style={{ backgroundColor: 'rgba(255,255,255,0.82)', borderColor: colors.navy, borderRadius: 14, borderWidth: 2, flex: 1, paddingHorizontal: 10, paddingVertical: 6 }}>
+                      <Text selectable style={{ color: colors.navy, fontSize: 10, fontWeight: '900', textAlign: 'center' }}>TEMPO</Text>
+                      <Text selectable style={{ color: colors.navy, fontSize: 20, fontVariant: ['tabular-nums'], fontWeight: '900', textAlign: 'center' }}>{timerLabel}</Text>
+                    </View>
+                  ) : null}
+                  {typeof remainingCount === 'number' ? (
+                    <View style={{ backgroundColor: 'rgba(255,255,255,0.82)', borderColor: colors.navy, borderRadius: 14, borderWidth: 2, flex: 1, paddingHorizontal: 10, paddingVertical: 6 }}>
+                      <Text selectable style={{ color: colors.pink, fontSize: 10, fontWeight: '900', textAlign: 'center' }}>RESTAM</Text>
+                      <Text selectable style={{ color: colors.navy, fontSize: 20, fontVariant: ['tabular-nums'], fontWeight: '900', textAlign: 'center' }}>{remainingCount}</Text>
+                    </View>
+                  ) : null}
+                </View>
+              ) : null}
+              <View style={{ borderColor: colors.navy, borderRadius: 999, borderWidth: 2, flexDirection: 'row', height: 16, overflow: 'hidden', width: '100%' }}>
+                <View style={{ backgroundColor: '#5AB8FF', flex: 1 }} />
+                <View style={{ backgroundColor: '#FFD35A', flex: 1 }} />
+                <View style={{ backgroundColor: '#FF5A4E', flex: 1 }} />
+                <View style={{ backgroundColor: colors.surface, borderColor: colors.navy, borderRadius: 999, borderWidth: 2, height: 24, left: meta.markerLeft, marginLeft: -12, position: 'absolute', top: -5, width: 24 }} />
+              </View>
+              <Text selectable style={{ color: band === 'none' ? colors.ink : meta.color, fontSize: 20, fontWeight: '900', textAlign: 'center' }}>
+                {statusLabel} {confidence > 0 && !hasNoTarget ? `${confidence}%` : ''}
+              </Text>
+              <Text selectable style={{ color: colors.ink, fontSize: 12, fontWeight: '900', textAlign: 'center' }}>{statusBody}</Text>
+              <Text selectable style={{ color: colors.muted, fontSize: 11, fontWeight: '900', textAlign: 'center' }}>
+                {directionLabel}
+                {deviceHeading?.status === 'active' && deviceHeading.accuracy > 0 ? ` - bussola ${deviceHeading.accuracy}/3` : ''}
+              </Text>
+            </BlurView>
+          </View>
+        )}
+      </LinearGradient>
     </View>
   );
 }
