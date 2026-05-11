@@ -459,3 +459,33 @@ Decisao:
 
 Link para test run:
 - `docs/qa/test-runs/2026-05-10-pwa-session-lobby-sync.md`
+
+## KI-013 - Reconexao com mesmo apelido bloqueada se sessao local for perdida
+
+Status: Aceito no MVP
+Severidade: Media
+Area: Lobby / Entrada / Unicidade de apelido
+Detectado em: 2026-05-11
+Commit/versao: a385a30
+
+Descricao:
+- Com a constraint de apelido unico por sala (migration `202605110001`), se um jogador esta na sala como "Ana" e perde a sessao local (storage limpo, troca de browser, modo privado), nao consegue entrar novamente com o mesmo apelido enquanto seu registro ainda existir na sala.
+- A RPC `pe_join_room` retorna "Nickname already in use" porque o `nickname_key` ja existe para outro registro da mesma sala.
+
+Impacto:
+- Jogador vira prisioneiro do proprio nome se a sessao local sumir.
+- Em ambiente normal (refresh simples, queda de rede), a sessao e restaurada pelo storage e o jogador volta sem chamar `pe_join_room` — nao ha conflito.
+- O problema so ocorre quando o storage e perdido de vez (modo privado, limpeza manual, troca de dispositivo).
+
+Comportamento esperado:
+- Jogador que perde sessao consegue reentrar na sala com o mesmo apelido se seu registro ainda estiver ativo.
+
+Comportamento atual:
+- Bloqueado com mensagem de erro de nome duplicado.
+
+Decisao:
+- Aceito no MVP. A reconexao por session token (caminho normal) funciona corretamente.
+- Para corrigir definitivamente: `pe_join_room` poderia detectar registro existente inativo com mesmo `nickname_key` e reutilizar/substituir o token. Avaliar pos-piloto.
+
+Link para test run:
+- `docs/qa/test-runs/2026-05-11-nickname-dedup-lobby.md` (TC-NIC-REJ na secao de riscos)
