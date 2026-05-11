@@ -90,6 +90,9 @@ export default function LocationPermissionScreen() {
           <Text selectable style={{ color: colors.muted, fontSize: 15, lineHeight: 22, textAlign: 'center' }}>
             {t('location.body')}
           </Text>
+          <Text selectable style={{ color: colors.muted, fontSize: 13, lineHeight: 20, textAlign: 'center' }}>
+            {t('location.safety')}
+          </Text>
           {canUseDevGps ? (
             <Text selectable style={{ color: colors.muted, fontSize: 13, fontWeight: '800', lineHeight: 18, textAlign: 'center' }}>
               DEV: libera o lobby sem GPS real e cria um alvo pronto para calibrar radar/captura.

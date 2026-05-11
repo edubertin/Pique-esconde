@@ -72,6 +72,7 @@ export const enUS = {
   'location.badge': 'Only during the match',
   'location.body': 'We do not show your exact point to other players and we do not share GPS on social networks.',
   'location.denied': 'GPS permission denied. Enable location to test the real match.',
+  'location.safety': 'Play in a safe, open area. GPS shows approximate position, not precise navigation.',
   'location.requesting': 'Opening permission...',
   'location.title': 'Location',
   'location.summary': 'We use your location to calculate radar and captures.',

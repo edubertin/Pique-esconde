@@ -68,6 +68,7 @@ export const ptBR = {
   'location.badge': 'Só durante a partida',
   'location.body': 'Não mostramos seu ponto exato para outros jogadores e não compartilhamos GPS em redes sociais.',
   'location.denied': 'Permissão de GPS negada. Ative a localização para testar a partida real.',
+  'location.safety': 'Jogue em local seguro e aberto. O GPS indica posição aproximada, não navegação precisa.',
   'location.requesting': 'Abrindo permissão...',
   'location.title': 'Localização',
   'location.summary': 'Usamos sua localização para calcular radar e capturas.',
