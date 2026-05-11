@@ -7,6 +7,7 @@ import type { RadarHint } from '@/src/state/room-store';
 import { colors } from '@/src/theme/colors';
 import type { DeviceHeadingState } from '@/src/hooks/use-device-heading';
 import { patterns } from '@/src/theme/patterns';
+import { surfaces } from '@/src/theme/surfaces';
 
 const bandMeta: Record<RadarHint['band'], { color: string; label: string; markerLeft: `${number}%` }> = {
   cold: { color: '#5AB8FF', label: 'Frio', markerLeft: '17%' },
@@ -383,16 +384,7 @@ export function RadarView({
         {timerLabel || typeof remainingCount === 'number' ? (
           <View style={{ flexDirection: 'row', gap: 10, width: '100%' }}>
             {timerLabel ? (
-              <View
-                style={{
-                  backgroundColor: 'rgba(221, 244, 255, 0.50)',
-                  borderColor: 'rgba(255, 255, 255, 0.72)',
-                  borderRadius: 14,
-                  borderWidth: 1,
-                  flex: 1,
-                  paddingHorizontal: 10,
-                  paddingVertical: 6,
-                }}>
+              <View style={{ ...surfaces.glassTile, borderRadius: 14, flex: 1, paddingHorizontal: 10, paddingVertical: 6 }}>
                 <Text selectable style={{ color: colors.navy, fontSize: 10, fontWeight: '900', textAlign: 'center' }}>
                   TEMPO
                 </Text>
@@ -402,16 +394,7 @@ export function RadarView({
               </View>
             ) : null}
             {typeof remainingCount === 'number' ? (
-              <View
-                style={{
-                  backgroundColor: 'rgba(221, 244, 255, 0.50)',
-                  borderColor: 'rgba(255, 255, 255, 0.72)',
-                  borderRadius: 14,
-                  borderWidth: 1,
-                  flex: 1,
-                  paddingHorizontal: 10,
-                  paddingVertical: 6,
-                }}>
+              <View style={{ ...surfaces.glassTile, borderRadius: 14, flex: 1, paddingHorizontal: 10, paddingVertical: 6 }}>
                 <Text selectable style={{ color: colors.pink, fontSize: 10, fontWeight: '900', textAlign: 'center' }}>
                   RESTAM
                 </Text>
@@ -478,13 +461,13 @@ export function RadarView({
               {timerLabel || typeof remainingCount === 'number' ? (
                 <View style={{ flexDirection: 'row', gap: 10, width: '100%' }}>
                   {timerLabel ? (
-                    <View style={{ backgroundColor: 'rgba(221, 244, 255, 0.50)', borderColor: 'rgba(255, 255, 255, 0.72)', borderRadius: 14, borderWidth: 1, flex: 1, paddingHorizontal: 10, paddingVertical: 6 }}>
+                    <View style={{ ...surfaces.glassTile, borderRadius: 14, flex: 1, paddingHorizontal: 10, paddingVertical: 6 }}>
                       <Text selectable style={{ color: colors.navy, fontSize: 10, fontWeight: '900', textAlign: 'center' }}>TEMPO</Text>
                       <Text selectable style={{ color: colors.navy, fontSize: 20, fontVariant: ['tabular-nums'], fontWeight: '900', textAlign: 'center' }}>{timerLabel}</Text>
                     </View>
                   ) : null}
                   {typeof remainingCount === 'number' ? (
-                    <View style={{ backgroundColor: 'rgba(221, 244, 255, 0.50)', borderColor: 'rgba(255, 255, 255, 0.72)', borderRadius: 14, borderWidth: 1, flex: 1, paddingHorizontal: 10, paddingVertical: 6 }}>
+                    <View style={{ ...surfaces.glassTile, borderRadius: 14, flex: 1, paddingHorizontal: 10, paddingVertical: 6 }}>
                       <Text selectable style={{ color: colors.pink, fontSize: 10, fontWeight: '900', textAlign: 'center' }}>RESTAM</Text>
                       <Text selectable style={{ color: colors.navy, fontSize: 20, fontVariant: ['tabular-nums'], fontWeight: '900', textAlign: 'center' }}>{remainingCount}</Text>
                     </View>
