@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { Link, type Href } from 'expo-router';
-import { Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import type { ViewStyle } from 'react-native';
 
 import { colors } from '@/src/theme/colors';
@@ -31,19 +31,26 @@ export function PrototypeScreen({ centered = false, children }: PrototypeScreenP
           zIndex: 0,
         }}
       />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={{ flex: 1, minHeight: minScreenHeight, zIndex: 1 }}
-        contentContainerStyle={{
-          alignItems: 'center',
-          gap: 18,
-          justifyContent: centered ? 'center' : 'flex-start',
-          minHeight: minScreenHeight,
-          padding: 20,
-          paddingBottom: 40,
-        }}>
-        {children}
-      </ScrollView>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
+        style={{ flex: 1, minHeight: minScreenHeight, zIndex: 1 }}>
+        <ScrollView
+          contentInsetAdjustmentBehavior="automatic"
+          keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
+          keyboardShouldPersistTaps="handled"
+          style={{ flex: 1, minHeight: minScreenHeight }}
+          contentContainerStyle={{
+            alignItems: 'center',
+            gap: 18,
+            justifyContent: centered ? 'center' : 'flex-start',
+            minHeight: minScreenHeight,
+            padding: 20,
+            paddingBottom: 96,
+          }}>
+          {children}
+        </ScrollView>
+      </KeyboardAvoidingView>
     </View>
   );
 }

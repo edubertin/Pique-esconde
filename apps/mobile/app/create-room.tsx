@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Text, TextInput, View } from 'react-native';
+import { Platform, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { AvatarChoice } from '@/src/components/avatar-choice';
 import { Badge } from '@/src/components/badge';
@@ -10,18 +10,28 @@ import { t } from '@/src/i18n';
 import { useRoom } from '@/src/state/room-store';
 import { colors } from '@/src/theme/colors';
 
-const inputStyle = {
-  backgroundColor: 'rgba(221, 244, 255, 0.78)',
-  borderColor: colors.navy,
-  borderRadius: 16,
-  borderWidth: 2,
-  boxShadow: '0 5px 0 rgba(7, 26, 61, 0.10)',
-  color: colors.ink,
-  fontSize: 16,
-  fontWeight: '800' as const,
-  minHeight: 56,
-  padding: 14,
-};
+const styles = StyleSheet.create({
+  input: {
+    backgroundColor: 'rgba(221, 244, 255, 0.78)',
+    borderColor: colors.navy,
+    borderRadius: 16,
+    borderWidth: 2,
+    color: colors.ink,
+    fontSize: 16,
+    fontWeight: '800',
+    minHeight: 56,
+    padding: 14,
+    ...(Platform.OS === 'web'
+      ? { boxShadow: '0 5px 0 rgba(7, 26, 61, 0.10)' }
+      : {
+          elevation: 2,
+          shadowColor: colors.navy,
+          shadowOffset: { height: 3, width: 0 },
+          shadowOpacity: 0.1,
+          shadowRadius: 4,
+        }),
+  },
+});
 
 export default function CreateRoomScreen() {
   const router = useRouter();
@@ -61,11 +71,15 @@ export default function CreateRoomScreen() {
             {t('create.nickname')}
           </Text>
           <TextInput
+            autoCapitalize="words"
+            autoCorrect={false}
             onChangeText={setNickname}
             placeholder={t('create.nickname')}
             placeholderTextColor={colors.muted}
+            returnKeyType="done"
+            selectTextOnFocus
             value={nickname}
-            style={inputStyle}
+            style={styles.input}
           />
         </View>
 
