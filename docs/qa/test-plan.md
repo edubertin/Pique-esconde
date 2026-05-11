@@ -86,6 +86,10 @@ Este plano cobre o MVP mobile/web em Expo:
 
 - [Teste de campo com 2 jogadores](field-test-2-players.md): roteiro pratico para validar GPS, radar, captura, resultado, rematch, convite e privacidade com apenas duas pessoas.
 
+## Fase 0
+
+- [Estrutura de QA da Fase 0](fase-0/README.md): templates de test-run, bug, checklist Go/No-Go e resumo para decidir avanco ao piloto fechado.
+
 ## Ambientes
 
 Preencher durante cada execucao:
