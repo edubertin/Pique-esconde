@@ -11,56 +11,9 @@ import { useRoom } from '@/src/state/room-store';
 import { colors } from '@/src/theme/colors';
 import { enableDevGps, isDevGpsAvailable } from '@/src/utils/dev-gps';
 
-type InitialCoords = {
-  accuracy?: number | null;
-  heading?: number | null;
-  latitude: number;
-  longitude: number;
-  speed?: number | null;
-};
-
-function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
-  return new Promise((resolve, reject) => {
-    const timeout = setTimeout(() => reject(new Error('Location timeout')), timeoutMs);
-
-    promise
-      .then(resolve, reject)
-      .finally(() => clearTimeout(timeout));
-  });
-}
-
-async function getInitialCoords(): Promise<InitialCoords> {
-  try {
-    const currentLocation = await withTimeout(
-      Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Balanced,
-      }),
-      6000,
-    );
-
-    return currentLocation.coords;
-  } catch (expoError) {
-    if (typeof navigator === 'undefined' || !navigator.geolocation) {
-      throw expoError;
-    }
-
-    return new Promise((resolve, reject) => {
-      navigator.geolocation.getCurrentPosition(
-        (position) => resolve(position.coords),
-        reject,
-        {
-          enableHighAccuracy: false,
-          maximumAge: 10000,
-          timeout: 6000,
-        },
-      );
-    });
-  }
-}
-
 export default function LocationPermissionScreen() {
   const router = useRouter();
-  const { activePlayer, addDevTargetPlayer, leaveRoom, room, updatePlayerLocation } = useRoom();
+  const { activePlayer, addDevTargetPlayer, leaveRoom, room } = useRoom();
   const [error, setError] = useState<string>();
   const [isDevRequesting, setIsDevRequesting] = useState(false);
   const [isRequesting, setIsRequesting] = useState(false);
@@ -82,24 +35,6 @@ export default function LocationPermissionScreen() {
         }
         setError(permission.canAskAgain ? 'Toque novamente para permitir a localizacao.' : t('location.denied'));
         return;
-      }
-
-      try {
-        const currentCoords = await getInitialCoords();
-
-        if (room) {
-          await updatePlayerLocation({
-            accuracyMeters: currentCoords.accuracy ?? undefined,
-            headingDegrees: currentCoords.heading ?? undefined,
-            lat: currentCoords.latitude,
-            lng: currentCoords.longitude,
-            speedMetersPerSecond: currentCoords.speed ?? undefined,
-          });
-        }
-      } catch {
-        if (room) {
-          setError('Permissao aceita. Vamos continuar enquanto o GPS pega sinal.');
-        }
       }
 
       router.push(room ? '/lobby' : '/create-room');
