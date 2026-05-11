@@ -36,6 +36,7 @@ export const ptBR = {
   'hiderStatus.near': 'Ele esta chegando',
   'hiderStatus.released': '{name} ja pode procurar',
   'hiderStatus.radarIncreasing': 'Radar aumentando',
+  'hiderStatus.signalWarning': 'GPS instavel — fique ao ar livre para nao sair da rodada.',
   'hiderStatus.surviveText': 'Fique escondido ate o tempo acabar. {name} esta procurando.',
   'hiderStatus.timerEnded': '00:00',
   'hiderStatus.title': 'Continue escondido',

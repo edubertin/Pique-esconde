@@ -40,6 +40,7 @@ export const enUS = {
   'hiderStatus.near': 'They are getting close',
   'hiderStatus.released': '{name} can search now',
   'hiderStatus.radarIncreasing': 'Radar increasing',
+  'hiderStatus.signalWarning': 'Unstable GPS — stay in the open to avoid being dropped.',
   'hiderStatus.surviveText': 'Stay hidden until time runs out. {name} is searching.',
   'hiderStatus.timerEnded': '00:00',
   'hiderStatus.title': 'Stay hidden',

@@ -28,6 +28,7 @@ export default function HiderStatusScreen() {
   const remainingSeconds = seekEndsAt ? (seekEndsAt - now) / 1000 : 0;
   const timerLabel = seekEndsAt ? formatTimer(remainingSeconds) : t('hiderStatus.timerEnded');
   const dangerLevel = dangerHint?.signalStatus === 'fresh' ? dangerHint.level : 'calm';
+  const signalWarning = dangerHint?.signalStatus === 'warning';
   const heartColor = dangerLevel === 'danger' ? colors.pink : dangerLevel === 'near' ? colors.yellow : colors.blue;
   const heartLabel = dangerLevel === 'danger' ? t('hiderStatus.danger') : dangerLevel === 'near' ? t('hiderStatus.near') : t('hiderStatus.calm');
   usePlayerLocationSync(Boolean(room?.phase === 'seeking' && activePlayer));
@@ -132,6 +133,11 @@ export default function HiderStatusScreen() {
           </Text>
         </View>
 
+        {signalWarning ? (
+          <Text selectable style={{ color: colors.yellow, fontSize: 13, fontWeight: '800', textAlign: 'center' }}>
+            {t('hiderStatus.signalWarning')}
+          </Text>
+        ) : null}
         <Badge label={t('hiderStatus.released', { name: seekerName })} tone="waiting" />
         <GameButton label={t('common.exit')} onPress={handleLeaveRoom} variant="danger" />
       </View>
