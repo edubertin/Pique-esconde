@@ -1,4 +1,4 @@
-import { Animated, Text, useWindowDimensions, View } from 'react-native';
+import { Animated, Platform, Text, useWindowDimensions, View } from 'react-native';
 import { useEffect, useMemo, useRef } from 'react';
 
 import type { RadarHint } from '@/src/state/room-store';
@@ -359,11 +359,14 @@ export function RadarView({
       <View
         style={{
           alignItems: 'center',
-          backgroundColor: 'rgba(255, 255, 255, 0.82)',
-          borderColor: 'rgba(255, 255, 255, 0.94)',
+          backgroundColor: 'rgba(190, 225, 255, 0.50)',
+          borderColor: 'rgba(255, 255, 255, 0.90)',
           borderRadius: 18,
-          borderWidth: 2,
-          boxShadow: '0 7px 0 rgba(7, 26, 61, 0.14)',
+          borderWidth: 1,
+          boxShadow: Platform.select({
+            web: 'inset 0 1px 0 rgba(255,255,255,0.90), 0 8px 32px rgba(7, 26, 61, 0.18)',
+            default: '0 8px 32px rgba(7, 26, 61, 0.18)',
+          }),
           gap: 7,
           paddingHorizontal: 12,
           paddingVertical: 9,
