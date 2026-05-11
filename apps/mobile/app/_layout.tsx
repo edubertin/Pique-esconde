@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 
 import { RoomRouteGuard } from '@/src/components/room-route-guard';
+import { SessionConflictGuard } from '@/src/components/session-conflict-guard';
 import { RoomProvider } from '@/src/state/room-store';
 
 export default function RootLayout() {
@@ -11,6 +12,7 @@ export default function RootLayout() {
     <ThemeProvider value={DefaultTheme}>
       <RoomProvider>
         <RoomRouteGuard />
+        <SessionConflictGuard />
         <Stack
           screenOptions={{
             headerShown: false,

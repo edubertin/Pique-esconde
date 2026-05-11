@@ -25,7 +25,8 @@ function getTargetPath({
   }
 
   if (!room) {
-    return publicPaths.has(pathname) ? undefined : '/?notice=missing-room';
+    if (pathname === '/lobby') return '/?notice=missing-room';
+    return publicPaths.has(pathname) ? undefined : '/';
   }
 
   if (room.phase === 'lobby') {

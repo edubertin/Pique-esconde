@@ -106,6 +106,15 @@ Preencher durante cada execucao:
 
 Para validar dois jogadores no navegador, use dois contextos separados: dois navegadores diferentes, janela anonima separada ou dois celulares. Duas abas comuns no mesmo navegador podem compartilhar a mesma sessao local e parecer o mesmo jogador.
 
+Checklist de regressao para sessao ja aberta:
+
+- [ ] A primeira aba cria sala e continua controlando o lobby.
+- [ ] A segunda aba comum mostra o aviso `Sessao ja aberta`.
+- [ ] `Entrar como outro jogador` leva para entrada por codigo sem remover o jogador original.
+- [ ] `Atualizar` reavalia a sessao.
+- [ ] Fechar a primeira aba libera a sessao apos alguns segundos.
+- [ ] Em app nativo, o fluxo nao mostra esse aviso.
+
 ## Criterio de Pronto para MVP
 
 O MVP pode avancar para piloto quando:

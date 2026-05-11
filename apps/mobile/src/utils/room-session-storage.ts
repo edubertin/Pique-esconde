@@ -1,4 +1,5 @@
 const storageKey = 'pique-esconde:room-session:v1';
+const ignoreStoredSessionOnceKey = 'pique-esconde:ignore-stored-session-once:v1';
 
 export type StoredRoomSession = {
   activePlayerId: string;
@@ -18,6 +19,16 @@ function getWebStorage() {
   }
 }
 
+function getWebSessionStorage() {
+  if (typeof window === 'undefined') return undefined;
+
+  try {
+    return window.sessionStorage;
+  } catch {
+    return undefined;
+  }
+}
+
 export function clearStoredRoomSession() {
   try {
     getWebStorage()?.removeItem(storageKey);
@@ -26,7 +37,21 @@ export function clearStoredRoomSession() {
   }
 }
 
+export function ignoreStoredRoomSessionOnce() {
+  try {
+    getWebSessionStorage()?.setItem(ignoreStoredSessionOnceKey, 'true');
+  } catch {
+    // Session restore is a convenience; room RPCs remain the source of truth.
+  }
+}
+
 export function loadStoredRoomSession(): StoredRoomSession | undefined {
+  const sessionStorage = getWebSessionStorage();
+  if (sessionStorage?.getItem(ignoreStoredSessionOnceKey) === 'true') {
+    sessionStorage.removeItem(ignoreStoredSessionOnceKey);
+    return undefined;
+  }
+
   const rawSession = getWebStorage()?.getItem(storageKey);
   if (!rawSession) return undefined;
 

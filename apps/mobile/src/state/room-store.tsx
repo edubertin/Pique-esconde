@@ -171,6 +171,7 @@ type Room = {
 
 type RoomStore = {
   activePlayer?: RoomPlayer;
+  abandonLocalSession: () => void;
   addDemoPlayer: () => Promise<void>;
   addDevTargetPlayer: () => Promise<void>;
   clearDevTestDistance: () => Promise<void>;
@@ -551,6 +552,16 @@ export function RoomProvider({ children }: { children: ReactNode }) {
 
     return {
       activePlayer,
+      abandonLocalSession() {
+        disableDevGps();
+        leavingRoomRef.current = false;
+        suppressRemovalNoticeRef.current = true;
+        setActivePlayerId(undefined);
+        setActivePlayerToken(undefined);
+        setError(undefined);
+        setRoom(undefined);
+        clearFinalResultSnapshot();
+      },
       clearError() {
         setError(undefined);
       },

@@ -127,7 +127,7 @@ export default function ResultScreen() {
               actions={[
                 {
                   disabled: Boolean(pendingAction),
-                  label: pendingAction === 'leave' ? 'Saindo...' : t('common.exit'),
+                  label: pendingAction === 'leave' ? 'Saindo...' : t('result.backHome'),
                   onPress: handleLeaveRoom,
                   variant: 'danger',
                 },

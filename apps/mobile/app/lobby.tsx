@@ -55,14 +55,8 @@ export default function LobbyScreen() {
       : t('lobby.notReadyReadyBody', { names: missingReadyNames });
   const readyLabel = activePlayer?.status === 'Preparado' ? t('lobby.readyDone') : t('lobby.ready');
   const syncAgeSeconds = lastRoomSyncedAt ? Math.max(0, Math.round((now - lastRoomSyncedAt) / 1000)) : undefined;
-  const syncLabel = isRoomSyncing
-    ? t('lobby.syncUpdating')
-    : syncAgeSeconds == null
-      ? t('lobby.syncConnecting')
-      : syncAgeSeconds <= 4
-        ? t('lobby.syncNow')
-        : t('lobby.syncAge', { seconds: String(syncAgeSeconds) });
-  const syncColor = syncAgeSeconds != null && syncAgeSeconds > 8 ? colors.danger : colors.green;
+  const showSyncWarning = Boolean(syncAgeSeconds != null && syncAgeSeconds > 8);
+  const syncLabel = isRoomSyncing ? t('lobby.syncReconnecting') : t('lobby.syncUnstable');
   const roomWarning =
     room?.closedReason === 'seeker_left'
       ? { body: t('lobby.seekerLeftBody'), title: t('lobby.roundInterruptedTitle') }
@@ -84,7 +78,7 @@ export default function LobbyScreen() {
       }
 
       setCopied(true);
-      setInviteFeedback(t('lobby.copyShareHint'));
+      setInviteFeedback(t('lobby.copyDone'));
       setTimeout(() => setCopied(false), 1600);
       setTimeout(() => setInviteFeedback(undefined), 2200);
     } catch {
@@ -267,26 +261,19 @@ export default function LobbyScreen() {
             </View>
             <Badge label={`${players.length}/${room?.maxPlayers ?? 8}`} tone="rush" />
           </View>
-          {copied ? (
-            <Text selectable style={{ color: colors.green, fontSize: 12, fontWeight: '800' }}>
-              {t('common.codeCopied')}
-            </Text>
-          ) : null}
           {inviteFeedback ? (
             <Text selectable style={{ color: colors.green, fontSize: 12, fontWeight: '800' }}>
               {inviteFeedback}
             </Text>
           ) : null}
-          <View style={{ flexDirection: 'row', gap: 8 }}>
-            <Badge label={copied ? t('lobby.copyDone') : t('lobby.copyShort')} tone={copied ? 'ready' : 'neutral'} />
-            <Badge label={qrOpen ? t('lobby.qrOpen') : t('lobby.qrShort')} tone={qrOpen ? 'ready' : 'neutral'} />
-          </View>
-          <View style={{ alignItems: 'center', flexDirection: 'row', gap: 6 }}>
-            <Ionicons color={syncColor} name={isRoomSyncing ? 'sync-outline' : 'radio-outline'} size={14} />
-            <Text selectable style={{ color: syncColor, fontSize: 12, fontWeight: '900' }}>
-              {syncLabel}
-            </Text>
-          </View>
+          {showSyncWarning ? (
+            <View style={{ alignItems: 'center', flexDirection: 'row', gap: 6 }}>
+              <Ionicons color={colors.danger} name={isRoomSyncing ? 'sync-outline' : 'warning-outline'} size={14} />
+              <Text selectable style={{ color: colors.danger, fontSize: 12, fontWeight: '900' }}>
+                {syncLabel}
+              </Text>
+            </View>
+          ) : null}
           <PlayerList
             activePlayerId={activePlayer?.id}
             canRemove={activePlayer?.isLeader}
