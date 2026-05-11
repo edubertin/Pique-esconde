@@ -20,7 +20,6 @@ function ResultStat({ label, value }: { label: string; value: string }) {
         borderRadius: 16,
         flex: 1,
         gap: 4,
-        minWidth: 132,
         padding: 12,
       }}>
       <Text selectable style={{ color: colors.muted, fontSize: 12, fontWeight: '800' }}>
