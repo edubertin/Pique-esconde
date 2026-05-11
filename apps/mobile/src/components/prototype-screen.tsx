@@ -87,11 +87,12 @@ type MenuPanelProps = {
   children: ReactNode;
   headerAction?: ReactNode;
   meta?: ReactNode;
+  onBack?: () => void;
   showBack?: boolean;
   title: string;
 };
 
-export function MenuPanel({ actions, backHref = '/', children, headerAction, meta, showBack = true, title }: MenuPanelProps) {
+export function MenuPanel({ actions, backHref = '/', children, headerAction, meta, onBack, showBack = true, title }: MenuPanelProps) {
   return (
     <Panel>
       <View
@@ -105,10 +106,11 @@ export function MenuPanel({ actions, backHref = '/', children, headerAction, met
           paddingBottom: 12,
         }}>
         {showBack ? (
-          <Link href={backHref} asChild>
+          onBack ? (
             <Pressable
               accessibilityLabel={t('common.back')}
               accessibilityRole="button"
+              onPress={onBack}
               style={{
                 ...surfaces.iconButtonActive,
                 alignItems: 'center',
@@ -119,7 +121,23 @@ export function MenuPanel({ actions, backHref = '/', children, headerAction, met
               }}>
               <Ionicons color={colors.navy} name="chevron-back" size={24} />
             </Pressable>
-          </Link>
+          ) : (
+            <Link href={backHref} asChild>
+              <Pressable
+                accessibilityLabel={t('common.back')}
+                accessibilityRole="button"
+                style={{
+                  ...surfaces.iconButtonActive,
+                  alignItems: 'center',
+                  borderRadius: 14,
+                  height: 40,
+                  justifyContent: 'center',
+                  width: 40,
+                }}>
+                <Ionicons color={colors.navy} name="chevron-back" size={24} />
+              </Pressable>
+            </Link>
+          )
         ) : null}
         <View style={{ flex: 1, gap: 2 }}>
           <Text

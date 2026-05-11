@@ -69,6 +69,34 @@ Proibido:
 - Endereço.
 - Coordenadas.
 
+## Janelas de Retenção Formalizadas
+
+As seguintes janelas estão implementadas e aplicadas automaticamente a cada tick de manutenção (cron a cada minuto) pela função `pe_enforce_retention_policy()`, introduzida na migration `202605110005_retention_policy_enforcement.sql`.
+
+### `pe_player_locations` — GPS bruto
+
+| Condição | Janela | Fundamento |
+|---|---|---|
+| Sessão ativa (`hiding` ou `seeking`) | Mantido | Necessário para radar e captura |
+| Sessão encerrada (status `finished` ou ausente) | Apagado após 5 minutos | Graça para a tela de resultado carregar |
+| Qualquer linha com `updated_at` antigo | Apagado após 2 horas | Teto absoluto — segurança contra sessões abandonadas |
+
+### `pe_player_hide_spots` — posição bloqueada
+
+Apagado pelo `pe_cleanup_expired_state()` existente quando não há sessão ativa correspondente e a linha tem mais de 10 minutos.
+
+### `pe_game_sessions` — eventos da partida
+
+Nunca deletados automaticamente. Retidos indefinidamente para as views de métricas de produto. Não contêm coordenadas GPS.
+
+### `pe_rooms`
+
+Expiradas pelo `pe_cleanup_expired_state()` existente via `expires_at` e por esvaziamento de jogadores.
+
+### Princípio geral
+
+Dado bruto de localização é apagado em até 5 minutos após o encerramento da rodada/partida. O teto absoluto de 2 horas garante que nenhum dado GPS permaneça no banco independentemente do estado da sessão. Nenhum dado de localização é retido para fins analíticos.
+
 ## Decisões CEO Pendentes
 
 - Verificar requisitos legais de idade mínima, termos de uso e loja antes de publicação.

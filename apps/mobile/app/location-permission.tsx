@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Text, View } from 'react-native';
 
 import { Badge } from '@/src/components/badge';
-import { GameButton, GameLinkButton } from '@/src/components/game-button';
+import { GameButton } from '@/src/components/game-button';
 import { MenuPanel, PrototypeScreen } from '@/src/components/prototype-screen';
 import { t } from '@/src/i18n';
 import { useRoom } from '@/src/state/room-store';
@@ -18,6 +18,11 @@ export default function LocationPermissionScreen() {
   const [isDevRequesting, setIsDevRequesting] = useState(false);
   const [isRequesting, setIsRequesting] = useState(false);
   const canUseDevGps = isDevGpsAvailable();
+
+  const handleLeaveRoom = async (destination: '/' | '/create-room') => {
+    if (room) await leaveRoom().catch(() => undefined);
+    router.replace(destination);
+  };
 
   const handleAllow = async () => {
     setError(undefined);
@@ -66,7 +71,7 @@ export default function LocationPermissionScreen() {
   return (
     <PrototypeScreen>
       <MenuPanel
-        backHref="/create-room"
+        onBack={() => handleLeaveRoom('/create-room')}
         title={t('location.title')}
         actions={
           <>
@@ -79,7 +84,7 @@ export default function LocationPermissionScreen() {
                 variant="secondary"
               />
             ) : null}
-            <GameLinkButton href="/" label={t('common.cancel')} variant="danger" />
+            <GameButton label={t('common.cancel')} onPress={() => handleLeaveRoom('/')} variant="danger" />
           </>
         }>
         <View style={{ alignItems: 'center', gap: 12 }}>
