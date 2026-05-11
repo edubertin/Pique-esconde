@@ -3,7 +3,8 @@ import { useEffect, useRef } from 'react';
 
 import { useRoom } from '@/src/state/room-store';
 
-const publicPaths = new Set(['/', '/create-room', '/join-room']);
+const alwaysPublicPaths = new Set(['/data-deletion', '/privacy', '/support', '/terms']);
+const publicPaths = new Set(['/', '/create-room', '/join-room', ...alwaysPublicPaths]);
 const lobbyAuxiliaryPaths = new Set(['/create-room', '/join-room', '/location-permission', '/rules']);
 
 function getTargetPath({
@@ -17,6 +18,8 @@ function getTargetPath({
   pathname: string;
   room: ReturnType<typeof useRoom>['room'];
 }) {
+  if (alwaysPublicPaths.has(pathname)) return undefined;
+
   if (finalResultSnapshot) {
     return pathname === '/result' || pathname === '/social-card' ? undefined : '/result';
   }
