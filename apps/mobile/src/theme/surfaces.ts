@@ -14,10 +14,10 @@ export const surfaces = {
     boxShadow: '0 8px 0 rgba(255, 45, 141, 0.18)',
   },
   liquidPanel: {
-    backgroundColor: 'rgba(221, 244, 255, 0.68)',
-    borderColor: 'rgba(255, 255, 255, 0.85)',
+    backgroundColor: 'rgba(190, 225, 255, 0.50)',
+    borderColor: 'rgba(255, 255, 255, 0.90)',
     borderWidth: 1,
-    boxShadow: '0 8px 0 rgba(7, 26, 61, 0.12), 0 1px 0 rgba(255, 255, 255, 0.60)',
+    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.90), 0 8px 32px rgba(7, 26, 61, 0.18)',
   },
   warningTile: {
     backgroundColor: 'rgba(255, 204, 0, 0.18)',

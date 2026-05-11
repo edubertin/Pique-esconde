@@ -1,3 +1,4 @@
+import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Link } from 'expo-router';
 import { Platform, Pressable, Text, View } from 'react-native';
@@ -30,7 +31,6 @@ export default function HomeScreen() {
         <BrandLogo />
         <ButtonCard />
         {noticeText ? <NoticeTile title={noticeText.title} body={noticeText.body} /> : null}
-        <LegalPills />
       </View>
     </PrototypeScreen>
   );
@@ -45,26 +45,55 @@ function resolveNoticeText(roomNotice: ReturnType<typeof useRoom>['roomNotice'])
   return undefined;
 }
 
+const cardInnerStyle = {
+  borderRadius: 24,
+  gap: 14,
+  overflow: 'hidden',
+  padding: 20,
+} as const;
+
+const cardContentStyle = {
+  gap: 2,
+} as const;
+
+function CardContent() {
+  return (
+    <View style={cardContentStyle}>
+      <GameLinkButton href="/create-room" label={t('home.createRoom')} />
+      <GameLinkButton href="/join-room" label={t('home.joinWithCode')} variant="secondary" />
+      <View style={{ backgroundColor: 'rgba(7,26,61,0.08)', height: 1, marginVertical: 4 }} />
+      <GameLinkButton href="/how-to-play" label={t('home.howToPlay')} variant="ghost" />
+      <LegalLinksCompact />
+    </View>
+  );
+}
+
 function ButtonCard() {
   return (
     <LinearGradient
-      colors={['rgba(255,255,255,0.90)', 'rgba(255,255,255,0.18)']}
+      colors={['rgba(255,255,255,1.0)', 'rgba(255,255,255,0.0)']}
       start={{ x: 0, y: 0 }}
-      end={{ x: 0.3, y: 1 }}
+      end={{ x: 0.4, y: 1 }}
       style={{ borderRadius: 25, padding: 1, width: '100%' }}>
-      <View
-        style={{
-          backgroundColor: surfaces.liquidPanel.backgroundColor,
-          borderRadius: 24,
-          boxShadow: surfaces.liquidPanel.boxShadow,
-          gap: 14,
-          padding: 20,
-        }}>
-        <GameLinkButton href="/create-room" label={t('home.createRoom')} />
-        <GameLinkButton href="/join-room" label={t('home.joinWithCode')} variant="secondary" />
-        <View style={{ backgroundColor: 'rgba(7,26,61,0.08)', height: 1, marginVertical: 4 }} />
-        <GameLinkButton href="/how-to-play" label={t('home.howToPlay')} variant="ghost" />
-      </View>
+      {Platform.OS === 'web' ? (
+        <View
+          style={[
+            cardInnerStyle,
+            {
+              backgroundColor: surfaces.liquidPanel.backgroundColor,
+              boxShadow: surfaces.liquidPanel.boxShadow,
+              backdropFilter: 'blur(20px)',
+              // @ts-expect-error webkit vendor prefix not in RN ViewStyle but passed through on web
+              WebkitBackdropFilter: 'blur(20px)',
+            },
+          ]}>
+          <CardContent />
+        </View>
+      ) : (
+        <BlurView intensity={55} tint="light" style={[cardInnerStyle, { boxShadow: surfaces.liquidPanel.boxShadow }]}>
+          <CardContent />
+        </BlurView>
+      )}
     </LinearGradient>
   );
 }
@@ -89,33 +118,34 @@ function NoticeTile({ body, title }: { body: string; title: string }) {
   );
 }
 
-function LegalPills() {
+function LegalLinksCompact() {
   return (
-    <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 10 }}>
-      <LegalPill href="/privacy" label="Privacidade" />
-      <LegalPill href="/terms" label="Termos" />
-      <LegalPill href="/support" label="Suporte" />
+    <View style={{ alignItems: 'center', marginTop: 12, width: '100%' }}>
+      <View style={{ backgroundColor: 'rgba(7, 26, 61, 0.12)', height: 1, width: '100%' }} />
+      <View style={{ alignItems: 'center', justifyContent: 'center', height: 34, width: '100%' }}>
+        <View
+          style={{
+            alignItems: 'center',
+            flexDirection: 'row',
+            justifyContent: 'center',
+            gap: 8,
+          }}>
+          <LegalFooterLink href="/privacy" label="Privacidade" />
+          <Text style={{ color: colors.muted, opacity: 0.7 }}>•</Text>
+          <LegalFooterLink href="/terms" label="Termos" />
+          <Text style={{ color: colors.muted, opacity: 0.7 }}>•</Text>
+          <LegalFooterLink href="/support" label="Suporte" />
+        </View>
+      </View>
     </View>
   );
 }
 
-function LegalPill({ href, label }: { href: '/privacy' | '/support' | '/terms'; label: string }) {
+function LegalFooterLink({ href, label }: { href: '/privacy' | '/support' | '/terms'; label: string }) {
   return (
     <Link href={href} asChild>
-      <Pressable
-        accessibilityLabel={label}
-        accessibilityRole="link"
-        style={{
-          backgroundColor: 'rgba(255,255,255,0.55)',
-          borderColor: 'rgba(255,255,255,0.85)',
-          borderRadius: 999,
-          borderWidth: 1,
-          boxShadow: '0 2px 4px rgba(7,26,61,0.08)',
-          minHeight: 36,
-          paddingHorizontal: 12,
-          paddingVertical: 6,
-        }}>
-        <Text style={{ color: colors.navy, fontSize: 12, fontWeight: '900', opacity: 0.82 }}>{label}</Text>
+      <Pressable accessibilityLabel={label} accessibilityRole="link" style={{ minHeight: 20, paddingHorizontal: 0 }}>
+        <Text style={{ color: colors.navy, fontSize: 10, fontWeight: '800', textDecorationLine: 'underline' }}>{label}</Text>
       </Pressable>
     </Link>
   );
