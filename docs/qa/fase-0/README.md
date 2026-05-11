@@ -18,6 +18,8 @@ Manter a validacao da Fase 0 rastreavel e objetiva:
 - [Template de bug](bug-template.md)
 - [Checklist Go/No-Go](go-no-go-checklist.md)
 - [Resumo da Fase 0](resumo-fase-0.md)
+- [Runbook de Supabase Cron e tick](cron-tick-runbook.md)
+- [Checklist de smoke de seguranca](security-smoke-checklist.md)
 
 ## Severidade
 
@@ -38,4 +40,3 @@ Enquanto isso, QA pode emitir apenas:
 - `Go tecnico provisorio`
 - `No-Go tecnico`
 - `Bloqueado aguardando campo`
-
