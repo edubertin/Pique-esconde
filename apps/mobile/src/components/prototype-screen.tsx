@@ -141,10 +141,11 @@ type MenuPanelProps = {
   onBack?: () => void;
   showBack?: boolean;
   title: string;
+  titleCentered?: boolean;
   tone?: PanelProps['tone'];
 };
 
-export function MenuPanel({ actions, backHref = '/', children, headerAction, meta, onBack, showBack = true, title, tone }: MenuPanelProps) {
+export function MenuPanel({ actions, backHref = '/', children, headerAction, meta, onBack, showBack = true, title, titleCentered = false, tone }: MenuPanelProps) {
   return (
     <Panel tone={tone}>
       <View
@@ -181,7 +182,7 @@ export function MenuPanel({ actions, backHref = '/', children, headerAction, met
           <Text
             numberOfLines={2}
             selectable
-            style={{ color: colors.ink, fontSize: 22, fontWeight: '900', lineHeight: 26 }}>
+            style={{ color: colors.ink, fontSize: 22, fontWeight: '900', lineHeight: 26, textAlign: titleCentered ? 'center' : undefined }}>
             {title}
           </Text>
           {meta ? <View>{meta}</View> : null}

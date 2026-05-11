@@ -112,6 +112,7 @@ export default function ResultScreen() {
       <MenuPanel
         tone="glass"
         showBack={false}
+        titleCentered
         title={t('result.title')}
         actions={
           <>
@@ -147,10 +148,10 @@ export default function ResultScreen() {
           <Text selectable style={{ color: colors.ink, fontSize: 32, fontWeight: '900', textAlign: 'center' }}>
             {resultTitle}
           </Text>
-          <Badge label={highlightReason} tone="ready" />
+          <Badge label={highlightReason} tone="leader" />
         </View>
 
-        <View style={{ flexDirection: 'row', gap: 10 }}>
+        <View style={{ flexDirection: 'row', gap: 10, marginTop: 4 }}>
           <ResultStat label={t('result.time')} value={result?.durationLabel ?? '--'} />
           <ResultStat label={t('result.players')} value={`${playerCount || '--'}`} />
           <ResultStat label={t('result.captured')} value={`${capturedCount}`} />
