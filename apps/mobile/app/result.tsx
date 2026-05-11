@@ -60,10 +60,6 @@ export default function ResultScreen() {
   const seekerName = result?.seekerNickname ?? seeker?.nickname;
   const resultTitle = winner === 'seeker' && seekerName ? t('result.seekerWonBy', { name: seekerName }) : winner === 'seeker' ? t('result.seekerWon') : t('result.hidersWon');
   const highlightReason = winner === 'seeker' ? t('result.highlightSeeker') : t('result.highlightHiders');
-  const summary =
-    winner === 'seeker'
-      ? t('result.summarySeeker', { name: seekerName ?? t('player.roleLeaderSeeker') })
-      : t('result.summaryHiders', { name: highlightName });
 
   if ((!room || room.phase !== 'finished') && !finalResultSnapshot) {
     return null;
@@ -72,9 +68,9 @@ export default function ResultScreen() {
   if (!result) {
     return (
       <PrototypeScreen>
-        <MenuPanel showBack={false} title={t('result.title')}>
+        <MenuPanel tone="glass" showBack={false} title={t('result.title')}>
           <Text selectable style={{ color: colors.muted, fontSize: 16, fontWeight: '900', textAlign: 'center' }}>
-            Fechando resultado...
+            {t('result.closing')}
           </Text>
         </MenuPanel>
       </PrototypeScreen>
@@ -114,24 +110,25 @@ export default function ResultScreen() {
   return (
     <PrototypeScreen>
       <MenuPanel
+        tone="glass"
         showBack={false}
         title={t('result.title')}
         actions={
           <>
             <GameButton
               disabled={Boolean(pendingAction)}
-              label={pendingAction === 'rematch' ? 'Sincronizando...' : t('result.playAgain')}
+              label={pendingAction === 'rematch' ? t('result.syncing') : t('result.playAgain')}
               onPress={handleRematch}
             />
             <ActionGrid
               actions={[
+                { disabled: Boolean(pendingAction), href: '/social-card', label: t('common.share'), variant: 'ghost' },
                 {
                   disabled: Boolean(pendingAction),
-                  label: pendingAction === 'leave' ? 'Saindo...' : t('result.backHome'),
+                  label: pendingAction === 'leave' ? t('result.leaving') : t('result.backHome'),
                   onPress: handleLeaveRoom,
                   variant: 'danger',
                 },
-                { disabled: Boolean(pendingAction), href: '/social-card', label: t('common.share'), variant: 'ghost' },
               ]}
             />
           </>
@@ -139,38 +136,24 @@ export default function ResultScreen() {
         <View
           style={{
             alignItems: 'center',
-            ...surfaces.highlightTile,
+            ...surfaces.glassTile,
             borderRadius: 22,
             gap: 12,
             padding: 18,
           }}>
-          <Badge label={t('result.winner')} tone="leader" />
-          <View
-            style={{
-              alignItems: 'center',
-              height: 144,
-              justifyContent: 'center',
-              width: 144,
-            }}>
-            <Image contentFit="contain" source={highlightAvatar.celebrateImage} style={{ height: 142, width: 142 }} />
+          <View style={{ borderColor: colors.pink, borderRadius: 999, borderWidth: 3, boxShadow: '0 0 18px rgba(255, 45, 141, 0.35)' }}>
+            <Image contentFit="contain" source={highlightAvatar.celebrateImage} style={{ borderRadius: 999, height: 176, width: 176 }} />
           </View>
-          <Text selectable style={{ color: colors.ink, fontSize: 28, fontWeight: '900', textAlign: 'center' }}>
+          <Text selectable style={{ color: colors.ink, fontSize: 32, fontWeight: '900', textAlign: 'center' }}>
             {resultTitle}
           </Text>
           <Badge label={highlightReason} tone="ready" />
-          <Text selectable style={{ color: colors.muted, fontSize: 16, fontWeight: '700', lineHeight: 22, textAlign: 'center' }}>
-            {summary}
-          </Text>
         </View>
 
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
-          <ResultStat label={t('result.time')} value={result?.durationLabel ?? '3min'} />
-          <ResultStat label={t('result.players')} value={`${playerCount || 4}`} />
+        <View style={{ flexDirection: 'row', gap: 10 }}>
+          <ResultStat label={t('result.time')} value={result?.durationLabel ?? '--'} />
+          <ResultStat label={t('result.players')} value={`${playerCount || '--'}`} />
           <ResultStat label={t('result.captured')} value={`${capturedCount}`} />
-          <ResultStat
-            label={winner === 'seeker' ? t('result.seeker') : t('result.highlight')}
-            value={winner === 'seeker' ? (seekerName ?? t('player.roleLeaderSeeker')) : highlightName}
-          />
         </View>
 
         {error ? (
@@ -180,7 +163,7 @@ export default function ResultScreen() {
         ) : null}
         {resultExpiresAt ? (
           <Text selectable style={{ color: colors.muted, fontSize: 12, fontWeight: '800', textAlign: 'center' }}>
-            Sala disponivel por 2 min para compartilhar.
+            {t('result.expiresNotice')}
           </Text>
         ) : null}
       </MenuPanel>
