@@ -1,4 +1,4 @@
-import { Link } from 'expo-router';
+import { Link, useLocalSearchParams } from 'expo-router';
 import { Platform, Pressable, Text, View } from 'react-native';
 import type { ViewStyle } from 'react-native';
 
@@ -11,10 +11,13 @@ import { colors } from '@/src/theme/colors';
 import { surfaces } from '@/src/theme/surfaces';
 
 export default function HomeScreen() {
+  const params = useLocalSearchParams<{ notice?: string }>();
   const { roomNotice } = useRoom();
   const heroOffset = (Platform.OS === 'web' ? '-10vh' : -48) as ViewStyle['marginTop'];
   const noticeText =
-    roomNotice === 'removed'
+    params.notice === 'missing-room'
+      ? { body: t('home.missingRoomBody'), title: t('home.missingRoomTitle') }
+      : roomNotice === 'removed'
       ? { body: t('home.removedBody'), title: t('home.removedTitle') }
       : roomNotice === 'left_match'
         ? { body: t('home.leftMatchBody'), title: t('home.matchEndedTitle') }

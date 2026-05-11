@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react';
 
 import { useRoom } from '@/src/state/room-store';
 
-const alwaysPublicPaths = new Set(['/data-deletion', '/privacy', '/support', '/terms']);
+const alwaysPublicPaths = new Set(['/data-deletion', '/legal', '/privacy', '/support', '/terms']);
 const publicPaths = new Set(['/', '/create-room', '/join-room', ...alwaysPublicPaths]);
 const lobbyAuxiliaryPaths = new Set(['/create-room', '/join-room', '/location-permission', '/rules']);
 
@@ -25,7 +25,7 @@ function getTargetPath({
   }
 
   if (!room) {
-    return publicPaths.has(pathname) ? undefined : '/';
+    return publicPaths.has(pathname) ? undefined : '/?notice=missing-room';
   }
 
   if (room.phase === 'lobby') {
