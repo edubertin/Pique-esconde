@@ -385,10 +385,10 @@ export function RadarView({
             {timerLabel ? (
               <View
                 style={{
-                  backgroundColor: 'rgba(255, 255, 255, 0.82)',
-                  borderColor: colors.navy,
+                  backgroundColor: 'rgba(221, 244, 255, 0.50)',
+                  borderColor: 'rgba(255, 255, 255, 0.72)',
                   borderRadius: 14,
-                  borderWidth: 2,
+                  borderWidth: 1,
                   flex: 1,
                   paddingHorizontal: 10,
                   paddingVertical: 6,
@@ -404,10 +404,10 @@ export function RadarView({
             {typeof remainingCount === 'number' ? (
               <View
                 style={{
-                  backgroundColor: 'rgba(255, 255, 255, 0.82)',
-                  borderColor: colors.navy,
+                  backgroundColor: 'rgba(221, 244, 255, 0.50)',
+                  borderColor: 'rgba(255, 255, 255, 0.72)',
                   borderRadius: 14,
-                  borderWidth: 2,
+                  borderWidth: 1,
                   flex: 1,
                   paddingHorizontal: 10,
                   paddingVertical: 6,
@@ -478,13 +478,13 @@ export function RadarView({
               {timerLabel || typeof remainingCount === 'number' ? (
                 <View style={{ flexDirection: 'row', gap: 10, width: '100%' }}>
                   {timerLabel ? (
-                    <View style={{ backgroundColor: 'rgba(255,255,255,0.82)', borderColor: colors.navy, borderRadius: 14, borderWidth: 2, flex: 1, paddingHorizontal: 10, paddingVertical: 6 }}>
+                    <View style={{ backgroundColor: 'rgba(221, 244, 255, 0.50)', borderColor: 'rgba(255, 255, 255, 0.72)', borderRadius: 14, borderWidth: 1, flex: 1, paddingHorizontal: 10, paddingVertical: 6 }}>
                       <Text selectable style={{ color: colors.navy, fontSize: 10, fontWeight: '900', textAlign: 'center' }}>TEMPO</Text>
                       <Text selectable style={{ color: colors.navy, fontSize: 20, fontVariant: ['tabular-nums'], fontWeight: '900', textAlign: 'center' }}>{timerLabel}</Text>
                     </View>
                   ) : null}
                   {typeof remainingCount === 'number' ? (
-                    <View style={{ backgroundColor: 'rgba(255,255,255,0.82)', borderColor: colors.navy, borderRadius: 14, borderWidth: 2, flex: 1, paddingHorizontal: 10, paddingVertical: 6 }}>
+                    <View style={{ backgroundColor: 'rgba(221, 244, 255, 0.50)', borderColor: 'rgba(255, 255, 255, 0.72)', borderRadius: 14, borderWidth: 1, flex: 1, paddingHorizontal: 10, paddingVertical: 6 }}>
                       <Text selectable style={{ color: colors.pink, fontSize: 10, fontWeight: '900', textAlign: 'center' }}>RESTAM</Text>
                       <Text selectable style={{ color: colors.navy, fontSize: 20, fontVariant: ['tabular-nums'], fontWeight: '900', textAlign: 'center' }}>{remainingCount}</Text>
                     </View>
