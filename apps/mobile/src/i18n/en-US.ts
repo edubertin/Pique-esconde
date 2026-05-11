@@ -104,7 +104,7 @@ export const enUS = {
   'radar.capture': 'Capture',
   'radar.captureSimulation': 'Simulate capture',
   'radar.confirmingCapture': 'Keep the target close to confirm.',
-  'radar.finishHiders': 'Go to final rush',
+  'radar.finishHiders': 'End search',
   'radar.noCaptureSignal': 'Get closer to capture.',
   'radar.remaining': '{count} left',
   'radar.timerEnded': '00:00',

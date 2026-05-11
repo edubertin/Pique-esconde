@@ -100,7 +100,7 @@ export const ptBR = {
   'radar.capture': 'Capturar',
   'radar.captureSimulation': 'Simular captura',
   'radar.confirmingCapture': 'Mantenha o alvo perto para confirmar.',
-  'radar.finishHiders': 'Ir para rush final',
+  'radar.finishHiders': 'Encerrar busca',
   'radar.noCaptureSignal': 'Chegue mais perto para capturar.',
   'radar.remaining': 'Restam {count}',
   'radar.timerEnded': '00:00',
