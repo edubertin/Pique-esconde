@@ -49,7 +49,9 @@ const cardInnerStyle = {
   borderRadius: 24,
   gap: 14,
   overflow: 'hidden',
-  padding: 20,
+  paddingTop: 20,
+  paddingHorizontal: 20,
+  paddingBottom: 0,
 } as const;
 
 const cardContentStyle = {
@@ -61,7 +63,7 @@ function CardContent() {
     <View style={cardContentStyle}>
       <GameLinkButton href="/create-room" label={t('home.createRoom')} />
       <GameLinkButton href="/join-room" label={t('home.joinWithCode')} variant="secondary" />
-      <View style={{ backgroundColor: 'rgba(7,26,61,0.08)', height: 1, marginVertical: 4 }} />
+      <View style={{ backgroundColor: 'rgba(7,26,61,0.12)', height: 1, marginVertical: 4 }} />
       <GameLinkButton href="/how-to-play" label={t('home.howToPlay')} variant="ghost" />
       <LegalLinksCompact />
     </View>
@@ -120,16 +122,10 @@ function NoticeTile({ body, title }: { body: string; title: string }) {
 
 function LegalLinksCompact() {
   return (
-    <View style={{ alignItems: 'center', marginTop: 12, width: '100%' }}>
+    <View style={{ marginTop: 4, width: '100%' }}>
       <View style={{ backgroundColor: 'rgba(7, 26, 61, 0.12)', height: 1, width: '100%' }} />
-      <View style={{ alignItems: 'center', justifyContent: 'center', height: 34, width: '100%' }}>
-        <View
-          style={{
-            alignItems: 'center',
-            flexDirection: 'row',
-            justifyContent: 'center',
-            gap: 8,
-          }}>
+      <View style={{ alignItems: 'center', justifyContent: 'center', paddingVertical: 10, width: '100%' }}>
+        <View style={{ alignItems: 'center', flexDirection: 'row', justifyContent: 'center', gap: 8 }}>
           <LegalFooterLink href="/privacy" label="Privacidade" />
           <Text style={{ color: colors.muted, opacity: 0.7 }}>•</Text>
           <LegalFooterLink href="/terms" label="Termos" />

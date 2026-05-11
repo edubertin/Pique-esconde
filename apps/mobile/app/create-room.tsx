@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { Platform, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { AvatarChoice } from '@/src/components/avatar-choice';
-import { Badge } from '@/src/components/badge';
 import { GameButton, GameLinkButton } from '@/src/components/game-button';
 import { MenuPanel, PrototypeScreen } from '@/src/components/prototype-screen';
 import { t } from '@/src/i18n';
@@ -12,24 +11,15 @@ import { colors } from '@/src/theme/colors';
 
 const styles = StyleSheet.create({
   input: {
-    backgroundColor: 'rgba(221, 244, 255, 0.78)',
-    borderColor: colors.navy,
-    borderRadius: 16,
-    borderWidth: 2,
+    backgroundColor: 'rgba(255, 255, 255, 0.30)',
+    borderColor: 'rgba(255, 255, 255, 0.55)',
+    borderRadius: 12,
+    borderWidth: 1,
     color: colors.ink,
     fontSize: 16,
     fontWeight: '800',
-    minHeight: 56,
+    minHeight: 52,
     padding: 14,
-    ...(Platform.OS === 'web'
-      ? { boxShadow: '0 5px 0 rgba(7, 26, 61, 0.10)' }
-      : {
-          elevation: 2,
-          shadowColor: colors.navy,
-          shadowOffset: { height: 3, width: 0 },
-          shadowOpacity: 0.1,
-          shadowRadius: 4,
-        }),
   },
 });
 
@@ -37,6 +27,7 @@ export default function CreateRoomScreen() {
   const router = useRouter();
   const { createRoom, error, isLoading } = useRoom();
   const [avatarId, setAvatarId] = useState('avatar_01');
+  const [isFocused, setIsFocused] = useState(false);
   const [nickname, setNickname] = useState('Dudu');
 
   const handleSelectAvatar = (nextAvatarId: string) => {
@@ -55,6 +46,7 @@ export default function CreateRoomScreen() {
   return (
     <PrototypeScreen>
       <MenuPanel
+        tone="glass"
         title={t('create.title')}
         actions={
           <>
@@ -62,10 +54,6 @@ export default function CreateRoomScreen() {
             <GameLinkButton href="/join-room" label={t('create.joinWithCode')} variant="secondary" />
           </>
         }>
-        <View style={{ alignItems: 'center', gap: 8 }}>
-          <Badge label={t('create.badge')} tone="rush" />
-        </View>
-
         <View style={{ gap: 10, width: '100%' }}>
           <Text selectable style={{ color: colors.ink, fontSize: 16, fontWeight: '900' }}>
             {t('create.nickname')}
@@ -73,32 +61,30 @@ export default function CreateRoomScreen() {
           <TextInput
             autoCapitalize="words"
             autoCorrect={false}
+            onBlur={() => setIsFocused(false)}
             onChangeText={setNickname}
+            onFocus={() => setIsFocused(true)}
             placeholder={t('create.nickname')}
-            placeholderTextColor={colors.muted}
+            placeholderTextColor="rgba(7, 26, 61, 0.40)"
             returnKeyType="done"
             selectTextOnFocus
             value={nickname}
-            style={styles.input}
+            style={[
+              styles.input,
+              isFocused && {
+                borderColor: colors.pink,
+                borderWidth: 2,
+                ...(Platform.OS === 'web' ? { boxShadow: '0 0 0 3px rgba(255, 45, 141, 0.18)' } : {}),
+              },
+            ]}
           />
         </View>
 
         <AvatarChoice onSelect={handleSelectAvatar} selectedId={avatarId} />
 
-        <View
-          style={{
-            backgroundColor: colors.esconde,
-            borderColor: colors.lime,
-            borderRadius: 16,
-            borderWidth: 2,
-            gap: 8,
-            padding: 12,
-            width: '100%',
-          }}>
-          <Text selectable style={{ color: colors.navy, fontSize: 14, fontWeight: '900', textAlign: 'center' }}>
-            {t('common.playersRange')}
-          </Text>
-        </View>
+        <Text selectable style={{ color: 'rgba(7, 26, 61, 0.70)', fontSize: 11, fontWeight: '600', textAlign: 'center' }}>
+          {t('common.playersRange')}
+        </Text>
         {error ? (
           <Text selectable style={{ color: colors.danger, fontSize: 13, fontWeight: '800', textAlign: 'center' }}>
             {error}

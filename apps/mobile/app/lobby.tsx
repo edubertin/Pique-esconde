@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Pressable, Share, Text, View } from 'react-native';
 
 import { Badge } from '@/src/components/badge';
-import { CoverBanner } from '@/src/components/cover-banner';
+import { BrandLogo } from '@/src/components/brand-logo';
 import { GameButton } from '@/src/components/game-button';
 import { PlayerList } from '@/src/components/player-list';
 import { Panel, PrototypeScreen } from '@/src/components/prototype-screen';
@@ -175,11 +175,13 @@ export default function LobbyScreen() {
         <RoomQrModal inviteUrl={inviteUrl} onClose={() => setQrOpen(false)} roomCode={room.code} visible={qrOpen} />
       ) : null}
 
-      <View style={{ maxWidth: patterns.layout.panelMaxWidth, width: '100%' }}>
-        <CoverBanner />
-      </View>
+      <View style={{ gap: 0, marginTop: -20, width: '100%' }}>
+        <View style={{ maxWidth: patterns.layout.panelMaxWidth, width: '100%' }}>
+          <BrandLogo />
+        </View>
 
-      <Panel>
+      <View style={{ marginTop: -30, width: '100%' }}>
+      <Panel tone="glass">
         <Pressable
           accessibilityLabel={t('lobby.rules')}
           accessibilityRole="button"
@@ -198,10 +200,7 @@ export default function LobbyScreen() {
                 {t('rules.title')}
               </Text>
             </View>
-            <View style={{ alignItems: 'center', flexDirection: 'row', gap: 8 }}>
-              <Badge label={environmentLabel(room?.rules.environmentPreset)} tone="leader" />
-              <Ionicons color={colors.navy} name="chevron-forward" size={20} />
-            </View>
+            <Ionicons color={colors.navy} name="chevron-forward" size={20} />
           </View>
           <View style={{ flexDirection: 'row', gap: 8 }}>
             <View style={{ flex: 1 }}>
@@ -283,6 +282,8 @@ export default function LobbyScreen() {
           />
         </View>
       </Panel>
+      </View>
+      </View>
 
       <View style={{ gap: 10, maxWidth: patterns.layout.panelMaxWidth, width: '100%' }}>
         {lobbyNoticeNames.length > 0 ? (

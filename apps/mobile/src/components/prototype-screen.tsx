@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react';
 import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
 import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Link, type Href } from 'expo-router';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import type { ViewStyle } from 'react-native';
@@ -60,8 +62,46 @@ type PanelProps = {
   tone?: 'default' | 'strong' | 'sunny' | 'glass';
 };
 
+const glassPanelInnerStyle = {
+  borderRadius: 24,
+  gap: 14,
+  overflow: 'hidden',
+  padding: 16,
+  width: '100%',
+} as const;
+
 export function Panel({ children, tone = 'default' }: PanelProps) {
   const pattern = patterns.panel[tone];
+
+  if (tone === 'glass') {
+    return (
+      <LinearGradient
+        colors={['rgba(255,255,255,1.0)', 'rgba(255,255,255,0.0)']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0.4, y: 1 }}
+        style={{ borderRadius: 25, maxWidth: patterns.layout.panelMaxWidth, padding: 1, width: '100%' }}>
+        {Platform.OS === 'web' ? (
+          <View
+            style={[
+              glassPanelInnerStyle,
+              {
+                backgroundColor: pattern.backgroundColor,
+                boxShadow: pattern.shadow,
+                backdropFilter: 'blur(20px)',
+                // @ts-expect-error webkit vendor prefix not in RN ViewStyle but forwarded on web
+                WebkitBackdropFilter: 'blur(20px)',
+              },
+            ]}>
+            {children}
+          </View>
+        ) : (
+          <BlurView intensity={55} tint="light" style={[glassPanelInnerStyle, { boxShadow: pattern.shadow }]}>
+            {children}
+          </BlurView>
+        )}
+      </LinearGradient>
+    );
+  }
 
   return (
     <View
@@ -81,6 +121,15 @@ export function Panel({ children, tone = 'default' }: PanelProps) {
   );
 }
 
+const backButtonStyle = {
+  alignItems: 'center' as const,
+  backgroundColor: 'transparent',
+  borderRadius: 20,
+  height: 40,
+  justifyContent: 'center' as const,
+  width: 40,
+};
+
 type MenuPanelProps = {
   actions?: ReactNode;
   backHref?: Href;
@@ -90,11 +139,12 @@ type MenuPanelProps = {
   onBack?: () => void;
   showBack?: boolean;
   title: string;
+  tone?: PanelProps['tone'];
 };
 
-export function MenuPanel({ actions, backHref = '/', children, headerAction, meta, onBack, showBack = true, title }: MenuPanelProps) {
+export function MenuPanel({ actions, backHref = '/', children, headerAction, meta, onBack, showBack = true, title, tone }: MenuPanelProps) {
   return (
-    <Panel>
+    <Panel tone={tone}>
       <View
         style={{
           alignItems: 'center',
@@ -111,30 +161,16 @@ export function MenuPanel({ actions, backHref = '/', children, headerAction, met
               accessibilityLabel={t('common.back')}
               accessibilityRole="button"
               onPress={onBack}
-              style={{
-                ...surfaces.iconButtonActive,
-                alignItems: 'center',
-                borderRadius: 14,
-                height: 40,
-                justifyContent: 'center',
-                width: 40,
-              }}>
-              <Ionicons color={colors.navy} name="chevron-back" size={24} />
+              style={({ pressed }) => [backButtonStyle, pressed && { transform: [{ scale: 0.92 }] }]}>
+              <Ionicons color={colors.navy} name="arrow-back-circle" size={26} />
             </Pressable>
           ) : (
             <Link href={backHref} asChild>
               <Pressable
                 accessibilityLabel={t('common.back')}
                 accessibilityRole="button"
-                style={{
-                  ...surfaces.iconButtonActive,
-                  alignItems: 'center',
-                  borderRadius: 14,
-                  height: 40,
-                  justifyContent: 'center',
-                  width: 40,
-                }}>
-                <Ionicons color={colors.navy} name="chevron-back" size={24} />
+                style={({ pressed }) => [backButtonStyle, pressed && { transform: [{ scale: 0.92 }] }]}>
+                <Ionicons color={colors.navy} name="arrow-back-circle" size={26} />
               </Pressable>
             </Link>
           )

@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { Platform, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { AvatarChoice } from '@/src/components/avatar-choice';
-import { Badge } from '@/src/components/badge';
 import { GameButton } from '@/src/components/game-button';
 import { MenuPanel, PrototypeScreen } from '@/src/components/prototype-screen';
 import { t } from '@/src/i18n';
@@ -18,24 +17,15 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   input: {
-    backgroundColor: 'rgba(221, 244, 255, 0.78)',
-    borderColor: colors.navy,
-    borderRadius: 16,
-    borderWidth: 2,
+    backgroundColor: 'rgba(255, 255, 255, 0.30)',
+    borderColor: 'rgba(255, 255, 255, 0.55)',
+    borderRadius: 12,
+    borderWidth: 1,
     color: colors.ink,
     fontSize: 16,
     fontWeight: '800',
-    minHeight: 56,
+    minHeight: 52,
     padding: 14,
-    ...(Platform.OS === 'web'
-      ? { boxShadow: '0 5px 0 rgba(7, 26, 61, 0.10)' }
-      : {
-          elevation: 2,
-          shadowColor: colors.navy,
-          shadowOffset: { height: 3, width: 0 },
-          shadowOpacity: 0.1,
-          shadowRadius: 4,
-        }),
   },
   codeInput: {
     fontSize: 22,
@@ -77,8 +67,7 @@ export default function JoinRoomScreen() {
 
   return (
     <PrototypeScreen>
-      <MenuPanel title={t('join.title')} actions={<GameButton label={isLoading ? 'Entrando...' : t('join.enter')} onPress={handleJoinRoom} />}>
-        <Badge label={t('join.badge')} tone="neutral" />
+      <MenuPanel tone="glass" title={t('join.title')} actions={<GameButton label={isLoading ? 'Entrando...' : t('join.enter')} onPress={handleJoinRoom} />}>
         <View style={styles.field}>
           <Text selectable style={{ color: colors.ink, fontSize: 16, fontWeight: '900' }}>
             {t('join.code')}

@@ -3,7 +3,6 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Text, View } from 'react-native';
 
-import { Badge } from '@/src/components/badge';
 import { GameButton } from '@/src/components/game-button';
 import { MenuPanel, PrototypeScreen } from '@/src/components/prototype-screen';
 import { t } from '@/src/i18n';
@@ -71,6 +70,7 @@ export default function LocationPermissionScreen() {
   return (
     <PrototypeScreen>
       <MenuPanel
+        tone="glass"
         onBack={() => handleLeaveRoom('/create-room')}
         title={t('location.title')}
         actions={
@@ -84,18 +84,14 @@ export default function LocationPermissionScreen() {
                 variant="secondary"
               />
             ) : null}
-            <GameButton label={t('common.cancel')} onPress={() => handleLeaveRoom('/')} variant="danger" />
+            <GameButton label={t('location.cancel')} onPress={() => handleLeaveRoom('/')} variant="dangerStrong" />
           </>
         }>
-        <View style={{ alignItems: 'center', gap: 12 }}>
-          <Badge label={t('location.badge')} tone="ready" />
-          <Text selectable style={{ color: colors.ink, fontSize: 18, fontWeight: '900', lineHeight: 25, textAlign: 'center' }}>
-            {t('location.summary')}
-          </Text>
-          <Text selectable style={{ color: colors.muted, fontSize: 15, lineHeight: 22, textAlign: 'center' }}>
+        <View style={{ alignItems: 'center', gap: 14 }}>
+          <Text selectable style={{ color: colors.ink, fontSize: 18, fontWeight: '900', lineHeight: 26, textAlign: 'center' }}>
             {t('location.body')}
           </Text>
-          <Text selectable style={{ color: colors.muted, fontSize: 13, lineHeight: 20, textAlign: 'center' }}>
+          <Text selectable style={{ color: colors.danger, fontSize: 14, fontWeight: '700', lineHeight: 21, textAlign: 'center' }}>
             {t('location.safety')}
           </Text>
           {canUseDevGps ? (
