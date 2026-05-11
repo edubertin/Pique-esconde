@@ -63,6 +63,7 @@ Notas:
 - Jogadores podem voltar para a mesma sala após desconexão.
 - Quem negar localização não participa como jogador ativo.
 - Upload de foto fica fora do MVP.
+- Leituras de snapshot podem validar a sessao do jogador, mas o toque em `last_seen_at` deve ser moderado para nao gerar loop de realtime.
 
 ### `game_sessions`
 
@@ -260,6 +261,12 @@ A RPC devolve, em uma unica chamada:
 Esse contrato substitui a montagem de snapshot no cliente com leituras paralelas de `pe_rooms`, `pe_players`, `pe_game_sessions` e `pe_player_exit_notices`. A mudanca reduz janelas em que o cliente poderia combinar uma fase nova de sala com jogadores vindos de uma leitura antiga.
 
 Quando a sala esta no lobby, a resposta normaliza status de rodada apenas para exibicao do snapshot: lider aparece como `Entrou`, jogadores reais como `Aguardando` e `Alvo DEV` como `Preparado`. A RPC nao retorna latitude, longitude ou campos brutos de GPS.
+
+## Sessao Local e Reconexao
+
+No PWA, a sessao temporaria da sala e persistida localmente com `roomId`, `roomCode`, `activePlayerId` e `activePlayerToken`. Ao recarregar a pagina, o app tenta restaurar a sessao chamando `pe_get_room_snapshot` antes de redirecionar para a Home.
+
+Se o token ainda for valido, o guard de rota envia o jogador para a tela correta da fase atual. Se o token nao for valido, a sessao local e limpa.
 
 ## Métricas Agregadas
 

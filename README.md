@@ -131,7 +131,7 @@ Compromissos do MVP:
 
 ## Status Atual
 
-O MVP esta em implementacao ativa. Ja existem app Expo, fluxo web/mobile, Supabase conectado, lobby realtime, regras de sala, rodada real, radar/GPS base, QR/link de convite, paginas legais e export web para Vercel.
+O MVP esta em implementacao ativa. Ja existem app Expo, fluxo web/mobile, Supabase conectado, lobby realtime com fallback de snapshot, restauracao de sessao no PWA, regras de sala, rodada real, radar/GPS base, QR/link de convite, paginas legais e export web para Vercel.
 
 Antes de piloto publico, ainda e necessario validar em celulares reais, ajustar documentos de loja, revisar requisitos de idade/classificacao e estabilizar QA de GPS em campo.
 

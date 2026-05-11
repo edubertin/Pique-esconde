@@ -424,3 +424,38 @@ Decisao:
 
 Link para test run:
 - `docs/qa/test-runs/2026-05-10-dev-target-auto-hide.md`
+
+## L-012 - Lobby PWA precisava de refresh manual para refletir jogadores
+
+Status: Parcialmente resolvido / Validar em celulares reais
+Severidade: Alta
+Area: Lobby / Realtime / PWA
+Detectado em: 2026-05-10
+Commit/versao: worktree local / deploy Vercel `dpl_66SVXah6N44DYpZuKq8uUKs1YHVV` / migration `202605100009_throttle_player_presence_touch`
+
+Descricao:
+- Em teste PWA de producao, um jogador entrava na sala mas o criador nem sempre via a lista atualizar sem refresh manual.
+- Ao recarregar a pagina, a sessao local era perdida e o jogador voltava para Home.
+- Ao entrar novamente, podia surgir duplicacao visual/funcional de jogador.
+
+Impacto:
+- Lobby parecia congelado.
+- Jogadores repetiam entrada/saida e aumentavam chance de duplicata.
+- Estado de `Preparado` ficava confuso entre clientes.
+
+Comportamento esperado:
+- Refresh do navegador deve restaurar a sessao temporaria quando o token ainda for valido.
+- O lobby deve atualizar por Realtime e tambem por fallback de snapshot enquanto aberto.
+- A UI deve informar quando a sala esta atualizando ou quando o ultimo snapshot foi recebido.
+
+Comportamento atual:
+- PWA salva `roomId`, `roomCode`, `activePlayerId` e `activePlayerToken` em storage local e tenta restaurar antes do guard de rota.
+- Lobby faz polling leve de `pe_get_room_snapshot`, atualiza ao voltar para foco, debounca eventos Realtime e coalesce chamadas concorrentes.
+- Backend throttla `last_seen_at` para reduzir ciclo de snapshot/realtime.
+
+Decisao:
+- Validar novamente em APK Android e PWA com dois aparelhos reais.
+- Se ainda houver duplicacao apos sair explicitamente e entrar de novo, revisar idempotencia de `pe_join_room`/`pe_leave_room`.
+
+Link para test run:
+- `docs/qa/test-runs/2026-05-10-pwa-session-lobby-sync.md`

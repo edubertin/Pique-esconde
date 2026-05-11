@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Pressable, Share, Text, View } from 'react-native';
 
 import { Badge } from '@/src/components/badge';
@@ -30,9 +30,10 @@ function environmentLabel(preset?: string) {
 
 export default function LobbyScreen() {
   const router = useSafeRouter();
-  const { activePlayer, error, isLoading, leaveRoom, promoteLeader, removePlayer, room, startRound, toggleReady } = useRoom();
+  const { activePlayer, error, isLoading, isRoomSyncing, lastRoomSyncedAt, leaveRoom, promoteLeader, removePlayer, room, startRound, toggleReady } = useRoom();
   const [copied, setCopied] = useState(false);
   const [inviteFeedback, setInviteFeedback] = useState<string>();
+  const [now, setNow] = useState(Date.now());
   const [qrOpen, setQrOpen] = useState(false);
   const players = room?.players ?? [];
   const inviteUrl = useMemo(() => (room?.code ? buildRoomInviteUrl(room.code) : ''), [room?.code]);
@@ -53,12 +54,26 @@ export default function LobbyScreen() {
       ? t('lobby.notReadyPlayerBody')
       : t('lobby.notReadyReadyBody', { names: missingReadyNames });
   const readyLabel = activePlayer?.status === 'Preparado' ? t('lobby.readyDone') : t('lobby.ready');
+  const syncAgeSeconds = lastRoomSyncedAt ? Math.max(0, Math.round((now - lastRoomSyncedAt) / 1000)) : undefined;
+  const syncLabel = isRoomSyncing
+    ? t('lobby.syncUpdating')
+    : syncAgeSeconds == null
+      ? t('lobby.syncConnecting')
+      : syncAgeSeconds <= 4
+        ? t('lobby.syncNow')
+        : t('lobby.syncAge', { seconds: String(syncAgeSeconds) });
+  const syncColor = syncAgeSeconds != null && syncAgeSeconds > 8 ? colors.danger : colors.green;
   const roomWarning =
     room?.closedReason === 'seeker_left'
       ? { body: t('lobby.seekerLeftBody'), title: t('lobby.roundInterruptedTitle') }
       : room?.closedReason === 'not_enough_players'
         ? { body: t('lobby.notEnoughPlayersBody'), title: t('lobby.roundInterruptedTitle') }
         : undefined;
+
+  useEffect(() => {
+    const interval = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleCopyCode = async () => {
     if (!room?.code) return;
@@ -255,6 +270,12 @@ export default function LobbyScreen() {
               {inviteFeedback}
             </Text>
           ) : null}
+          <View style={{ alignItems: 'center', flexDirection: 'row', gap: 6 }}>
+            <Ionicons color={syncColor} name={isRoomSyncing ? 'sync-outline' : 'radio-outline'} size={14} />
+            <Text selectable style={{ color: syncColor, fontSize: 12, fontWeight: '900' }}>
+              {syncLabel}
+            </Text>
+          </View>
           <PlayerList
             activePlayerId={activePlayer?.id}
             canRemove={activePlayer?.isLeader}

@@ -31,3 +31,5 @@ web-build/
 # Build outputs
 build/
 coverage/
+
+.vercel

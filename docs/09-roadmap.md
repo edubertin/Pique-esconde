@@ -4,6 +4,7 @@
 
 - Validar fluxo web/mobile com usuarios reais.
 - Testar GPS em celulares reais.
+- Gerar APK Android de QA e validar lobby/realtime em aparelhos reais.
 - Ajustar radar e feedback com dados de campo.
 - Stabilizar deploy web e dominio oficial.
 - Completar documentacao publica do GitHub.

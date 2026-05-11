@@ -1,6 +1,8 @@
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { AppState, Platform } from 'react-native';
 
 import { roomService } from '@/src/services/room-service';
+import { clearStoredRoomSession, loadStoredRoomSession, saveStoredRoomSession } from '@/src/utils/room-session-storage';
 import { disableDevGps, isDevGpsEnabled } from '@/src/utils/dev-gps';
 
 export type PlayerStatus = 'Entrou' | 'Preparado' | 'Aguardando' | 'Escondendo' | 'Escondido' | 'Procurando' | 'Capturado';
@@ -177,12 +179,15 @@ type RoomStore = {
   createRoom: (input: PlayerInput) => Promise<void>;
   error?: string;
   finalResultSnapshot?: FinalResultSnapshot;
+  isRestoringSession: boolean;
   finishRound: (winner?: GameResult['winner']) => Promise<void>;
   getHiderDangerHint: () => Promise<HiderDangerHint | undefined>;
   getRadarHint: () => Promise<RadarHint | undefined>;
   getRoomDebugSnapshot: () => Promise<RoomDebugSnapshot | undefined>;
   isLoading: boolean;
   joinRoom: (input: PlayerInput & { code: string }) => Promise<boolean>;
+  isRoomSyncing: boolean;
+  lastRoomSyncedAt?: number;
   leaveRoom: () => Promise<void>;
   markHidden: () => Promise<void>;
   promoteLeader: (playerId: string) => Promise<void>;
@@ -239,6 +244,9 @@ export function RoomProvider({ children }: { children: ReactNode }) {
   const [activePlayerToken, setActivePlayerToken] = useState<string>();
   const [error, setError] = useState<string>();
   const [isLoading, setIsLoading] = useState(false);
+  const [isRestoringSession, setIsRestoringSession] = useState(true);
+  const [isRoomSyncing, setIsRoomSyncing] = useState(false);
+  const [lastRoomSyncedAt, setLastRoomSyncedAt] = useState<number>();
   const [finalResultSnapshot, setFinalResultSnapshot] = useState<FinalResultSnapshot>();
   const [room, setRoom] = useState<Room>();
   const [roomNotice, setRoomNotice] = useState<RoomStore['roomNotice']>();
@@ -246,6 +254,9 @@ export function RoomProvider({ children }: { children: ReactNode }) {
   const ignoredRoomIdsRef = useRef(new Set<string>());
   const leavingRoomRef = useRef(false);
   const refreshSeqRef = useRef(0);
+  const refreshPromiseRef = useRef<Promise<void> | null>(null);
+  const realtimeRefreshTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const restoreAttemptedRef = useRef(false);
   const suppressRemovalNoticeRef = useRef(false);
 
   const clearFinalResultSnapshot = useCallback(() => {
@@ -338,18 +349,88 @@ export function RoomProvider({ children }: { children: ReactNode }) {
       setRoom(snapshot.room);
       setActivePlayerId(snapshot.activePlayer?.id ?? activePlayerId);
       setActivePlayerToken(snapshot.activePlayerToken ?? activePlayerToken);
+
+      const nextActivePlayerId = snapshot.activePlayer?.id ?? activePlayerId;
+      const nextActivePlayerToken = snapshot.activePlayerToken ?? activePlayerToken;
+      if (nextActivePlayerId && nextActivePlayerToken) {
+        saveStoredRoomSession({
+          activePlayerId: nextActivePlayerId,
+          activePlayerToken: nextActivePlayerToken,
+          roomCode: snapshot.room.code,
+          roomId: snapshot.room.id,
+        });
+      }
     },
     [activePlayerId, activePlayerToken, clearFinalResultSnapshot],
   );
 
+  useEffect(() => {
+    if (restoreAttemptedRef.current) return undefined;
+
+    restoreAttemptedRef.current = true;
+    let cancelled = false;
+    const storedSession = loadStoredRoomSession();
+
+    if (!storedSession) {
+      setIsRestoringSession(false);
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    roomService
+      .fetchSnapshot(storedSession.roomId, storedSession.activePlayerId, storedSession.activePlayerToken)
+      .then((snapshot) => {
+        if (cancelled) return;
+
+        if (!snapshot.activePlayer) {
+          clearStoredRoomSession();
+          return;
+        }
+
+        setActivePlayerId(storedSession.activePlayerId);
+        setActivePlayerToken(storedSession.activePlayerToken);
+        applySnapshot(snapshot);
+      })
+      .catch((restoreError: unknown) => {
+        if (cancelled) return;
+
+        console.warn('Room session restore failed', restoreError);
+        clearStoredRoomSession();
+      })
+      .finally(() => {
+        if (!cancelled) setIsRestoringSession(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [applySnapshot]);
+
   const refreshRoom = useCallback(async () => {
     if (!room?.id) return;
+    if (refreshPromiseRef.current) return refreshPromiseRef.current;
 
-    const refreshSeq = ++refreshSeqRef.current;
-    const snapshot = await roomService.fetchSnapshot(room.id, activePlayerId, activePlayerToken);
-    if (refreshSeq !== refreshSeqRef.current) return;
+    const refreshPromise = (async () => {
+      const refreshSeq = ++refreshSeqRef.current;
+      setIsRoomSyncing(true);
 
-    applySnapshot(snapshot);
+      try {
+        const snapshot = await roomService.fetchSnapshot(room.id, activePlayerId, activePlayerToken);
+        if (refreshSeq !== refreshSeqRef.current) return;
+
+        applySnapshot(snapshot);
+        setLastRoomSyncedAt(Date.now());
+      } finally {
+        if (refreshSeq === refreshSeqRef.current) {
+          setIsRoomSyncing(false);
+        }
+        refreshPromiseRef.current = null;
+      }
+    })();
+
+    refreshPromiseRef.current = refreshPromise;
+    return refreshPromise;
   }, [activePlayerId, activePlayerToken, applySnapshot, room?.id]);
 
   const refreshRoomSoft = useCallback(async () => {
@@ -383,16 +464,60 @@ export function RoomProvider({ children }: { children: ReactNode }) {
     if (!room?.id) return undefined;
 
     const subscription = roomService.subscribeToRoom(room.id, () => {
-      refreshRoom().catch((subscriptionError: unknown) => {
-        const message = getErrorMessage(subscriptionError);
-        if (message !== connectionUnstableMessage) setError(message);
-      });
+      if (realtimeRefreshTimeoutRef.current) clearTimeout(realtimeRefreshTimeoutRef.current);
+
+      realtimeRefreshTimeoutRef.current = setTimeout(() => {
+        refreshRoom().catch((subscriptionError: unknown) => {
+          const message = getErrorMessage(subscriptionError);
+          if (message !== connectionUnstableMessage) setError(message);
+        });
+      }, 250);
     });
 
     return () => {
+      if (realtimeRefreshTimeoutRef.current) clearTimeout(realtimeRefreshTimeoutRef.current);
       subscription.unsubscribe().catch(() => undefined);
     };
   }, [refreshRoom, room?.id]);
+
+  useEffect(() => {
+    if (room?.phase !== 'lobby') return undefined;
+
+    const interval = setInterval(() => {
+      refreshRoomSoft();
+    }, 2500);
+
+    return () => clearInterval(interval);
+  }, [refreshRoomSoft, room?.phase]);
+
+  useEffect(() => {
+    if (!room?.id || Platform.OS !== 'web' || typeof window === 'undefined' || typeof document === 'undefined') return undefined;
+
+    const refreshIfVisible = () => {
+      if (typeof document === 'undefined' || document.visibilityState === 'hidden') return;
+      refreshRoomSoft();
+    };
+
+    window.addEventListener('focus', refreshIfVisible);
+    document.addEventListener('visibilitychange', refreshIfVisible);
+
+    return () => {
+      window.removeEventListener('focus', refreshIfVisible);
+      document.removeEventListener('visibilitychange', refreshIfVisible);
+    };
+  }, [refreshRoomSoft, room?.id]);
+
+  useEffect(() => {
+    if (!room?.id) return undefined;
+
+    const subscription = AppState.addEventListener('change', (nextState) => {
+      if (nextState === 'active') {
+        refreshRoomSoft();
+      }
+    });
+
+    return () => subscription.remove();
+  }, [refreshRoomSoft, room?.id]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -403,6 +528,7 @@ export function RoomProvider({ children }: { children: ReactNode }) {
 
         setActivePlayerId(undefined);
         setActivePlayerToken(undefined);
+        clearStoredRoomSession();
         if (!finalResultSnapshotRef.current || currentRoom.phase !== 'finished') {
           clearFinalResultSnapshot();
         }
@@ -433,7 +559,10 @@ export function RoomProvider({ children }: { children: ReactNode }) {
       },
       error,
       finalResultSnapshot,
+      isRestoringSession,
       isLoading,
+      isRoomSyncing,
+      lastRoomSyncedAt,
       room,
       roomNotice,
       async addDemoPlayer() {
@@ -506,6 +635,7 @@ export function RoomProvider({ children }: { children: ReactNode }) {
           setActivePlayerId(undefined);
           setActivePlayerToken(undefined);
           setRoom(undefined);
+          clearStoredRoomSession();
           clearFinalResultSnapshot();
           return;
         }
@@ -524,6 +654,7 @@ export function RoomProvider({ children }: { children: ReactNode }) {
           setActivePlayerToken(undefined);
           setRoomNotice(notice);
           setRoom(undefined);
+          clearStoredRoomSession();
           clearFinalResultSnapshot();
 
           if (isDevGpsEnabled()) {
@@ -647,7 +778,7 @@ export function RoomProvider({ children }: { children: ReactNode }) {
         await roomService.updatePlayerLocation(session.roomId, session.activePlayerId, session.activePlayerToken, input);
       },
     };
-  }, [activePlayerId, activePlayerToken, applyFinalResultSnapshot, applySnapshot, clearFinalResultSnapshot, error, finalResultSnapshot, isLoading, refreshRoom, refreshRoomSoft, room, roomNotice, runAction]);
+  }, [activePlayerId, activePlayerToken, applyFinalResultSnapshot, applySnapshot, clearFinalResultSnapshot, error, finalResultSnapshot, isLoading, isRestoringSession, isRoomSyncing, lastRoomSyncedAt, refreshRoom, refreshRoomSoft, room, roomNotice, runAction]);
 
   return <RoomContext.Provider value={store}>{children}</RoomContext.Provider>;
 }

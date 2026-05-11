@@ -71,6 +71,9 @@ Concluído nesta etapa:
 - GPS/radar/captura por proximidade com Supabase dev.
 - Snapshot final de resultado retornado pelas RPCs terminais.
 - Modo DEV de GPS estabilizado para repeticao de rodadas.
+- Sessao PWA restaurada apos refresh para reduzir duplicacao por recarregamento.
+- Lobby com polling leve de snapshot, refresh ao voltar para foco e indicador de sincronizacao.
+- Throttle de `last_seen_at` no Supabase para reduzir loop entre snapshot e Realtime.
 
 ## Materiais Necessários
 
@@ -244,4 +247,4 @@ Backlog tecnico antes de producao:
 - Monitorar `cron.job_run_details` durante QA e piloto.
 - Revisao de politica de dados temporarios de GPS.
 - Monitoramento basico de erros e logs de rodada.
-- Build nativo e teste em iOS/Android reais.
+- Build nativo e teste em iOS/Android reais, com prioridade para APK Android de QA.
