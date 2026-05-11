@@ -112,13 +112,13 @@ export default function JoinRoomScreen() {
             value={nickname}
             style={styles.input}
           />
+          {error ? (
+            <Text selectable style={{ color: colors.danger, fontSize: 13, fontWeight: '800', textAlign: 'center' }}>
+              {error}
+            </Text>
+          ) : null}
         </View>
         <AvatarChoice onSelect={handleSelectAvatar} selectedId={avatarId} />
-        {error ? (
-          <Text selectable style={{ color: colors.danger, fontSize: 13, fontWeight: '800', textAlign: 'center' }}>
-            {error}
-          </Text>
-        ) : null}
       </MenuPanel>
     </PrototypeScreen>
   );

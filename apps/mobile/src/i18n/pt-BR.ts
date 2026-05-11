@@ -55,6 +55,7 @@ export const ptBR = {
   'home.signalLostTitle': 'Sinal perdido',
   'join.badge': 'Sala temporária',
   'join.code': 'Código da sala',
+  'join.duplicateName': 'Esse nome ja esta na sala. Escolha outro.',
   'join.enter': 'Entrar',
   'join.title': 'Entrar na sala',
   'legal.badge': 'Central legal',

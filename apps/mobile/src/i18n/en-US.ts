@@ -59,6 +59,7 @@ export const enUS = {
   'home.signalLostTitle': 'Signal lost',
   'join.badge': 'Temporary room',
   'join.code': 'Room code',
+  'join.duplicateName': 'That name is already in the room. Choose another.',
   'join.enter': 'Join',
   'join.title': 'Join room',
   'legal.badge': 'Legal center',

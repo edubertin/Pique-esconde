@@ -218,10 +218,18 @@ const connectionUnstableMessage = 'Conexao instavel. Tente novamente em alguns s
 function getErrorMessage(error: unknown) {
   const cleanMessage = (message: string) => message.split('\n')[0]?.trim() || 'Nao foi possivel sincronizar a sala agora.';
   const isFetchFailure = (message: string) => message.toLowerCase().includes('failed to fetch');
+  const normalizeMessage = (message: string) => message.toLowerCase();
+  const toFriendlyMessage = (message: string) => {
+    if (normalizeMessage(message).includes('nickname already in use')) {
+      return 'Esse nome ja esta na sala. Escolha outro.';
+    }
+
+    return cleanMessage(message);
+  };
 
   if (error instanceof Error) {
     if (isFetchFailure(error.message)) return connectionUnstableMessage;
-    return cleanMessage(error.message);
+    return toFriendlyMessage(error.message);
   }
 
   if (typeof error === 'object' && error) {
@@ -232,7 +240,7 @@ function getErrorMessage(error: unknown) {
     if (parts.length > 0) {
       const message = parts.join(' ');
       if (isFetchFailure(message)) return connectionUnstableMessage;
-      return cleanMessage(message);
+      return toFriendlyMessage(message);
     }
     if (typeof supabaseError.code === 'string') return `Erro Supabase: ${supabaseError.code}`;
   }
