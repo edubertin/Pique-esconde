@@ -250,7 +250,7 @@ export default function LobbyScreen() {
                 onPress={() => setQrOpen(true)}
                 testID="lobby-open-qr"
                 style={{
-                  ...surfaces.iconButtonActive,
+                  ...surfaces.iconButton,
                   alignItems: 'center',
                   borderRadius: 12,
                   height: 34,

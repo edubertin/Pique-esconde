@@ -41,7 +41,7 @@ function normalizeRoomCode(nextCode: string) {
 export default function JoinRoomScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ code?: string }>();
-  const { error, isLoading, joinRoom } = useRoom();
+  const { error, isLoading, joinRoom, leaveRoom, room } = useRoom();
   const [avatarId, setAvatarId] = useState('avatar_02');
   const [code, setCode] = useState(normalizeRoomCode(params.code ?? 'ABCD'));
   const [nickname, setNickname] = useState('Ana');
@@ -51,6 +51,11 @@ export default function JoinRoomScreen() {
       setCode(normalizeRoomCode(params.code));
     }
   }, [params.code]);
+
+  const handleBack = async () => {
+    if (room) await leaveRoom().catch(() => undefined);
+    router.replace('/');
+  };
 
   const handleSelectAvatar = (nextAvatarId: string) => {
     setAvatarId(nextAvatarId);
@@ -67,7 +72,7 @@ export default function JoinRoomScreen() {
 
   return (
     <PrototypeScreen>
-      <MenuPanel tone="glass" title={t('join.title')} actions={<GameButton label={isLoading ? 'Entrando...' : t('join.enter')} onPress={handleJoinRoom} />}>
+      <MenuPanel tone="glass" onBack={handleBack} title={t('join.title')} actions={<GameButton label={isLoading ? 'Entrando...' : t('join.enter')} onPress={handleJoinRoom} />}>
         <View style={styles.field}>
           <Text selectable style={{ color: colors.ink, fontSize: 16, fontWeight: '900' }}>
             {t('join.code')}

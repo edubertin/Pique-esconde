@@ -50,7 +50,7 @@ export default function CreateRoomScreen() {
         title={t('create.title')}
         actions={
           <>
-            <GameButton label={isLoading ? 'Criando...' : t('create.createRoom')} onPress={handleCreateRoom} />
+            <GameButton label={isLoading ? t('create.creating') : t('create.createRoom')} onPress={handleCreateRoom} />
             <GameLinkButton href="/join-room" label={t('create.joinWithCode')} variant="secondary" />
           </>
         }>

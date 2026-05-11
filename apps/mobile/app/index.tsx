@@ -142,7 +142,7 @@ function LegalLinksCompact() {
 function LegalFooterLink({ href, label }: { href: '/privacy' | '/support' | '/terms'; label: string }) {
   return (
     <Link href={href} asChild>
-      <Pressable accessibilityLabel={label} accessibilityRole="link" style={{ minHeight: 20, paddingHorizontal: 0 }}>
+      <Pressable accessibilityLabel={label} accessibilityRole="link" style={{ alignItems: 'center', justifyContent: 'center', minHeight: 44, paddingHorizontal: 4 }}>
         <Text style={{ color: colors.navy, fontSize: 10, fontWeight: '800', textDecorationLine: 'underline' }}>{label}</Text>
       </Pressable>
     </Link>

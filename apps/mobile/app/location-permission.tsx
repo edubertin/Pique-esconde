@@ -37,7 +37,7 @@ export default function LocationPermissionScreen() {
           router.replace('/');
           return;
         }
-        setError(permission.canAskAgain ? 'Toque novamente para permitir a localizacao.' : t('location.denied'));
+        setError(permission.canAskAgain ? t('location.retryPermission') : t('location.denied'));
         return;
       }
 
