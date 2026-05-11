@@ -13,11 +13,17 @@ export const surfaces = {
     borderWidth: 3,
     boxShadow: '0 8px 0 rgba(255, 45, 141, 0.18)',
   },
-  warningTile: {
-    backgroundColor: 'rgba(255, 247, 214, 0.72)',
-    borderColor: colors.yellow,
+  liquidPanel: {
+    backgroundColor: 'rgba(221, 244, 255, 0.68)',
+    borderColor: 'rgba(255, 255, 255, 0.85)',
     borderWidth: 1,
-    boxShadow: '0 4px 0 rgba(7, 26, 61, 0.08)',
+    boxShadow: '0 8px 0 rgba(7, 26, 61, 0.12), 0 1px 0 rgba(255, 255, 255, 0.60)',
+  },
+  warningTile: {
+    backgroundColor: 'rgba(255, 204, 0, 0.18)',
+    borderColor: 'rgba(255, 204, 0, 0.55)',
+    borderWidth: 1,
+    boxShadow: '0 4px 0 rgba(7, 26, 61, 0.08), 0 1px 0 rgba(255, 255, 255, 0.40)',
   },
   iconButton: {
     backgroundColor: 'rgba(221, 244, 255, 0.62)',

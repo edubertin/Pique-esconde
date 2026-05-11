@@ -11,7 +11,7 @@ type LegalPageProps = {
   children: ReactNode;
   eyebrow: string;
   title: string;
-  updatedAt: string;
+  updatedAt?: string;
 };
 
 type LegalSectionProps = {
@@ -66,9 +66,11 @@ export function LegalPage({ children, eyebrow, title, updatedAt }: LegalPageProp
             <Text selectable style={{ color: colors.ink, fontSize: 30, fontWeight: '900', lineHeight: 34 }}>
               {title}
             </Text>
-            <Text selectable style={{ color: colors.muted, fontSize: 13, fontWeight: '700' }}>
-              Ultima atualizacao: {updatedAt}
-            </Text>
+            {updatedAt ? (
+              <Text selectable style={{ color: colors.muted, fontSize: 13, fontWeight: '700' }}>
+                Ultima atualizacao: {updatedAt}
+              </Text>
+            ) : null}
           </View>
 
           {children}

@@ -1,10 +1,10 @@
 import { usePathname, useRouter } from 'expo-router';
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 
 import { useRoom } from '@/src/state/room-store';
 
-const alwaysPublicPaths = new Set(['/data-deletion', '/legal', '/privacy', '/support', '/terms']);
-const publicPaths = new Set(['/', '/create-room', '/join-room', ...alwaysPublicPaths]);
+const alwaysPublicPaths = new Set(['/data-deletion', '/how-to-play', '/legal', '/privacy', '/support', '/terms']);
+const publicPaths = new Set(['/', '/create-room', '/join-room']);
 const lobbyAuxiliaryPaths = new Set(['/create-room', '/join-room', '/location-permission', '/rules']);
 
 function getTargetPath({
@@ -18,14 +18,15 @@ function getTargetPath({
   pathname: string;
   room: ReturnType<typeof useRoom>['room'];
 }) {
-  if (alwaysPublicPaths.has(pathname)) return undefined;
+  if (alwaysPublicPaths.has(pathname)) {
+    return undefined;
+  }
 
   if (finalResultSnapshot) {
     return pathname === '/result' || pathname === '/social-card' ? undefined : '/result';
   }
 
   if (!room) {
-    if (pathname === '/lobby') return '/?notice=missing-room';
     return publicPaths.has(pathname) ? undefined : '/';
   }
 
@@ -58,28 +59,17 @@ function getTargetPath({
 export function RoomRouteGuard() {
   const pathname = usePathname();
   const router = useRouter();
-  const { activePlayer, finalResultSnapshot, isRestoringSession, room } = useRoom();
-  const lastReplaceTargetRef = useRef<string | undefined>(undefined);
+  const { activePlayer, finalResultSnapshot, room } = useRoom();
 
   useEffect(() => {
-    if (isRestoringSession) return;
-
-    const currentPathname =
-      typeof window !== 'undefined' && typeof window.location?.pathname === 'string'
-        ? window.location.pathname
-        : pathname;
+    const currentPathname = typeof window === 'undefined' ? pathname : window.location.pathname;
     if (currentPathname !== pathname) return;
-    if (lastReplaceTargetRef.current === pathname) {
-      lastReplaceTargetRef.current = undefined;
-    }
 
     const targetPath = getTargetPath({ activePlayer, finalResultSnapshot, pathname, room });
     if (targetPath && targetPath !== pathname) {
-      if (lastReplaceTargetRef.current === targetPath) return;
-      lastReplaceTargetRef.current = targetPath;
       router.replace(targetPath);
     }
-  }, [activePlayer, finalResultSnapshot, isRestoringSession, pathname, room, router]);
+  }, [activePlayer, finalResultSnapshot, pathname, room, router]);
 
   return null;
 }
