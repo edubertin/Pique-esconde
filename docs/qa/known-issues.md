@@ -165,20 +165,24 @@ Link para test run:
 
 ## L-005 - Botão Convidar ainda não abre compartilhamento nativo
 
-Status: Aceito no MVP atual
+Status: Resolvido (pendente validação em celular real)
 Severidade: Media
 Area: Convite
 Detectado em: 2026-05-08
-Commit/versao: 8bec69f
+Commit/versao: 8bec69f / resolvido em versao posterior
 
 Descricao:
-- O lobby usa o termo `Convidar`, mas por enquanto adiciona amigos demo no Supabase para teste. Ainda nao abre share nativo nem gera link real/deep link.
+- Implementado: botao Convidar abre `navigator.share` com URL e codigo, fallback para `Share.share` do React Native.
+- QR Code gerado via `react-native-qrcode-svg` aponta para URL de convite com codigo.
+- URL construida por `buildRoomInviteUrl()` usando `EXPO_PUBLIC_WEB_BASE_URL`, `window.location.origin` (web) ou `piqueesconde://` (deep link nativo).
+- Campo de codigo na tela de entrada e pre-preenchido via `useLocalSearchParams({ code })`.
 
-Impacto:
-- O codigo real da sala permite entrada manual em outro aparelho, mas o botao ainda nao aciona compartilhamento nativo.
+Impacto restante:
+- Deep link nativo (`piqueesconde://join-room?code=XXXX`) nao tem handler explicito mas e provavelmente tratado automaticamente pelo Expo Router.
+- Fluxo end-to-end (escanear QR → codigo pre-preenchido) ainda nao foi validado em celular real.
 
 Decisao:
-- Implementar share nativo e deep link na etapa de convite.
+- Marcar como resolvido. Incluir no roteiro de QA de campo: testar link compartilhado e QR em dois celulares reais.
 
 Link para test run:
 - `docs/qa/test-runs/2026-05-09-supabase-room-realtime-web.md`
