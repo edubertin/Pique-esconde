@@ -1,6 +1,7 @@
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { AppState, Platform } from 'react-native';
 
+import { t } from '@/src/i18n';
 import { roomService } from '@/src/services/room-service';
 import { clearStoredRoomSession, loadStoredRoomSession, saveStoredRoomSession } from '@/src/utils/room-session-storage';
 import { disableDevGps, isDevGpsEnabled } from '@/src/utils/dev-gps';
@@ -221,7 +222,7 @@ function getErrorMessage(error: unknown) {
   const normalizeMessage = (message: string) => message.toLowerCase();
   const toFriendlyMessage = (message: string) => {
     if (normalizeMessage(message).includes('nickname already in use')) {
-      return 'Esse nome ja esta na sala. Escolha outro.';
+      return t('join.duplicateName');
     }
 
     return cleanMessage(message);
