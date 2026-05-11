@@ -1,3 +1,5 @@
+import { Platform } from 'react-native';
+
 import { colors } from './colors';
 
 export const patterns = {
@@ -72,7 +74,10 @@ export const patterns = {
       borderColor: 'rgba(255, 255, 255, 0.90)',
       borderWidth: 1,
       radius: 24,
-      shadow: 'inset 0 1px 0 rgba(255,255,255,0.90), 0 8px 32px rgba(7, 26, 61, 0.18)',
+      shadow: Platform.select({
+        web: 'inset 0 1px 0 rgba(255,255,255,0.90), 0 8px 32px rgba(7, 26, 61, 0.18)',
+        default: '0 8px 32px rgba(7, 26, 61, 0.18)',
+      }),
     },
   },
   screen: {

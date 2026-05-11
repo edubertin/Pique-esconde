@@ -75,12 +75,14 @@ export default function LobbyScreen() {
     try {
       if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
         await navigator.clipboard.writeText(room.code);
+        setCopied(true);
+        setInviteFeedback(t('lobby.copyDone'));
+        setTimeout(() => setCopied(false), 1600);
+        setTimeout(() => setInviteFeedback(undefined), 2200);
+      } else {
+        setInviteFeedback(t('lobby.copyUnavailable'));
+        setTimeout(() => setInviteFeedback(undefined), 2200);
       }
-
-      setCopied(true);
-      setInviteFeedback(t('lobby.copyDone'));
-      setTimeout(() => setCopied(false), 1600);
-      setTimeout(() => setInviteFeedback(undefined), 2200);
     } catch {
       setInviteFeedback(t('lobby.copyUnavailable'));
       setTimeout(() => setInviteFeedback(undefined), 2200);

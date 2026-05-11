@@ -1,3 +1,5 @@
+import { Platform } from 'react-native';
+
 import { colors } from './colors';
 
 export const surfaces = {
@@ -17,13 +19,17 @@ export const surfaces = {
     backgroundColor: 'rgba(190, 225, 255, 0.50)',
     borderColor: 'rgba(255, 255, 255, 0.90)',
     borderWidth: 1,
-    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.90), 0 8px 32px rgba(7, 26, 61, 0.18)',
+    // inset not supported on native; drop shadow only for iOS/Android
+    boxShadow: Platform.select({
+      web: 'inset 0 1px 0 rgba(255,255,255,0.90), 0 8px 32px rgba(7, 26, 61, 0.18)',
+      default: '0 8px 32px rgba(7, 26, 61, 0.18)',
+    }),
   },
   warningTile: {
     backgroundColor: 'rgba(255, 204, 0, 0.18)',
     borderColor: 'rgba(255, 204, 0, 0.55)',
     borderWidth: 1,
-    boxShadow: '0 4px 0 rgba(7, 26, 61, 0.08), 0 1px 0 rgba(255, 255, 255, 0.40)',
+    boxShadow: '0 4px 0 rgba(7, 26, 61, 0.08)',
   },
   iconButton: {
     backgroundColor: 'rgba(221, 244, 255, 0.62)',

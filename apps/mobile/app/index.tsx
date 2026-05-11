@@ -92,9 +92,11 @@ function ButtonCard() {
           <CardContent />
         </View>
       ) : (
-        <BlurView intensity={55} tint="light" style={[cardInnerStyle, { boxShadow: surfaces.liquidPanel.boxShadow }]}>
-          <CardContent />
-        </BlurView>
+        <View style={{ borderRadius: 24, boxShadow: surfaces.liquidPanel.boxShadow, width: '100%' }}>
+          <BlurView intensity={55} tint="light" style={cardInnerStyle}>
+            <CardContent />
+          </BlurView>
+        </View>
       )}
     </LinearGradient>
   );

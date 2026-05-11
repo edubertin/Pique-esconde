@@ -95,9 +95,11 @@ export function Panel({ children, tone = 'default' }: PanelProps) {
             {children}
           </View>
         ) : (
-          <BlurView intensity={55} tint="light" style={[glassPanelInnerStyle, { boxShadow: pattern.shadow }]}>
-            {children}
-          </BlurView>
+          <View style={{ borderRadius: 24, boxShadow: pattern.shadow, width: '100%' }}>
+            <BlurView intensity={55} tint="light" style={glassPanelInnerStyle}>
+              {children}
+            </BlurView>
+          </View>
         )}
       </LinearGradient>
     );
