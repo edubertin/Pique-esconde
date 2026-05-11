@@ -650,19 +650,27 @@ export function RoomProvider({ children }: { children: ReactNode }) {
           ignoredRoomIdsRef.current.add(previousRoom.id);
           leavingRoomRef.current = true;
           suppressRemovalNoticeRef.current = true;
+
+          if (isDevGpsEnabled()) {
+            await roomService.clearDevTestDistance(previousRoom.id, activePlayerId, activePlayerToken).catch(() => undefined);
+          }
+
+          try {
+            await roomService.leaveRoom(previousRoom.id, activePlayerId, activePlayerToken);
+          } catch (leaveError) {
+            ignoredRoomIdsRef.current.delete(previousRoom.id);
+            leavingRoomRef.current = false;
+            suppressRemovalNoticeRef.current = false;
+            throw leaveError;
+          }
+
+          disableDevGps();
           setActivePlayerId(undefined);
           setActivePlayerToken(undefined);
           setRoomNotice(notice);
           setRoom(undefined);
           clearStoredRoomSession();
           clearFinalResultSnapshot();
-
-          if (isDevGpsEnabled()) {
-            await roomService.clearDevTestDistance(previousRoom.id, activePlayerId, activePlayerToken).catch(() => undefined);
-            disableDevGps();
-          }
-
-          await roomService.leaveRoom(previousRoom.id, activePlayerId, activePlayerToken);
         });
       },
       async markHidden() {
