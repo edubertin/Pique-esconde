@@ -82,6 +82,10 @@ Este plano cobre o MVP mobile/web em Expo:
 - Teste de agente: revisao feita por IA seguindo checklist e evidencias.
 - Teste exploratorio: tentativa livre de quebrar fluxo, estados e navegacao.
 
+## Roteiros de Campo
+
+- [Teste de campo com 2 jogadores](field-test-2-players.md): roteiro pratico para validar GPS, radar, captura, resultado, rematch, convite e privacidade com apenas duas pessoas.
+
 ## Ambientes
 
 Preencher durante cada execucao:
@@ -114,4 +118,3 @@ O MVP pode avancar para piloto quando:
 - Diferencie bug, risco, decisao pendente e limitacao aceita do MVP.
 - Nao implemente testes automatizados sem pedido explicito.
 - Quando uma falha for encontrada, registre ou sugira registro em `known-issues.md`.
-
