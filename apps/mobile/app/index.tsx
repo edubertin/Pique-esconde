@@ -88,8 +88,20 @@ export default function HomeScreen() {
 function HomeLegalLink({ href, label }: { href: '/privacy' | '/support' | '/terms'; label: string }) {
   return (
     <Link href={href} asChild>
-      <Pressable accessibilityLabel={label} accessibilityRole="link">
-        <Text style={{ color: colors.navy, fontSize: 12, fontWeight: '900', opacity: 0.82 }}>{label}</Text>
+      <Pressable
+        accessibilityLabel={label}
+        accessibilityRole="link"
+        style={{
+          backgroundColor: 'rgba(255, 255, 255, 0.72)',
+          borderColor: 'rgba(7, 26, 61, 0.18)',
+          borderRadius: 999,
+          borderWidth: 1,
+          minHeight: 44,
+          justifyContent: 'center',
+          paddingHorizontal: 10,
+          paddingVertical: 5,
+        }}>
+        <Text style={{ color: colors.navy, fontSize: 13, fontWeight: '900' }}>{label}</Text>
       </Pressable>
     </Link>
   );

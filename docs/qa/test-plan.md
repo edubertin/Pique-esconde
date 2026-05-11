@@ -102,6 +102,10 @@ Preencher durante cada execucao:
 - Data:
 - Responsavel:
 
+## Nota Sobre Abas e Sessoes
+
+Para validar dois jogadores no navegador, use dois contextos separados: dois navegadores diferentes, janela anonima separada ou dois celulares. Duas abas comuns no mesmo navegador podem compartilhar a mesma sessao local e parecer o mesmo jogador.
+
 ## Criterio de Pronto para MVP
 
 O MVP pode avancar para piloto quando:

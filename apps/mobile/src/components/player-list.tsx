@@ -13,6 +13,28 @@ function getAvatar(avatarId: string) {
   return avatars.find((avatar) => avatar.id === avatarId) ?? avatars[0];
 }
 
+function getDuplicateCounts(players: RoomPlayer[]) {
+  return players.reduce<Record<string, number>>((counts, player) => {
+    counts[player.nickname] = (counts[player.nickname] ?? 0) + 1;
+    return counts;
+  }, {});
+}
+
+function getNameIndexes(players: RoomPlayer[]) {
+  const seen: Record<string, number> = {};
+
+  return players.reduce<Record<string, number>>((indexes, player) => {
+    seen[player.nickname] = (seen[player.nickname] ?? 0) + 1;
+    indexes[player.id] = seen[player.nickname];
+    return indexes;
+  }, {});
+}
+
+function getPlayerLabel(player: RoomPlayer, duplicateCounts: Record<string, number>, nameIndexes: Record<string, number>) {
+  if ((duplicateCounts[player.nickname] ?? 0) <= 1) return player.nickname;
+  return `${player.nickname} #${nameIndexes[player.id] ?? 1}`;
+}
+
 type PlayerListProps = {
   activePlayerId?: string;
   canRemove?: boolean;
@@ -26,6 +48,8 @@ export function PlayerList({ activePlayerId, canRemove, onPromote, onRemove, pla
     if (firstPlayer.isLeader === secondPlayer.isLeader) return 0;
     return firstPlayer.isLeader ? -1 : 1;
   });
+  const duplicateCounts = getDuplicateCounts(orderedPlayers);
+  const nameIndexes = getNameIndexes(orderedPlayers);
 
   const getTone = (player: RoomPlayer): BadgeTone => {
     if (player.isLeader) return 'leader';
@@ -56,6 +80,7 @@ export function PlayerList({ activePlayerId, canRemove, onPromote, onRemove, pla
           const avatar = getAvatar(player.avatarId);
           const canRemovePlayer = canRemove && player.id !== activePlayerId;
           const canPromotePlayer = Boolean(onPromote && player.id !== activePlayerId && !player.isLeader);
+          const playerLabel = getPlayerLabel(player, duplicateCounts, nameIndexes);
           const content = (
             <>
               <View
@@ -74,7 +99,7 @@ export function PlayerList({ activePlayerId, canRemove, onPromote, onRemove, pla
               </View>
               <View style={{ flex: 1, gap: 2, minWidth: 0 }}>
                 <Text numberOfLines={1} style={{ color: colors.ink, fontSize: 15, fontWeight: '800' }}>
-                  {player.nickname}
+                  {playerLabel}
                 </Text>
                 <Text numberOfLines={1} style={{ color: colors.muted, fontSize: 12 }}>
                   {player.isLeader ? t('player.roleLeaderSeeker') : player.id === activePlayerId ? t('player.roleYou') : t('player.rolePlayer')}

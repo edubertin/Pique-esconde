@@ -78,12 +78,19 @@ export default function LobbyScreen() {
   const handleCopyCode = async () => {
     if (!room?.code) return;
 
-    if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(room.code);
-    }
+    try {
+      if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(room.code);
+      }
 
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1600);
+      setCopied(true);
+      setInviteFeedback(t('lobby.copyShareHint'));
+      setTimeout(() => setCopied(false), 1600);
+      setTimeout(() => setInviteFeedback(undefined), 2200);
+    } catch {
+      setInviteFeedback(t('lobby.copyUnavailable'));
+      setTimeout(() => setInviteFeedback(undefined), 2200);
+    }
   };
 
   const handleShareInvite = async () => {
@@ -270,6 +277,10 @@ export default function LobbyScreen() {
               {inviteFeedback}
             </Text>
           ) : null}
+          <View style={{ flexDirection: 'row', gap: 8 }}>
+            <Badge label={copied ? t('lobby.copyDone') : t('lobby.copyShort')} tone={copied ? 'ready' : 'neutral'} />
+            <Badge label={qrOpen ? t('lobby.qrOpen') : t('lobby.qrShort')} tone={qrOpen ? 'ready' : 'neutral'} />
+          </View>
           <View style={{ alignItems: 'center', flexDirection: 'row', gap: 6 }}>
             <Ionicons color={syncColor} name={isRoomSyncing ? 'sync-outline' : 'radio-outline'} size={14} />
             <Text selectable style={{ color: syncColor, fontSize: 12, fontWeight: '900' }}>
