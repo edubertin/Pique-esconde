@@ -149,7 +149,7 @@ export const enUS = {
   'result.summarySeeker': '{name} found everyone before time ran out and won the round.',
   'result.survived': 'Survived',
   'result.syncing': 'Syncing...',
-  'result.time': 'Game time',
+  'result.time': 'Time',
   'result.title': 'Results',
   'result.winner': 'Winner',
   'rules.capture': 'Automatic capture',

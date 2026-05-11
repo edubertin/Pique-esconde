@@ -145,7 +145,7 @@ export const ptBR = {
   'result.summarySeeker': '{name} encontrou todos antes do fim e venceu a rodada.',
   'result.survived': 'Sobreviveram',
   'result.syncing': 'Sincronizando...',
-  'result.time': 'Tempo de jogo',
+  'result.time': 'Tempo',
   'result.title': 'Resultados',
   'result.winner': 'Vencedor',
   'rules.capture': 'Captura automática',
