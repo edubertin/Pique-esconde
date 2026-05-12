@@ -31,5 +31,9 @@ web-build/
 # Build outputs
 build/
 coverage/
+apps/mobile/build-artifacts/
+
+# Agent worktrees / local automation state
+.claude/
 
 .vercel

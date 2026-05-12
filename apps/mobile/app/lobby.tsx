@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, Share, Text, View } from 'react-native';
 
 import { Badge } from '@/src/components/badge';
@@ -33,6 +33,7 @@ export default function LobbyScreen() {
   const { activePlayer, error, isLoading, isRoomSyncing, lastRoomSyncedAt, leaveRoom, promoteLeader, removePlayer, room, startRound, toggleReady } = useRoom();
   const [copied, setCopied] = useState(false);
   const [inviteFeedback, setInviteFeedback] = useState<string>();
+  const isLeavingRef = useRef(false);
   const [now, setNow] = useState(Date.now());
   const [qrOpen, setQrOpen] = useState(false);
   const players = room?.players ?? [];
@@ -122,11 +123,16 @@ export default function LobbyScreen() {
   };
 
   const handleLeaveRoom = async () => {
+    if (isLeavingRef.current || isLoading) return;
+
+    isLeavingRef.current = true;
     try {
       await leaveRoom();
       router.replace('/');
     } catch {
       // Error is shown from room store state.
+    } finally {
+      isLeavingRef.current = false;
     }
   };
 
@@ -343,7 +349,7 @@ export default function LobbyScreen() {
             <GameButton label={t('lobby.invite')} onPress={handleShareInvite} size="compact" variant="secondary" />
           </View>
           <View style={{ flex: 1 }}>
-            <GameButton label={t('common.exit')} onPress={handleLeaveRoom} size="compact" variant="dangerStrong" />
+            <GameButton disabled={isLoading} label={t('common.exit')} onPress={handleLeaveRoom} size="compact" variant="dangerStrong" />
           </View>
         </View>
       </View>

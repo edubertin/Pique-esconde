@@ -39,6 +39,38 @@ Link para test run:
 
 ## Bugs Conhecidos
 
+## KI-014 - Saida do lobby apos GPS mostrava `Room not found`
+
+Status: Resolvido em debug local Android
+Severidade: Alta
+Area: Lobby / Estado / Realtime
+Detectado em: 2026-05-12
+Commit/versao: worktree local, apos `1.0.1` / `versionCode 4`
+
+Descricao:
+- Ao criar uma sala, liberar GPS, entrar no lobby e tocar em `Sair` sendo o unico jogador, o backend removia a sala vazia corretamente.
+- Um refresh antigo do cliente ainda tentava buscar snapshot da sala deletada.
+- A RPC respondia `Room not found`, e o app permanecia no lobby exibindo erro.
+
+Impacto:
+- Usuario ficava preso visualmente em uma sala que ja tinha sido removida.
+- Fluxo basico de abandono do lobby ficava quebrado no teste interno.
+
+Comportamento esperado:
+- Tocar em `Sair` deve limpar sessao local, interromper refreshes antigos da sala e voltar para Home sem erro visual.
+
+Comportamento atual:
+- Resolvido em build debug local: `leaveRoom` invalida refreshes pendentes, cancela timeout realtime, ignora `Room not found`/`Invalid room session` apenas durante saida da sala e trava duplo toque no botao `Sair`.
+
+Decisao:
+- Manter backend apagando sala vazia.
+- Tratar corrida de refresh no cliente.
+- Validar novamente em build Play apos proximo `versionCode`.
+
+Link para test run:
+- `docs/qa/test-runs/2026-05-12-lobby-leave-after-gps-error.md`
+- `docs/qa/test-runs/2026-05-12-lobby-leave-after-gps-fix-local-debug.md`
+
 ## KI-001 - Navegacao de resultado duplicada entre botao, tela e estado
 
 Status: Resolvido em QA web

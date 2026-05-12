@@ -59,17 +59,22 @@ function getTargetPath({
 export function RoomRouteGuard() {
   const pathname = usePathname();
   const router = useRouter();
-  const { activePlayer, finalResultSnapshot, room } = useRoom();
+  const { activePlayer, finalResultSnapshot, isRestoringSession, room } = useRoom();
 
   useEffect(() => {
-    const currentPathname = typeof window === 'undefined' ? pathname : window.location.pathname;
+    if (isRestoringSession) return;
+
+    const currentPathname =
+      typeof window === 'undefined' || !window.location?.pathname
+        ? pathname
+        : window.location.pathname;
     if (currentPathname !== pathname) return;
 
     const targetPath = getTargetPath({ activePlayer, finalResultSnapshot, pathname, room });
     if (targetPath && targetPath !== pathname) {
       router.replace(targetPath);
     }
-  }, [activePlayer, finalResultSnapshot, pathname, room, router]);
+  }, [activePlayer, finalResultSnapshot, isRestoringSession, pathname, room, router]);
 
   return null;
 }

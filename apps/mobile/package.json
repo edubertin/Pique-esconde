@@ -1,12 +1,12 @@
 {
   "name": "@pique-esconde/mobile",
   "main": "expo-router/entry",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "scripts": {
     "start": "expo start",
-    "android": "expo start --android",
+    "android": "expo run:android",
     "build:web": "expo export --platform web",
-    "ios": "expo start --ios",
+    "ios": "expo run:ios",
     "web": "expo start --web",
     "web:local": "expo start --web --clear --port 8086",
     "qa:web": "playwright test e2e/room-web-smoke.spec.js --browser=chromium",
