@@ -2,25 +2,33 @@
 
 Este documento registra o estado de loja do Pique Esconde e os cuidados antes de promover qualquer versao alem de teste interno.
 
-Ele nao afirma lancamento publico amplo. O estado atual e Google Play aceito para teste interno; a proxima frente de loja e Apple App Store.
+Ele nao afirma lancamento publico amplo. O estado atual e Google Play aceito para teste interno e iOS submetido para revisao da Apple.
 
 ## Status Atual
 
-- Plataforma ativa nesta rodada: Google Play.
+- Plataforma ativa nesta rodada: Google Play e Apple App Store.
 - Pacote Android: `com.eduardobertin.piqueesconde`.
-- Versao enviada: `1.0.2`.
+- Versao Android enviada: `1.0.2`.
 - `versionCode`: `5`.
 - Build: EAS production AAB.
 - Envio: upload manual pelo Google Play Console.
 - Status informado pelo Eduardo em 2026-05-13: app aceito na Google Play.
-- Proximo passo de loja: preparar submissao para Apple App Store.
 - Validacao em emulador: instalacao pela Play confirmada com `installerPackageName=com.android.vending`.
+- Bundle ID iOS: `com.eduardobertin.piqueesconde`.
+- App Store Connect Apple ID: `6768520532`.
+- Versao iOS enviada: `1.0.2`.
+- `buildNumber`: `1`.
+- Build iOS: EAS production IPA `3796080a-2af9-46db-8036-24965b0049ab`.
+- Envio ao App Store Connect/TestFlight: concluido em 2026-05-13.
+- Status informado pelo Eduardo em 2026-05-13: app colocado em revisao na Apple.
+- Proximo passo de loja: aguardar retorno da revisao da Apple e responder qualquer pendencia.
 
 Relatorios:
 
 - [EAS production AAB v5](qa/test-runs/2026-05-12-eas-production-aab-v5.md)
 - [Google Play v5 pos-publicacao no emulador](qa/test-runs/2026-05-12-google-play-v5-post-publish-emulator.md)
 - [Panorama final da build local](qa/test-runs/2026-05-12-final-local-build-panorama.md)
+- [iOS App Store submission](qa/test-runs/2026-05-13-ios-app-store-submission.md)
 
 ## URLs Publicas Necessarias
 
@@ -62,16 +70,24 @@ We also made stability improvements to the lobby, invite, and location flow.
 - Definir classificacao indicativa e politica para menores.
 - Confirmar se o app sera direcionado a criancas ou a publico geral.
 - Revisar textos de permissao no iOS/Android.
-- Validar Data Safety do Google Play com base no comportamento final.
-- Validar App Privacy da Apple antes de qualquer submissao iOS.
+- Data Safety do Google Play e App Privacy da Apple devem permanecer alinhados ao comportamento final a cada nova release.
 
-## Proxima Frente: Apple App Store
+## Apple App Store
 
-- Revisar `ios.bundleIdentifier`, `ios.buildNumber` e textos de permissao no `app.json`.
-- Preparar App Privacy, classificacao indicativa e metadados da App Store.
-- Gerar build iOS `production` pelo EAS.
-- Validar fluxo em aparelho iOS real, especialmente permissao de localizacao, share nativo e card social.
-- Submeter para revisao da Apple App Store quando o pacote e os metadados estiverem completos.
+- `ios.bundleIdentifier`: `com.eduardobertin.piqueesconde`.
+- `ios.buildNumber`: `1`.
+- `ios.config.usesNonExemptEncryption`: `false`.
+- App Privacy configurado no App Store Connect com localizacao precisa, ID de usuario e conteudos de jogos para funcionalidade do app, vinculados ao usuario e sem rastreamento.
+- Categoria configurada como jogo; classificacao etaria calculada como `4+`.
+- Politica de privacidade configurada com `https://pique-esconde.eduardobertin.com.br/privacy`.
+- Preco configurado como gratis para a submissao inicial.
+- Status atual: em revisao na Apple.
+
+Pendencias para depois do retorno da Apple:
+
+- Se aprovado, validar disponibilidade/TestFlight e preparar comunicacao de teste.
+- Se rejeitado, registrar motivo da revisao, corrigir apenas o necessario e gerar nova build com `ios.buildNumber` incrementado.
+- Testar em iPhone real, especialmente permissao de localizacao, share nativo, radar e captura.
 
 ## Metadados Sugeridos
 

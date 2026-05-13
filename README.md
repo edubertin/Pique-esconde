@@ -21,7 +21,7 @@
 </p>
 
 [![Mobile CI](https://github.com/edubertin/Pique-esconde/actions/workflows/mobile-ci.yml/badge.svg)](https://github.com/edubertin/Pique-esconde/actions/workflows/mobile-ci.yml)
-![Status](https://img.shields.io/badge/status-teste%20interno-ff2d8d)
+![Status](https://img.shields.io/badge/status-lojas%20em%20revisao-ff2d8d)
 ![Expo](https://img.shields.io/badge/Expo-54-000020)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178c6)
 ![Supabase](https://img.shields.io/badge/Supabase-Realtime-3ecf8e)
@@ -37,12 +37,12 @@ O celular nao substitui a brincadeira: ele organiza a sala, sincroniza jogadores
 
 - Android `1.0.2 (versionCode 5)` aceito na Google Play para teste interno.
 - Build da Play instalada e aberta no emulador com `installerPackageName=com.android.vending`.
-- Proximo foco de loja: preparar submissao para Apple App Store.
+- iOS `1.0.2 (build 1)` enviado ao App Store Connect/TestFlight e colocado em revisao na Apple em 2026-05-13.
 - Web demo disponivel em `https://pique-esconde.eduardobertin.com.br`.
 - Fluxos locais validados: abertura, paginas legais, criar sala, permissao de GPS, lobby, QR, convite, regras e sair do lobby.
 - Proximo gate: teste de campo com 2+ celulares reais para validar multiplayer, GPS real, radar, captura e realtime sob rede movel.
 
-O projeto ainda nao deve ser descrito como lancamento publico aprovado. Ele esta em validacao controlada.
+O projeto ainda nao deve ser descrito como lancamento publico aprovado. Ele esta em validacao controlada, com iOS aguardando revisao da Apple.
 
 ## Como Funciona
 
@@ -154,10 +154,12 @@ Nunca commite `.env` ou credenciais.
 - AAB validado com bundletool.
 - Instalacao via Play Store confirmada no emulador.
 - Aceite na Google Play confirmado pelo Eduardo em 2026-05-13.
+- Build iOS `1.0.2 (1)` gerada por EAS, enviada ao App Store Connect e colocada em revisao na Apple em 2026-05-13.
 - Bug de sair do lobby apos criar sala e liberar GPS nao reproduziu no smoke local.
 
 Relatorios:
 
+- [iOS App Store submission](docs/qa/test-runs/2026-05-13-ios-app-store-submission.md)
 - [EAS production AAB v5](docs/qa/test-runs/2026-05-12-eas-production-aab-v5.md)
 - [Google Play v5 no emulador](docs/qa/test-runs/2026-05-12-google-play-v5-post-publish-emulator.md)
 - [Panorama final da build local](docs/qa/test-runs/2026-05-12-final-local-build-panorama.md)

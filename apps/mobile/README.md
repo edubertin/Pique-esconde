@@ -6,9 +6,10 @@ App Expo/React Native do Pique Esconde.
 
 - Versao do app: `1.0.2`.
 - Android `versionCode`: `5`.
+- iOS `buildNumber`: `1`.
 - Pacote Android: `com.eduardobertin.piqueesconde`.
 - Build Play: AAB `production` gerado por EAS, enviado manualmente e aceito na Google Play para teste interno.
-- Proximo foco de loja: preparar submissao para Apple App Store.
+- Build iOS: IPA `production` gerado por EAS, enviado ao App Store Connect/TestFlight e colocado em revisao na Apple em 2026-05-13.
 - Web: export estatico Expo hospedado na Vercel.
 
 Este app ja possui fluxo real de sala/lobby/rodada com Supabase, mas ainda precisa de QA de campo com 2+ celulares reais para validar GPS, radar, captura e realtime fora do emulador.
@@ -104,6 +105,31 @@ npx eas-cli@latest submit --platform android --latest
 
 Rodar em modo interativo uma vez para configurar a Service Account e depois automatizar.
 
+## iOS / App Store
+
+Build IPA de producao para App Store:
+
+```bash
+npx eas-cli@latest build --platform ios --profile production
+```
+
+Status atual:
+
+- Bundle ID: `com.eduardobertin.piqueesconde`.
+- App Store Connect Apple ID: `6768520532`.
+- Build EAS: `3796080a-2af9-46db-8036-24965b0049ab`.
+- Versao enviada: `1.0.2 (1)`.
+- Envio ao App Store Connect/TestFlight concluido em 2026-05-13.
+- App colocado em revisao na Apple em 2026-05-13.
+
+Antes da proxima release iOS:
+
+- incrementar `ios.buildNumber`;
+- confirmar se `expo.version` precisa mudar;
+- rodar lint e TypeScript;
+- gerar novo IPA production;
+- validar TestFlight em iPhone real antes de promover para revisao.
+
 ## Telas Principais
 
 - Home
@@ -150,6 +176,7 @@ Ja validado em emulador:
 - versao `1.0.2 (5)`;
 - home carregando;
 - fluxo local de lobby/GPS/sair sem regressao critica.
+- upload iOS ao App Store Connect e submissao para revisao da Apple.
 
 Ainda precisa de campo:
 
