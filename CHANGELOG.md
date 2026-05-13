@@ -15,6 +15,7 @@ This project follows a simple human-readable changelog format inspired by Keep a
 ### Changed
 
 - GitHub documentation refresh with updated Play Internal Test status and current visual assets.
+- Store status docs now record Google Play acceptance and Apple App Store as the next submission focus.
 
 ## 2026-05-12 - 1.0.2
 

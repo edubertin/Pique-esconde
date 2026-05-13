@@ -2,7 +2,7 @@
 
 Este documento registra o estado de loja do Pique Esconde e os cuidados antes de promover qualquer versao alem de teste interno.
 
-Ele nao afirma aprovacao publica. O estado atual e de teste interno/analise pelo Google.
+Ele nao afirma lancamento publico amplo. O estado atual e Google Play aceito para teste interno; a proxima frente de loja e Apple App Store.
 
 ## Status Atual
 
@@ -12,7 +12,8 @@ Ele nao afirma aprovacao publica. O estado atual e de teste interno/analise pelo
 - `versionCode`: `5`.
 - Build: EAS production AAB.
 - Envio: upload manual pelo Google Play Console.
-- Status informado pelo Eduardo: projeto em analise no Google.
+- Status informado pelo Eduardo em 2026-05-13: app aceito na Google Play.
+- Proximo passo de loja: preparar submissao para Apple App Store.
 - Validacao em emulador: instalacao pela Play confirmada com `installerPackageName=com.android.vending`.
 
 Relatorios:
@@ -63,6 +64,14 @@ We also made stability improvements to the lobby, invite, and location flow.
 - Revisar textos de permissao no iOS/Android.
 - Validar Data Safety do Google Play com base no comportamento final.
 - Validar App Privacy da Apple antes de qualquer submissao iOS.
+
+## Proxima Frente: Apple App Store
+
+- Revisar `ios.bundleIdentifier`, `ios.buildNumber` e textos de permissao no `app.json`.
+- Preparar App Privacy, classificacao indicativa e metadados da App Store.
+- Gerar build iOS `production` pelo EAS.
+- Validar fluxo em aparelho iOS real, especialmente permissao de localizacao, share nativo e card social.
+- Submeter para revisao da Apple App Store quando o pacote e os metadados estiverem completos.
 
 ## Metadados Sugeridos
 

@@ -10,7 +10,8 @@ Confirmar que a versao `1.0.2 (5)` enviada ao Google Play aparece corretamente p
 - Build EAS: `ca9004fb-782e-4e93-b63f-857eecb36153`.
 - Versao esperada: `versionName=1.0.2`, `versionCode=5`.
 - Upload foi feito manualmente pelo Google Play Console, porque `eas submit` ficou bloqueado por falta de Google Service Account em modo nao interativo.
-- Status informado pelo Eduardo: projeto em analise no Google.
+- Status inicial informado pelo Eduardo: projeto em analise no Google.
+- Atualizacao 2026-05-13: Eduardo informou que o app foi aceito na Google Play.
 
 ## Execucao
 
@@ -59,10 +60,10 @@ Smoke de abertura:
 - A falha inicial nao foi da build nova; era incompatibilidade de assinatura entre instalacao local anterior e pacote assinado pela Play/EAS.
 - Depois de remover a instalacao local, a instalacao pela Play passou.
 - Usuario reportou que testou e deu certo.
-- Estado atual do projeto: em analise pelo Google.
+- Estado atual do projeto: aceito na Google Play.
 
 ## Decisao
 
-Status: aprovado para a etapa atual de teste interno/analise Google.
+Status: aprovado para a etapa atual de teste interno na Google Play.
 
-Proximo passo: aguardar conclusao da analise do Google e, quando disponivel para os testadores, repetir o roteiro completo em dispositivo real.
+Proximo passo: preparar a frente Apple App Store e repetir o roteiro completo em dispositivo real quando disponivel para os testadores.

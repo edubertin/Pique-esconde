@@ -7,7 +7,8 @@ App Expo/React Native do Pique Esconde.
 - Versao do app: `1.0.2`.
 - Android `versionCode`: `5`.
 - Pacote Android: `com.eduardobertin.piqueesconde`.
-- Build Play: AAB `production` gerado por EAS e enviado manualmente ao Google Play para teste interno/analise.
+- Build Play: AAB `production` gerado por EAS, enviado manualmente e aceito na Google Play para teste interno.
+- Proximo foco de loja: preparar submissao para Apple App Store.
 - Web: export estatico Expo hospedado na Vercel.
 
 Este app ja possui fluxo real de sala/lobby/rodada com Supabase, mas ainda precisa de QA de campo com 2+ celulares reais para validar GPS, radar, captura e realtime fora do emulador.

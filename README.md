@@ -35,8 +35,9 @@ O celular nao substitui a brincadeira: ele organiza a sala, sincroniza jogadores
 
 ## Status Atual
 
-- Android `1.0.2 (versionCode 5)` enviado ao Google Play para teste interno e analise.
+- Android `1.0.2 (versionCode 5)` aceito na Google Play para teste interno.
 - Build da Play instalada e aberta no emulador com `installerPackageName=com.android.vending`.
+- Proximo foco de loja: preparar submissao para Apple App Store.
 - Web demo disponivel em `https://pique-esconde.eduardobertin.com.br`.
 - Fluxos locais validados: abertura, paginas legais, criar sala, permissao de GPS, lobby, QR, convite, regras e sair do lobby.
 - Proximo gate: teste de campo com 2+ celulares reais para validar multiplayer, GPS real, radar, captura e realtime sob rede movel.
@@ -152,6 +153,7 @@ Nunca commite `.env` ou credenciais.
 - `1.0.2 (5)` gerado via EAS production AAB.
 - AAB validado com bundletool.
 - Instalacao via Play Store confirmada no emulador.
+- Aceite na Google Play confirmado pelo Eduardo em 2026-05-13.
 - Bug de sair do lobby apos criar sala e liberar GPS nao reproduziu no smoke local.
 
 Relatorios:
