@@ -12,8 +12,11 @@
       "bundleIdentifier": "com.eduardobertin.piqueesconde",
       "buildNumber": "1",
       "supportsTablet": false,
+      "config": {
+        "usesNonExemptEncryption": false
+      },
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "Pique Esconde uses your location during the match to calculate radar distance and confirm captures. It is never shown to other players as a map."
+        "NSLocationWhenInUseUsageDescription": "O Pique Esconde usa sua localização durante a partida para calcular o radar e confirmar capturas. Sua posição exata não é exibida em mapa para outros jogadores."
       }
     },
     "android": {
@@ -41,7 +44,7 @@
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "O Pique Esconde usa sua localização durante a partida para calcular radar e capturas."
+          "locationWhenInUsePermission": "O Pique Esconde usa sua localização durante a partida para calcular o radar e confirmar capturas. Sua posição exata não é exibida em mapa para outros jogadores."
         }
       ],
       [
