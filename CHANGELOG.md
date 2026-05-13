@@ -14,7 +14,27 @@ This project follows a simple human-readable changelog format inspired by Keep a
 
 ### Changed
 
-- Root README now works as the public project overview.
+- GitHub documentation refresh with updated Play Internal Test status and current visual assets.
+
+## 2026-05-12 - 1.0.2
+
+### Changed
+
+- Android app version updated to `1.0.2`.
+- Android `versionCode` updated to `5` for Google Play.
+- README and release docs now identify the current Play testing status.
+
+### Fixed
+
+- Stabilized the flow after creating a room, allowing GPS, entering the lobby and leaving the room.
+- Reduced stale lobby refresh errors around `Room not found` and `Invalid room session` during room exit.
+
+### Verified
+
+- EAS production AAB generated successfully.
+- AAB validated with bundletool.
+- Google Play installation confirmed in emulator with `installerPackageName=com.android.vending`.
+- App opened on Home from the Play-installed build.
 
 ## 2026-05-10
 

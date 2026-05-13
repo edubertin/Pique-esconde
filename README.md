@@ -1,7 +1,7 @@
 # Pique Esconde
 
 <p align="center">
-  <img src="docs/design/referencias/pique-esconde-logo.png" alt="Pique Esconde logo" width="220" />
+  <img src="apps/mobile/assets/images/pique-esconde-store-cover.png" alt="Banner do Pique Esconde com criancas brincando, radar no celular e o texto Esconda, Marque, Corra" width="900" />
 </p>
 
 <p align="center">
@@ -9,57 +9,75 @@
 </p>
 
 <p align="center">
-  <a href="https://pique-esconde.eduardobertin.com.br">Site oficial</a>
-  ·
+  <a href="https://pique-esconde.eduardobertin.com.br">App web</a>
+  |
   <a href="https://pique-esconde.eduardobertin.com.br/privacy">Privacidade</a>
-  ·
+  |
   <a href="https://pique-esconde.eduardobertin.com.br/terms">Termos</a>
-  ·
+  |
   <a href="https://pique-esconde.eduardobertin.com.br/support">Suporte</a>
+  |
+  <a href="docs/README.md">Docs</a>
 </p>
 
 [![Mobile CI](https://github.com/edubertin/Pique-esconde/actions/workflows/mobile-ci.yml/badge.svg)](https://github.com/edubertin/Pique-esconde/actions/workflows/mobile-ci.yml)
-![MVP](https://img.shields.io/badge/status-MVP-ff2d8d)
+![Status](https://img.shields.io/badge/status-teste%20interno-ff2d8d)
 ![Expo](https://img.shields.io/badge/Expo-54-000020)
-![React Native](https://img.shields.io/badge/React%20Native-0.81-61dafb)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178c6)
 ![Supabase](https://img.shields.io/badge/Supabase-Realtime-3ecf8e)
-![Vercel](https://img.shields.io/badge/Vercel-Web-000000)
 ![Privacy by Design](https://img.shields.io/badge/privacy-by%20design-b6f000)
-![License](https://img.shields.io/badge/license-All%20rights%20reserved-lightgrey)
 
-## Visao Geral
+## O Que E
 
-Pique Esconde ajuda grupos presenciais a criarem uma sala, convidarem amigos, escolherem quem procura e jogarem uma rodada de pique-esconde usando o celular como ferramenta de jogo.
+Pique Esconde ajuda grupos presenciais a criarem uma sala, convidarem amigos e jogarem uma rodada de pique-esconde usando o celular como apoio de partida.
 
-O app usa Supabase Realtime para sincronizar sala e rodada, Expo/React Native para mobile e web, e GPS apenas durante partidas ativas para calcular pistas derivadas de radar e captura por proximidade.
+O celular nao substitui a brincadeira: ele organiza a sala, sincroniza jogadores, mostra pistas de radar aproximadas e confirma capturas por proximidade. O procurador nao ve um mapa exato dos escondidos.
 
-O produto evita transformar localizacao em monitoramento: o procurador nao ve mapa exato dos escondidos, cards sociais nao incluem GPS, e salas/dados de partida sao temporarios.
+## Status Atual
 
-## Links Rapidos
+- Android `1.0.2 (versionCode 5)` enviado ao Google Play para teste interno e analise.
+- Build da Play instalada e aberta no emulador com `installerPackageName=com.android.vending`.
+- Web demo disponivel em `https://pique-esconde.eduardobertin.com.br`.
+- Fluxos locais validados: abertura, paginas legais, criar sala, permissao de GPS, lobby, QR, convite, regras e sair do lobby.
+- Proximo gate: teste de campo com 2+ celulares reais para validar multiplayer, GPS real, radar, captura e realtime sob rede movel.
 
-- [App web](https://pique-esconde.eduardobertin.com.br)
-- [Documentacao](docs/README.md)
-- [Specs do produto](docs/specs/README.md)
-- [Arquitetura e ADRs](docs/technical/README.md)
-- [Plano de QA](docs/qa/test-plan.md)
-- [Politica de Privacidade](https://pique-esconde.eduardobertin.com.br/privacy)
-- [Termos de Uso](https://pique-esconde.eduardobertin.com.br/terms)
-- [Suporte](https://pique-esconde.eduardobertin.com.br/support)
-- [Exclusao de dados](https://pique-esconde.eduardobertin.com.br/data-deletion)
+O projeto ainda nao deve ser descrito como lancamento publico aprovado. Ele esta em validacao controlada.
 
-## Escopo do MVP
+## Como Funciona
 
-- Salas temporarias com codigo, link de convite e QR code.
-- Entrada com apelido simples e avatar pre-pronto.
-- Lobby realtime com lista de jogadores, lider/procurador e status de preparo.
-- Regras configuraveis no lobby: ambiente, tempo para esconder e tempo de busca.
-- Rodada com fase de esconder, busca, captura e resultado.
-- Radar de proximidade com sinais derivados, animacao e direcao aproximada.
-- Sincronizacao via Supabase Realtime e snapshot atomico de sala.
-- Manutencao server-side para timers, limpeza e transicoes criticas.
-- Card social sem GPS, mapa, rota, endereco ou coordenadas.
-- Paginas publicas de privacidade, termos, suporte e exclusao de dados.
+- Crie uma sala temporaria.
+- Convide amigos por codigo, link ou QR code.
+- Escolha regras de ambiente e tempo.
+- Inicie a rodada presencial.
+- Escondidos usam o app durante a fase de esconder.
+- Procurador recebe sinais derivados de proximidade, sem mapa exato.
+- A partida termina por captura ou resultado sincronizado.
+
+## Privacidade
+
+Localizacao e uma mecanica temporaria de jogo, nao um produto de vigilancia.
+
+Compromissos do MVP:
+
+- GPS usado apenas durante partidas ativas.
+- Sem mapa exato dos escondidos.
+- Sem historico permanente de rotas.
+- Sem coordenadas, endereco, rota ou mapa real em cards sociais.
+- Salas e dados operacionais mantidos pelo menor tempo necessario.
+- Radar baseado em sinais derivados como frio, morno, quente, direcao aproximada e confianca.
+
+## Visual Do App
+
+<p align="center">
+  <img src="apps/mobile/assets/images/icon-512.png" alt="Icone do aplicativo Pique Esconde" width="160" />
+</p>
+
+Assets principais:
+
+- Icone do app: `apps/mobile/assets/images/icon.png`
+- Icone 512px para README/loja: `apps/mobile/assets/images/icon-512.png`
+- Banner de loja/GitHub: `apps/mobile/assets/images/pique-esconde-store-cover.png`
+- Feature graphic: `apps/mobile/assets/images/feature-graphic.png`
 
 ## Stack
 
@@ -68,7 +86,7 @@ O produto evita transformar localizacao em monitoramento: o procurador nao ve ma
 - **Backend:** Supabase Postgres, RPCs, Realtime e migrations SQL.
 - **Localizacao:** `expo-location`, pistas derivadas e captura validada no backend.
 - **Compartilhamento:** invite link, codigo de sala, QR code e card social.
-- **QA:** Playwright smoke test, checklist manual e registros em `docs/qa`.
+- **QA:** Playwright smoke test, checklists manuais e test runs em `docs/qa`.
 
 ## Desenvolvimento Local
 
@@ -93,14 +111,14 @@ npx tsc --noEmit
 npm run build:web
 ```
 
-Teste smoke web:
+Smoke web:
 
 ```bash
 cd apps/mobile
 npm run qa:web
 ```
 
-## Variaveis de Ambiente
+## Variaveis De Ambiente
 
 Copie `apps/mobile/.env.example` para `.env` e preencha:
 
@@ -116,36 +134,31 @@ EXPO_PUBLIC_WEB_BASE_URL=
 https://pique-esconde.eduardobertin.com.br
 ```
 
-## Privacidade
+Nunca commite `.env` ou credenciais.
 
-Localizacao e mecanica temporaria de jogo, nao produto de vigilancia.
+## Docs Por Intencao
 
-Compromissos do MVP:
+- Quero entender o produto: [docs/00-visao-geral.md](docs/00-visao-geral.md)
+- Quero saber como jogar: [docs/01-como-jogar.md](docs/01-como-jogar.md)
+- Quero revisar GPS/radar: [docs/03-radar-gps.md](docs/03-radar-gps.md)
+- Quero entender lobby/convites: [docs/04-lobby-convites.md](docs/04-lobby-convites.md)
+- Quero ver arquitetura: [docs/technical/README.md](docs/technical/README.md)
+- Quero revisar privacidade: [docs/specs/privacy-and-data.md](docs/specs/privacy-and-data.md)
+- Quero testar: [docs/qa/test-plan.md](docs/qa/test-plan.md)
+- Quero ver status de loja: [docs/07-app-store-play-store.md](docs/07-app-store-play-store.md)
 
-- usar localizacao apenas durante partidas ativas;
-- nao mostrar mapa exato dos escondidos;
-- nao manter historico permanente de rotas;
-- nao incluir GPS, rota, mapa real, endereco ou coordenadas em cards sociais;
-- manter salas, eventos e dados operacionais pelo menor tempo necessario;
-- expor ao app sinais derivados como frio, morno, quente, direcao aproximada e confianca.
+## Validacao Recente
 
-## Status Atual
+- `1.0.2 (5)` gerado via EAS production AAB.
+- AAB validado com bundletool.
+- Instalacao via Play Store confirmada no emulador.
+- Bug de sair do lobby apos criar sala e liberar GPS nao reproduziu no smoke local.
 
-O MVP esta em implementacao ativa. Ja existem app Expo, fluxo web/mobile, Supabase conectado, lobby realtime com fallback de snapshot, restauracao de sessao no PWA, regras de sala, rodada real, radar/GPS base, QR/link de convite, paginas legais e export web para Vercel.
+Relatorios:
 
-Antes de piloto publico, ainda e necessario validar em celulares reais, ajustar documentos de loja, revisar requisitos de idade/classificacao e estabilizar QA de GPS em campo.
-
-## Documentos Importantes
-
-- [Visao geral da documentacao](docs/README.md)
-- [Game loop](docs/specs/game-loop.md)
-- [Radar e GPS](docs/specs/location-radar.md)
-- [Salas e lobby](docs/specs/rooms-and-lobby.md)
-- [Privacidade e dados](docs/specs/privacy-and-data.md)
-- [Modelo de dados](docs/technical/data-model.md)
-- [Eventos realtime](docs/technical/realtime-events.md)
-- [Decisoes de arquitetura](docs/technical/decisions/README.md)
-- [QA](docs/qa/test-plan.md)
+- [EAS production AAB v5](docs/qa/test-runs/2026-05-12-eas-production-aab-v5.md)
+- [Google Play v5 no emulador](docs/qa/test-runs/2026-05-12-google-play-v5-post-publish-emulator.md)
+- [Panorama final da build local](docs/qa/test-runs/2026-05-12-final-local-build-panorama.md)
 
 ## Licenca
 
