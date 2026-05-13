@@ -373,7 +373,6 @@ export function RadarView({
               borderRadius: 18,
               boxShadow: patterns.panel.glass.shadow,
               backdropFilter: 'blur(20px)',
-              // @ts-expect-error webkit vendor prefix not in RN ViewStyle but forwarded on web
               WebkitBackdropFilter: 'blur(20px)',
               gap: 7,
               overflow: 'hidden',

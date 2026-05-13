@@ -85,7 +85,6 @@ function ButtonCard() {
               backgroundColor: surfaces.liquidPanel.backgroundColor,
               boxShadow: surfaces.liquidPanel.boxShadow,
               backdropFilter: 'blur(20px)',
-              // @ts-expect-error webkit vendor prefix not in RN ViewStyle but passed through on web
               WebkitBackdropFilter: 'blur(20px)',
             },
           ]}>

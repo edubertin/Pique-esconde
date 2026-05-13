@@ -88,7 +88,6 @@ export function Panel({ children, tone = 'default' }: PanelProps) {
                 backgroundColor: pattern.backgroundColor,
                 boxShadow: pattern.shadow,
                 backdropFilter: 'blur(20px)',
-                // @ts-expect-error webkit vendor prefix not in RN ViewStyle but forwarded on web
                 WebkitBackdropFilter: 'blur(20px)',
               },
             ]}>
