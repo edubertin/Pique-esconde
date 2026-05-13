@@ -28,6 +28,14 @@ Jogador entra com:
 
 Sem login completo no MVP.
 
+### Unicidade de apelido
+
+- Apelidos são únicos por sala — o mesmo apelido não pode ser usado por dois jogadores na mesma sala.
+- A comparação ignora maiúsculas/minúsculas e acentuação: "Ana", "ANA" e "Aná" são tratados como equivalentes.
+- O apelido exibido na sala preserva o que o jogador digitou; a normalização é usada apenas para verificar unicidade.
+- Se o apelido escolhido já estiver em uso (ou for equivalente a um já existente), o jogador recebe uma mensagem de erro e pode escolher outro nome.
+- A regra é aplicada no banco de dados — não apenas na interface — para prevenir condições de corrida.
+
 ## Lobby
 
 O lobby mostra:

@@ -1,3 +1,5 @@
+import { Platform } from 'react-native';
+
 import { colors } from './colors';
 
 export const patterns = {
@@ -68,11 +70,14 @@ export const patterns = {
       shadow: '0 12px 0 rgba(7, 26, 61, 0.22)',
     },
     glass: {
-      backgroundColor: 'rgba(255, 255, 255, 0.78)',
-      borderColor: 'rgba(255, 255, 255, 0.92)',
-      borderWidth: 2,
-      radius: 20,
-      shadow: '0 12px 0 rgba(7, 26, 61, 0.22)',
+      backgroundColor: 'rgba(190, 225, 255, 0.50)',
+      borderColor: 'rgba(255, 255, 255, 0.90)',
+      borderWidth: 1,
+      radius: 24,
+      shadow: Platform.select({
+        web: 'inset 0 1px 0 rgba(255,255,255,0.90), 0 8px 32px rgba(7, 26, 61, 0.18)',
+        default: '0 8px 32px rgba(7, 26, 61, 0.18)',
+      }),
     },
   },
   screen: {

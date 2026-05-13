@@ -20,7 +20,8 @@ export function enableDevGps() {
 }
 
 export function disableDevGps() {
-  if (typeof window === 'undefined') return;
+  if (!isDevGpsAvailable() || typeof window === 'undefined') return;
+
   window.sessionStorage.removeItem(devGpsStorageKey);
   window.sessionStorage.removeItem(devGpsDistanceStorageKey);
   window.sessionStorage.removeItem(devGpsDirectionStorageKey);

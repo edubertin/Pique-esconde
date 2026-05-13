@@ -82,6 +82,14 @@ Este plano cobre o MVP mobile/web em Expo:
 - Teste de agente: revisao feita por IA seguindo checklist e evidencias.
 - Teste exploratorio: tentativa livre de quebrar fluxo, estados e navegacao.
 
+## Roteiros de Campo
+
+- [Teste de campo com 2 jogadores](field-test-2-players.md): roteiro pratico para validar GPS, radar, captura, resultado, rematch, convite e privacidade com apenas duas pessoas.
+
+## Fase 0
+
+- [Estrutura de QA da Fase 0](fase-0/README.md): templates de test-run, bug, checklist Go/No-Go e resumo para decidir avanco ao piloto fechado.
+
 ## Ambientes
 
 Preencher durante cada execucao:
@@ -93,6 +101,19 @@ Preencher durante cada execucao:
 - Commit testado:
 - Data:
 - Responsavel:
+
+## Nota Sobre Abas e Sessoes
+
+Para validar dois jogadores no navegador, use dois contextos separados: dois navegadores diferentes, janela anonima separada ou dois celulares. Duas abas comuns no mesmo navegador podem compartilhar a mesma sessao local e parecer o mesmo jogador.
+
+Checklist de regressao para sessao ja aberta:
+
+- [ ] A primeira aba cria sala e continua controlando o lobby.
+- [ ] A segunda aba comum mostra o aviso `Sessao ja aberta`.
+- [ ] `Entrar como outro jogador` leva para entrada por codigo sem remover o jogador original.
+- [ ] `Atualizar` reavalia a sessao.
+- [ ] Fechar a primeira aba libera a sessao apos alguns segundos.
+- [ ] Em app nativo, o fluxo nao mostra esse aviso.
 
 ## Criterio de Pronto para MVP
 
@@ -114,4 +135,3 @@ O MVP pode avancar para piloto quando:
 - Diferencie bug, risco, decisao pendente e limitacao aceita do MVP.
 - Nao implemente testes automatizados sem pedido explicito.
 - Quando uma falha for encontrada, registre ou sugira registro em `known-issues.md`.
-

@@ -1,8 +1,10 @@
 import type { ReactNode } from 'react';
 import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
 import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Link, type Href } from 'expo-router';
-import { Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import type { ViewStyle } from 'react-native';
 
 import { colors } from '@/src/theme/colors';
@@ -31,19 +33,26 @@ export function PrototypeScreen({ centered = false, children }: PrototypeScreenP
           zIndex: 0,
         }}
       />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={{ flex: 1, minHeight: minScreenHeight, zIndex: 1 }}
-        contentContainerStyle={{
-          alignItems: 'center',
-          gap: 18,
-          justifyContent: centered ? 'center' : 'flex-start',
-          minHeight: minScreenHeight,
-          padding: 20,
-          paddingBottom: 40,
-        }}>
-        {children}
-      </ScrollView>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
+        style={{ flex: 1, minHeight: minScreenHeight, zIndex: 1 }}>
+        <ScrollView
+          contentInsetAdjustmentBehavior="automatic"
+          keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
+          keyboardShouldPersistTaps="handled"
+          style={{ flex: 1, minHeight: minScreenHeight }}
+          contentContainerStyle={{
+            alignItems: 'center',
+            gap: 18,
+            justifyContent: centered ? 'center' : 'flex-start',
+            minHeight: minScreenHeight,
+            padding: 20,
+            paddingBottom: 96,
+          }}>
+          {children}
+        </ScrollView>
+      </KeyboardAvoidingView>
     </View>
   );
 }
@@ -53,8 +62,47 @@ type PanelProps = {
   tone?: 'default' | 'strong' | 'sunny' | 'glass';
 };
 
+const glassPanelInnerStyle = {
+  borderRadius: 24,
+  gap: 14,
+  overflow: 'hidden',
+  padding: 16,
+  width: '100%',
+} as const;
+
 export function Panel({ children, tone = 'default' }: PanelProps) {
   const pattern = patterns.panel[tone];
+
+  if (tone === 'glass') {
+    return (
+      <LinearGradient
+        colors={['rgba(255,255,255,1.0)', 'rgba(255,255,255,0.0)']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0.4, y: 1 }}
+        style={{ borderRadius: 25, maxWidth: patterns.layout.panelMaxWidth, padding: 1, width: '100%' }}>
+        {Platform.OS === 'web' ? (
+          <View
+            style={[
+              glassPanelInnerStyle,
+              {
+                backgroundColor: pattern.backgroundColor,
+                boxShadow: pattern.shadow,
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+              },
+            ]}>
+            {children}
+          </View>
+        ) : (
+          <View style={{ borderRadius: 24, boxShadow: pattern.shadow, width: '100%' }}>
+            <BlurView intensity={55} tint="light" style={glassPanelInnerStyle}>
+              {children}
+            </BlurView>
+          </View>
+        )}
+      </LinearGradient>
+    );
+  }
 
   return (
     <View
@@ -74,19 +122,31 @@ export function Panel({ children, tone = 'default' }: PanelProps) {
   );
 }
 
+const backButtonStyle = {
+  alignItems: 'center' as const,
+  backgroundColor: 'transparent',
+  borderRadius: 20,
+  height: 40,
+  justifyContent: 'center' as const,
+  width: 40,
+};
+
 type MenuPanelProps = {
   actions?: ReactNode;
   backHref?: Href;
   children: ReactNode;
   headerAction?: ReactNode;
   meta?: ReactNode;
+  onBack?: () => void;
   showBack?: boolean;
   title: string;
+  titleCentered?: boolean;
+  tone?: PanelProps['tone'];
 };
 
-export function MenuPanel({ actions, backHref = '/', children, headerAction, meta, showBack = true, title }: MenuPanelProps) {
+export function MenuPanel({ actions, backHref = '/', children, headerAction, meta, onBack, showBack = true, title, titleCentered = false, tone }: MenuPanelProps) {
   return (
-    <Panel>
+    <Panel tone={tone}>
       <View
         style={{
           alignItems: 'center',
@@ -98,27 +158,30 @@ export function MenuPanel({ actions, backHref = '/', children, headerAction, met
           paddingBottom: 12,
         }}>
         {showBack ? (
-          <Link href={backHref} asChild>
+          onBack ? (
             <Pressable
               accessibilityLabel={t('common.back')}
               accessibilityRole="button"
-              style={{
-                ...surfaces.iconButtonActive,
-                alignItems: 'center',
-                borderRadius: 14,
-                height: 40,
-                justifyContent: 'center',
-                width: 40,
-              }}>
-              <Ionicons color={colors.navy} name="chevron-back" size={24} />
+              onPress={onBack}
+              style={({ pressed }) => [backButtonStyle, pressed && { transform: [{ scale: 0.92 }] }]}>
+              <Ionicons color={colors.navy} name="arrow-back-circle" size={26} />
             </Pressable>
-          </Link>
+          ) : (
+            <Link href={backHref} asChild>
+              <Pressable
+                accessibilityLabel={t('common.back')}
+                accessibilityRole="button"
+                style={({ pressed }) => [backButtonStyle, pressed && { transform: [{ scale: 0.92 }] }]}>
+                <Ionicons color={colors.navy} name="arrow-back-circle" size={26} />
+              </Pressable>
+            </Link>
+          )
         ) : null}
         <View style={{ flex: 1, gap: 2 }}>
           <Text
             numberOfLines={2}
             selectable
-            style={{ color: colors.ink, fontSize: 22, fontWeight: '900', lineHeight: 26 }}>
+            style={{ color: colors.ink, fontSize: 22, fontWeight: '900', lineHeight: 26, textAlign: titleCentered ? 'center' : undefined }}>
             {title}
           </Text>
           {meta ? <View>{meta}</View> : null}

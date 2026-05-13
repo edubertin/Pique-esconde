@@ -26,6 +26,9 @@ Implementado:
 - Sala finalizada disponivel por 2 minutos para compartilhar ou jogar novamente.
 - Limpeza oportunistica de salas expiradas e dados temporarios.
 - Ferramenta DEV de GPS/radar para calibracao sem depender de deslocamento fisico.
+- Restauracao de sessao no PWA apos refresh.
+- Lobby com fallback de snapshot, refresh ao voltar para foco e indicador de sincronizacao.
+- Throttle de presenca em `last_seen_at` para reduzir loops de realtime.
 
 Validado ate aqui:
 
@@ -151,8 +154,9 @@ Objetivo: validar o MVP como jogo real.
 
 Escopo:
 
-- Gerar build nativo de teste.
+- Gerar build nativo de teste, primeiro APK Android para instalacao direta.
 - Testar permissao de localizacao em iOS/Android.
+- Validar lobby/realtime com dois aparelhos reais sem depender de refresh manual.
 - Rodar piloto com 4 a 6 pessoas.
 - Observar se o grupo entende o jogo sem ajuda.
 - Medir se querem jogar novamente.

@@ -1,3 +1,4 @@
+import { useLocalSearchParams } from 'expo-router';
 import { Text, View } from 'react-native';
 
 import { Badge } from '@/src/components/badge';
@@ -11,8 +12,12 @@ import { surfaces } from '@/src/theme/surfaces';
 
 export default function CaptureScreen() {
   const router = useSafeRouter();
+  const { capturedPlayerId } = useLocalSearchParams<{ capturedPlayerId?: string }>();
   const { activePlayer, finishRound, leaveRoom, room } = useRoom();
-  const capturedPlayer = room?.players.find((player) => player.status === 'Capturado');
+  const capturedPlayer =
+    room?.players.find((player) => player.id === capturedPlayerId)
+    ?? (activePlayer?.status === 'Capturado' ? activePlayer : undefined)
+    ?? room?.players.find((player) => player.status === 'Capturado');
   const seekerPlayerId = room?.gameSession?.seekerPlayerId ?? room?.players.find((player) => player.isLeader)?.id;
   const remainingHiders = room?.players.filter((player) => player.id !== seekerPlayerId && player.status !== 'Capturado').length ?? 0;
   const isSeeker = Boolean(activePlayer?.isLeader || activePlayer?.id === room?.gameSession?.seekerPlayerId);

@@ -327,11 +327,11 @@ export const roomService = {
 
     return mapFinalResultSnapshot(data as RemoteFinalResultSnapshot | null);
   },
-  async getRadarHint(roomId: string, activePlayerId: string, activePlayerToken: string) {
+  async getRadarHint(roomId: string, activePlayerId: string, activePlayerToken: string, environmentPreset: EnvironmentPreset) {
     const client = assertSupabase();
     const { data, error } = await client.rpc('pe_get_radar_hint', {
       actor_player_id: activePlayerId,
-      area_preset: 'medium',
+      area_preset: environmentPreset,
       player_session_token: activePlayerToken,
       target_room_id: roomId,
     });

@@ -1,10 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, Share, Text, View } from 'react-native';
 
 import { Badge } from '@/src/components/badge';
-import { CoverBanner } from '@/src/components/cover-banner';
+import { BrandLogo } from '@/src/components/brand-logo';
 import { GameButton } from '@/src/components/game-button';
 import { PlayerList } from '@/src/components/player-list';
 import { Panel, PrototypeScreen } from '@/src/components/prototype-screen';
@@ -30,9 +30,11 @@ function environmentLabel(preset?: string) {
 
 export default function LobbyScreen() {
   const router = useSafeRouter();
-  const { activePlayer, error, isLoading, leaveRoom, promoteLeader, removePlayer, room, startRound, toggleReady } = useRoom();
+  const { activePlayer, error, isLoading, isRoomSyncing, lastRoomSyncedAt, leaveRoom, promoteLeader, removePlayer, room, startRound, toggleReady } = useRoom();
   const [copied, setCopied] = useState(false);
   const [inviteFeedback, setInviteFeedback] = useState<string>();
+  const isLeavingRef = useRef(false);
+  const [now, setNow] = useState(Date.now());
   const [qrOpen, setQrOpen] = useState(false);
   const players = room?.players ?? [];
   const inviteUrl = useMemo(() => (room?.code ? buildRoomInviteUrl(room.code) : ''), [room?.code]);
@@ -53,6 +55,9 @@ export default function LobbyScreen() {
       ? t('lobby.notReadyPlayerBody')
       : t('lobby.notReadyReadyBody', { names: missingReadyNames });
   const readyLabel = activePlayer?.status === 'Preparado' ? t('lobby.readyDone') : t('lobby.ready');
+  const syncAgeSeconds = lastRoomSyncedAt ? Math.max(0, Math.round((now - lastRoomSyncedAt) / 1000)) : undefined;
+  const showSyncWarning = Boolean(syncAgeSeconds != null && syncAgeSeconds > 8);
+  const syncLabel = isRoomSyncing ? t('lobby.syncReconnecting') : t('lobby.syncUnstable');
   const roomWarning =
     room?.closedReason === 'seeker_left'
       ? { body: t('lobby.seekerLeftBody'), title: t('lobby.roundInterruptedTitle') }
@@ -60,15 +65,29 @@ export default function LobbyScreen() {
         ? { body: t('lobby.notEnoughPlayersBody'), title: t('lobby.roundInterruptedTitle') }
         : undefined;
 
+  useEffect(() => {
+    const interval = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   const handleCopyCode = async () => {
     if (!room?.code) return;
 
-    if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(room.code);
+    try {
+      if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(room.code);
+        setCopied(true);
+        setInviteFeedback(t('lobby.copyDone'));
+        setTimeout(() => setCopied(false), 1600);
+        setTimeout(() => setInviteFeedback(undefined), 2200);
+      } else {
+        setInviteFeedback(t('lobby.copyUnavailable'));
+        setTimeout(() => setInviteFeedback(undefined), 2200);
+      }
+    } catch {
+      setInviteFeedback(t('lobby.copyUnavailable'));
+      setTimeout(() => setInviteFeedback(undefined), 2200);
     }
-
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1600);
   };
 
   const handleShareInvite = async () => {
@@ -104,11 +123,16 @@ export default function LobbyScreen() {
   };
 
   const handleLeaveRoom = async () => {
+    if (isLeavingRef.current || isLoading) return;
+
+    isLeavingRef.current = true;
     try {
       await leaveRoom();
       router.replace('/');
     } catch {
       // Error is shown from room store state.
+    } finally {
+      isLeavingRef.current = false;
     }
   };
 
@@ -159,11 +183,13 @@ export default function LobbyScreen() {
         <RoomQrModal inviteUrl={inviteUrl} onClose={() => setQrOpen(false)} roomCode={room.code} visible={qrOpen} />
       ) : null}
 
-      <View style={{ maxWidth: patterns.layout.panelMaxWidth, width: '100%' }}>
-        <CoverBanner />
-      </View>
+      <View style={{ gap: 0, marginTop: -20, width: '100%' }}>
+        <View style={{ maxWidth: patterns.layout.panelMaxWidth, width: '100%' }}>
+          <BrandLogo />
+        </View>
 
-      <Panel>
+      <View style={{ marginTop: -30, width: '100%' }}>
+      <Panel tone="glass">
         <Pressable
           accessibilityLabel={t('lobby.rules')}
           accessibilityRole="button"
@@ -182,10 +208,7 @@ export default function LobbyScreen() {
                 {t('rules.title')}
               </Text>
             </View>
-            <View style={{ alignItems: 'center', flexDirection: 'row', gap: 8 }}>
-              <Badge label={environmentLabel(room?.rules.environmentPreset)} tone="leader" />
-              <Ionicons color={colors.navy} name="chevron-forward" size={20} />
-            </View>
+            <Ionicons color={colors.navy} name="chevron-forward" size={20} />
           </View>
           <View style={{ flexDirection: 'row', gap: 8 }}>
             <View style={{ flex: 1 }}>
@@ -233,7 +256,7 @@ export default function LobbyScreen() {
                 onPress={() => setQrOpen(true)}
                 testID="lobby-open-qr"
                 style={{
-                  ...surfaces.iconButtonActive,
+                  ...surfaces.iconButton,
                   alignItems: 'center',
                   borderRadius: 12,
                   height: 34,
@@ -245,15 +268,18 @@ export default function LobbyScreen() {
             </View>
             <Badge label={`${players.length}/${room?.maxPlayers ?? 8}`} tone="rush" />
           </View>
-          {copied ? (
-            <Text selectable style={{ color: colors.green, fontSize: 12, fontWeight: '800' }}>
-              {t('common.codeCopied')}
-            </Text>
-          ) : null}
           {inviteFeedback ? (
             <Text selectable style={{ color: colors.green, fontSize: 12, fontWeight: '800' }}>
               {inviteFeedback}
             </Text>
+          ) : null}
+          {showSyncWarning ? (
+            <View style={{ alignItems: 'center', flexDirection: 'row', gap: 6 }}>
+              <Ionicons color={colors.danger} name={isRoomSyncing ? 'sync-outline' : 'warning-outline'} size={14} />
+              <Text selectable style={{ color: colors.danger, fontSize: 12, fontWeight: '900' }}>
+                {syncLabel}
+              </Text>
+            </View>
           ) : null}
           <PlayerList
             activePlayerId={activePlayer?.id}
@@ -264,6 +290,8 @@ export default function LobbyScreen() {
           />
         </View>
       </Panel>
+      </View>
+      </View>
 
       <View style={{ gap: 10, maxWidth: patterns.layout.panelMaxWidth, width: '100%' }}>
         {lobbyNoticeNames.length > 0 ? (
@@ -321,7 +349,7 @@ export default function LobbyScreen() {
             <GameButton label={t('lobby.invite')} onPress={handleShareInvite} size="compact" variant="secondary" />
           </View>
           <View style={{ flex: 1 }}>
-            <GameButton label={t('common.exit')} onPress={handleLeaveRoom} size="compact" variant="dangerStrong" />
+            <GameButton disabled={isLoading} label={t('common.exit')} onPress={handleLeaveRoom} size="compact" variant="dangerStrong" />
           </View>
         </View>
       </View>

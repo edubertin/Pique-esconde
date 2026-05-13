@@ -22,6 +22,8 @@ This folder is the source of truth for product, design, technical, QA and releas
 8. [Store Readiness](07-app-store-play-store.md)
 9. [Privacy and Safety](08-privacidade-seguranca.md)
 10. [Roadmap](09-roadmap.md)
+11. [Pilot and Controlled Beta Roadmap](roadmap-piloto-beta.md)
+12. [Parallel Execution Plan](roadmap-execucao-paralela.md)
 
 ## Existing Detailed Sections
 

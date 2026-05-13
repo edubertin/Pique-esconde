@@ -23,7 +23,7 @@ Status atual em 2026-05-09:
 - Supabase já está conectado para salas temporárias, jogadores, lobby realtime e sessões de rodada.
 - A camada real de sala usa RPCs e Realtime do Supabase, sem login completo.
 - A camada real de rodada já cobre início, esconder, busca, captura simulada, resultado, rematch e regras de saída durante partida.
-- GPS, radar real por distância e captura automática por proximidade ainda não foram implementados.
+- GPS, radar por distância derivada e captura automática por proximidade já existem como base funcional, ainda em calibração para celular real.
 
 ## Aplicações
 

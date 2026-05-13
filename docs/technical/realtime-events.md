@@ -291,7 +291,9 @@ Razões:
 Implementacao atual:
 
 - As telas ainda sincronizam sala por Supabase `postgres_changes` em `pe_rooms`, `pe_players` e `pe_game_sessions`.
-- Cada evento de Realtime dispara refresh por `pe_get_room_snapshot`, que devolve sala, jogadores, jogador ativo e sessao em uma unica RPC.
+- Cada evento de Realtime dispara refresh com debounce por `pe_get_room_snapshot`, que devolve sala, jogadores, jogador ativo e sessao em uma unica RPC.
+- O lobby tambem usa polling leve de snapshot enquanto esta aberto, para cobrir atraso ou perda de evento Realtime.
+- Chamadas de refresh sao coalescidas no cliente para evitar RPCs concorrentes.
 - As RPCs terminais (`pe_finish_round`, `pe_try_capture_nearest`, `pe_tick_game_session` e `pe_simulate_capture`) tambem retornam um `finalSnapshot` completo no mesmo retorno da acao.
 - `finalSnapshot` contem `roomId`, `roomCode`, `gameSessionId`, `finishedAt`, `expiresAt`, `result` e `players`.
 - O cliente aplica esse snapshot imediatamente e usa Realtime posterior apenas como confirmacao.
@@ -299,6 +301,7 @@ Implementacao atual:
 - Ao iniciar uma rodada, `expiresAt` da sala ativa e limpo; o cleanup de salas expiradas remove apenas salas em `lobby` ou `finished`.
 - `pe_run_maintenance_tick` pode executar o mesmo tipo de transicao pelo backend/cron quando nenhum cliente esta ativo. O Realtime continua refletindo alteracoes nas tabelas principais.
 - A manutencao server-side nao retorna nem transmite coordenadas brutas; ela usa apenas estado derivado e snapshots terminais.
+- O toque de presenca em `last_seen_at` e throttled no backend para reduzir loops de snapshot/realtime.
 
 ### `game.rematch_requested`
 

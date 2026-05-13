@@ -3,55 +3,25 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Text, View } from 'react-native';
 
-import { Badge } from '@/src/components/badge';
-import { GameButton, GameLinkButton } from '@/src/components/game-button';
+import { GameButton } from '@/src/components/game-button';
 import { MenuPanel, PrototypeScreen } from '@/src/components/prototype-screen';
 import { t } from '@/src/i18n';
 import { useRoom } from '@/src/state/room-store';
 import { colors } from '@/src/theme/colors';
 import { enableDevGps, isDevGpsAvailable } from '@/src/utils/dev-gps';
 
-type InitialCoords = {
-  accuracy?: number | null;
-  heading?: number | null;
-  latitude: number;
-  longitude: number;
-  speed?: number | null;
-};
-
-async function getInitialCoords(): Promise<InitialCoords> {
-  try {
-    const currentLocation = await Location.getCurrentPositionAsync({
-      accuracy: Location.Accuracy.Balanced,
-    });
-
-    return currentLocation.coords;
-  } catch (expoError) {
-    if (typeof navigator === 'undefined' || !navigator.geolocation) {
-      throw expoError;
-    }
-
-    return new Promise((resolve, reject) => {
-      navigator.geolocation.getCurrentPosition(
-        (position) => resolve(position.coords),
-        reject,
-        {
-          enableHighAccuracy: false,
-          maximumAge: 10000,
-          timeout: 6000,
-        },
-      );
-    });
-  }
-}
-
 export default function LocationPermissionScreen() {
   const router = useRouter();
-  const { activePlayer, addDevTargetPlayer, leaveRoom, room, updatePlayerLocation } = useRoom();
+  const { activePlayer, addDevTargetPlayer, leaveRoom, room } = useRoom();
   const [error, setError] = useState<string>();
   const [isDevRequesting, setIsDevRequesting] = useState(false);
   const [isRequesting, setIsRequesting] = useState(false);
   const canUseDevGps = isDevGpsAvailable();
+
+  const handleLeaveRoom = async (destination: '/' | '/create-room') => {
+    if (room) await leaveRoom().catch(() => undefined);
+    router.replace(destination);
+  };
 
   const handleAllow = async () => {
     setError(undefined);
@@ -67,26 +37,8 @@ export default function LocationPermissionScreen() {
           router.replace('/');
           return;
         }
-        setError(permission.canAskAgain ? 'Toque novamente para permitir a localizacao.' : t('location.denied'));
+        setError(permission.canAskAgain ? t('location.retryPermission') : t('location.denied'));
         return;
-      }
-
-      try {
-        const currentCoords = await getInitialCoords();
-
-        if (room) {
-          await updatePlayerLocation({
-            accuracyMeters: currentCoords.accuracy ?? undefined,
-            headingDegrees: currentCoords.heading ?? undefined,
-            lat: currentCoords.latitude,
-            lng: currentCoords.longitude,
-            speedMetersPerSecond: currentCoords.speed ?? undefined,
-          });
-        }
-      } catch {
-        if (room) {
-          setError('Permissao aceita. Vamos continuar enquanto o GPS pega sinal.');
-        }
       }
 
       router.push(room ? '/lobby' : '/create-room');
@@ -118,7 +70,8 @@ export default function LocationPermissionScreen() {
   return (
     <PrototypeScreen>
       <MenuPanel
-        backHref="/create-room"
+        tone="glass"
+        onBack={() => handleLeaveRoom('/create-room')}
         title={t('location.title')}
         actions={
           <>
@@ -131,16 +84,15 @@ export default function LocationPermissionScreen() {
                 variant="secondary"
               />
             ) : null}
-            <GameLinkButton href="/" label={t('common.cancel')} variant="danger" />
+            <GameButton label={t('location.cancel')} onPress={() => handleLeaveRoom('/')} variant="dangerStrong" />
           </>
         }>
-        <View style={{ alignItems: 'center', gap: 12 }}>
-          <Badge label={t('location.badge')} tone="ready" />
-          <Text selectable style={{ color: colors.ink, fontSize: 18, fontWeight: '900', lineHeight: 25, textAlign: 'center' }}>
-            {t('location.summary')}
-          </Text>
-          <Text selectable style={{ color: colors.muted, fontSize: 15, lineHeight: 22, textAlign: 'center' }}>
+        <View style={{ alignItems: 'center', gap: 14 }}>
+          <Text selectable style={{ color: colors.ink, fontSize: 18, fontWeight: '900', lineHeight: 26, textAlign: 'center' }}>
             {t('location.body')}
+          </Text>
+          <Text selectable style={{ color: colors.danger, fontSize: 14, fontWeight: '700', lineHeight: 21, textAlign: 'center' }}>
+            {t('location.safety')}
           </Text>
           {canUseDevGps ? (
             <Text selectable style={{ color: colors.muted, fontSize: 13, fontWeight: '800', lineHeight: 18, textAlign: 'center' }}>

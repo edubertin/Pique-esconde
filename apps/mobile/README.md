@@ -1,86 +1,159 @@
 # Pique Esconde Mobile
 
-Expo/React Native prototype for the Pique Esconde MVP.
+App Expo/React Native do Pique Esconde.
 
-## Running
+## Estado Atual
 
-From this folder:
+- Versao do app: `1.0.2`.
+- Android `versionCode`: `5`.
+- Pacote Android: `com.eduardobertin.piqueesconde`.
+- Build Play: AAB `production` gerado por EAS e enviado manualmente ao Google Play para teste interno/analise.
+- Web: export estatico Expo hospedado na Vercel.
+
+Este app ja possui fluxo real de sala/lobby/rodada com Supabase, mas ainda precisa de QA de campo com 2+ celulares reais para validar GPS, radar, captura e realtime fora do emulador.
+
+## Rodar Localmente
+
+Instale dependencias:
 
 ```bash
-npm install
+npm ci
+```
+
+Rode o app web local:
+
+```bash
 npm run web:local
 ```
 
-The recommended local web URL is printed by Expo, normally:
+URL recomendada:
 
 ```txt
 http://localhost:8086
 ```
 
-`web:local` starts Expo Web on a fixed port and clears the Metro cache. Use it when developing the web version locally so old dev-server state does not keep serving stale routes.
+`web:local` sobe Expo Web em porta fixa e limpa cache. Use esse comando quando quiser evitar rotas antigas ou estado de dev-server preso.
 
-For Expo Go:
+Para desenvolvimento Expo padrao:
 
 ```bash
 npm start
 ```
 
-Then scan the QR code with Expo Go.
+## Variaveis Publicas
 
-## Local Web Troubleshooting
-
-If the browser shows `Unmatched Route` at `http://localhost:8086`, the app route is usually not missing. Most of the time the browser is connected to an old Expo server or stale cache.
-
-1. Stop the running Expo server with `Ctrl+C`.
-2. Close old `localhost:8086` tabs.
-3. Start again with `npm run web:local`.
-4. Hard refresh the browser.
-
-For a production-like static web check:
-
-```bash
-npm run build:web
-npx serve dist
-```
-
-## Current Prototype
-
-The current version is a playable web/mobile prototype with Supabase-backed room flow, invite links, QR sharing, legal pages and GPS/radar gameplay screens:
-
-- Home
-- Create room
-- Join room
-- Location permission
-- Lobby
-- Rules
-- Hide phase
-- Seeker radar
-- Hider status
-- Capture
-- Result
-- Social card
-- Legal pages
-
-## Current Design Direction
-
-- Clean home menu with logo, aligned actions and short specs.
-- Arcade-style buttons with strong borders and large tap targets.
-- Reusable cards/panels with responsive max width.
-- Badges for player and game status.
-- Store cover banner at the top of the lobby.
-- Radar component as the main gameplay visual.
-- Minimal copy during gameplay screens.
-
-## Structure
+Configure as variaveis publicas no ambiente local ou no EAS:
 
 ```txt
-app/          Expo Router screens
-src/
-  assets/     Project assets
-  components/ Shared prototype components
-  constants/  Mock data and rules
-  features/   Future feature modules
-  services/   Future backend/realtime/location adapters
-  theme/      Visual tokens
-  types/      Shared TypeScript types
+EXPO_PUBLIC_SUPABASE_URL=
+EXPO_PUBLIC_SUPABASE_ANON_KEY=
+EXPO_PUBLIC_WEB_BASE_URL=https://pique-esconde.eduardobertin.com.br
 ```
+
+Nao commite `.env`, tokens, service accounts ou arquivos de credencial.
+
+## Validacoes Locais
+
+```bash
+npm run lint
+npx tsc --noEmit
+npm run build:web
+```
+
+Smoke web:
+
+```bash
+npm run qa:web
+```
+
+## Android
+
+APK local/debug para emulador ou verificacao rapida:
+
+```bash
+npx expo run:android
+```
+
+Build AAB de producao para Google Play:
+
+```bash
+npx eas-cli@latest build --platform android --profile production
+```
+
+O perfil `production` em `eas.json` gera `app-bundle`, formato correto para a Play Store.
+
+Antes de nova submissao Android:
+
+- incremente `expo.version` quando fizer sentido para QA/suporte;
+- incremente `android.versionCode` acima do ultimo codigo aceito pela Play;
+- confirme com `npx expo config --type public`;
+- rode lint e TypeScript;
+- gere AAB production;
+- valide instalacao via Play Internal/Test quando a versao propagar.
+
+## Submit Play
+
+O AAB `1.0.2 (5)` foi enviado manualmente pelo Play Console porque `eas submit --non-interactive` ainda nao possui Google Service Account configurada.
+
+Pendencia recomendada para proximas releases:
+
+```bash
+npx eas-cli@latest submit --platform android --latest
+```
+
+Rodar em modo interativo uma vez para configurar a Service Account e depois automatizar.
+
+## Telas Principais
+
+- Home
+- Criar sala
+- Entrar com codigo
+- Permissao de localizacao
+- Lobby
+- Regras
+- Fase de esconder
+- Radar do procurador
+- Status do escondido
+- Captura
+- Resultado
+- Card social
+- Paginas legais
+
+## Estrutura
+
+```txt
+app/          Telas Expo Router
+src/
+  assets/     Assets do projeto
+  components/ Componentes compartilhados
+  constants/  Dados e regras compartilhadas
+  features/   Modulos de dominio
+  services/   Supabase, realtime, GPS e adaptadores
+  theme/      Tokens visuais
+  types/      Tipos TypeScript compartilhados
+```
+
+## Assets Visuais
+
+- Icone principal: `assets/images/icon.png`
+- Icone 512px: `assets/images/icon-512.png`
+- Banner de loja/GitHub: `assets/images/pique-esconde-store-cover.png`
+- Feature graphic: `assets/images/feature-graphic.png`
+- Avatares: `assets/images/avatars/`
+
+## Riscos De QA
+
+Ja validado em emulador:
+
+- abertura da build instalada pela Play;
+- versao `1.0.2 (5)`;
+- home carregando;
+- fluxo local de lobby/GPS/sair sem regressao critica.
+
+Ainda precisa de campo:
+
+- entrada por convite em outro celular;
+- realtime entre 2+ aparelhos;
+- GPS real em movimento;
+- radar e captura automatica;
+- permissao de localizacao em aparelhos/OEMs diferentes.

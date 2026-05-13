@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 
 import { useRoom } from '@/src/state/room-store';
 
+const alwaysPublicPaths = new Set(['/data-deletion', '/how-to-play', '/legal', '/privacy', '/support', '/terms']);
 const publicPaths = new Set(['/', '/create-room', '/join-room']);
 const lobbyAuxiliaryPaths = new Set(['/create-room', '/join-room', '/location-permission', '/rules']);
 
@@ -17,6 +18,10 @@ function getTargetPath({
   pathname: string;
   room: ReturnType<typeof useRoom>['room'];
 }) {
+  if (alwaysPublicPaths.has(pathname)) {
+    return undefined;
+  }
+
   if (finalResultSnapshot) {
     return pathname === '/result' || pathname === '/social-card' ? undefined : '/result';
   }
@@ -54,17 +59,22 @@ function getTargetPath({
 export function RoomRouteGuard() {
   const pathname = usePathname();
   const router = useRouter();
-  const { activePlayer, finalResultSnapshot, room } = useRoom();
+  const { activePlayer, finalResultSnapshot, isRestoringSession, room } = useRoom();
 
   useEffect(() => {
-    const currentPathname = typeof window === 'undefined' ? pathname : window.location.pathname;
+    if (isRestoringSession) return;
+
+    const currentPathname =
+      typeof window === 'undefined' || !window.location?.pathname
+        ? pathname
+        : window.location.pathname;
     if (currentPathname !== pathname) return;
 
     const targetPath = getTargetPath({ activePlayer, finalResultSnapshot, pathname, room });
     if (targetPath && targetPath !== pathname) {
       router.replace(targetPath);
     }
-  }, [activePlayer, finalResultSnapshot, pathname, room, router]);
+  }, [activePlayer, finalResultSnapshot, isRestoringSession, pathname, room, router]);
 
   return null;
 }

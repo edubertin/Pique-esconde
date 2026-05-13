@@ -7,7 +7,7 @@ export function CoverBanner() {
   return (
     <View
       style={{
-        backgroundColor: colors.surface,
+        backgroundColor: colors.esconde,
         borderColor: colors.navy,
         borderRadius: 18,
         borderWidth: 2,
@@ -16,8 +16,11 @@ export function CoverBanner() {
       }}>
       <Image
         source={require('@/assets/images/pique-esconde-store-cover.png')}
+        cachePolicy="memory-disk"
         contentFit="cover"
-        style={{ aspectRatio: 2.31, width: '100%' }}
+        placeholderContentFit="cover"
+        style={{ aspectRatio: 2.31, backgroundColor: colors.esconde, width: '100%' }}
+        transition={120}
       />
     </View>
   );

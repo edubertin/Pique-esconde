@@ -65,8 +65,6 @@ function RulePicker<T extends number | string>({
   title: string;
   value: T;
 }) {
-  const selectedLabel = options.find((option) => option.value === value)?.label ?? String(value);
-
   return (
     <View
       style={{
@@ -75,26 +73,23 @@ function RulePicker<T extends number | string>({
         gap: 10,
         padding: 12,
       }}>
-      <View style={{ alignItems: 'center', flexDirection: 'row', gap: 10, justifyContent: 'space-between' }}>
-        <View style={{ alignItems: 'center', flexDirection: 'row', gap: 8 }}>
-          <View
-            style={{
-              alignItems: 'center',
-              backgroundColor: `${colors.pink}18`,
-              borderColor: colors.pink,
-              borderRadius: 12,
-              borderWidth: 2,
-              height: 34,
-              justifyContent: 'center',
-              width: 34,
-            }}>
-            <Ionicons color={colors.pink} name={icon} size={18} />
-          </View>
-          <Text selectable style={{ color: colors.ink, fontSize: 15, fontWeight: '900' }}>
-            {title}
-          </Text>
+      <View style={{ alignItems: 'center', flexDirection: 'row', gap: 8 }}>
+        <View
+          style={{
+            alignItems: 'center',
+            backgroundColor: `${colors.pink}18`,
+            borderColor: colors.pink,
+            borderRadius: 12,
+            borderWidth: 2,
+            height: 34,
+            justifyContent: 'center',
+            width: 34,
+          }}>
+          <Ionicons color={colors.pink} name={icon} size={18} />
         </View>
-        <Badge label={selectedLabel} tone="leader" />
+        <Text selectable style={{ color: colors.ink, fontSize: 15, fontWeight: '900' }}>
+          {title}
+        </Text>
       </View>
 
       <View style={{ flexDirection: 'row', gap: 8 }}>
@@ -208,8 +203,8 @@ export default function RulesScreen() {
   return (
     <PrototypeScreen>
       <MenuPanel
+        tone="glass"
         backHref="/lobby"
-        meta={<Badge label={isLeader ? t('rules.leaderBadge') : t('rules.viewOnlyBadge')} tone={isLeader ? 'leader' : 'neutral'} />}
         title={t('rules.title')}
         actions={<GameButton disabled={isLeader && (!changed || isLoading)} label={isLeader ? t('common.save') : t('common.back')} onPress={handleSave} />}>
         <RulePicker disabled={!isLeader || isLoading} icon="map-outline" onChange={handleEnvironmentChange} options={environmentOptions} title={t('rules.environment')} value={environmentPreset} />

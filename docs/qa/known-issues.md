@@ -39,6 +39,38 @@ Link para test run:
 
 ## Bugs Conhecidos
 
+## KI-014 - Saida do lobby apos GPS mostrava `Room not found`
+
+Status: Resolvido em debug local Android
+Severidade: Alta
+Area: Lobby / Estado / Realtime
+Detectado em: 2026-05-12
+Commit/versao: worktree local, apos `1.0.1` / `versionCode 4`
+
+Descricao:
+- Ao criar uma sala, liberar GPS, entrar no lobby e tocar em `Sair` sendo o unico jogador, o backend removia a sala vazia corretamente.
+- Um refresh antigo do cliente ainda tentava buscar snapshot da sala deletada.
+- A RPC respondia `Room not found`, e o app permanecia no lobby exibindo erro.
+
+Impacto:
+- Usuario ficava preso visualmente em uma sala que ja tinha sido removida.
+- Fluxo basico de abandono do lobby ficava quebrado no teste interno.
+
+Comportamento esperado:
+- Tocar em `Sair` deve limpar sessao local, interromper refreshes antigos da sala e voltar para Home sem erro visual.
+
+Comportamento atual:
+- Resolvido em build debug local: `leaveRoom` invalida refreshes pendentes, cancela timeout realtime, ignora `Room not found`/`Invalid room session` apenas durante saida da sala e trava duplo toque no botao `Sair`.
+
+Decisao:
+- Manter backend apagando sala vazia.
+- Tratar corrida de refresh no cliente.
+- Validar novamente em build Play apos proximo `versionCode`.
+
+Link para test run:
+- `docs/qa/test-runs/2026-05-12-lobby-leave-after-gps-error.md`
+- `docs/qa/test-runs/2026-05-12-lobby-leave-after-gps-fix-local-debug.md`
+
 ## KI-001 - Navegacao de resultado duplicada entre botao, tela e estado
 
 Status: Resolvido em QA web
@@ -165,20 +197,24 @@ Link para test run:
 
 ## L-005 - Botão Convidar ainda não abre compartilhamento nativo
 
-Status: Aceito no MVP atual
+Status: Resolvido (pendente validação em celular real)
 Severidade: Media
 Area: Convite
 Detectado em: 2026-05-08
-Commit/versao: 8bec69f
+Commit/versao: 8bec69f / resolvido em versao posterior
 
 Descricao:
-- O lobby usa o termo `Convidar`, mas por enquanto adiciona amigos demo no Supabase para teste. Ainda nao abre share nativo nem gera link real/deep link.
+- Implementado: botao Convidar abre `navigator.share` com URL e codigo, fallback para `Share.share` do React Native.
+- QR Code gerado via `react-native-qrcode-svg` aponta para URL de convite com codigo.
+- URL construida por `buildRoomInviteUrl()` usando `EXPO_PUBLIC_WEB_BASE_URL`, `window.location.origin` (web) ou `piqueesconde://` (deep link nativo).
+- Campo de codigo na tela de entrada e pre-preenchido via `useLocalSearchParams({ code })`.
 
-Impacto:
-- O codigo real da sala permite entrada manual em outro aparelho, mas o botao ainda nao aciona compartilhamento nativo.
+Impacto restante:
+- Deep link nativo (`piqueesconde://join-room?code=XXXX`) nao tem handler explicito mas e provavelmente tratado automaticamente pelo Expo Router.
+- Fluxo end-to-end (escanear QR → codigo pre-preenchido) ainda nao foi validado em celular real.
 
 Decisao:
-- Implementar share nativo e deep link na etapa de convite.
+- Marcar como resolvido. Incluir no roteiro de QA de campo: testar link compartilhado e QR em dois celulares reais.
 
 Link para test run:
 - `docs/qa/test-runs/2026-05-09-supabase-room-realtime-web.md`
@@ -424,3 +460,68 @@ Decisao:
 
 Link para test run:
 - `docs/qa/test-runs/2026-05-10-dev-target-auto-hide.md`
+
+## L-012 - Lobby PWA precisava de refresh manual para refletir jogadores
+
+Status: Parcialmente resolvido / Validar em celulares reais
+Severidade: Alta
+Area: Lobby / Realtime / PWA
+Detectado em: 2026-05-10
+Commit/versao: worktree local / deploy Vercel `dpl_66SVXah6N44DYpZuKq8uUKs1YHVV` / migration `202605100009_throttle_player_presence_touch`
+
+Descricao:
+- Em teste PWA de producao, um jogador entrava na sala mas o criador nem sempre via a lista atualizar sem refresh manual.
+- Ao recarregar a pagina, a sessao local era perdida e o jogador voltava para Home.
+- Ao entrar novamente, podia surgir duplicacao visual/funcional de jogador.
+
+Impacto:
+- Lobby parecia congelado.
+- Jogadores repetiam entrada/saida e aumentavam chance de duplicata.
+- Estado de `Preparado` ficava confuso entre clientes.
+
+Comportamento esperado:
+- Refresh do navegador deve restaurar a sessao temporaria quando o token ainda for valido.
+- O lobby deve atualizar por Realtime e tambem por fallback de snapshot enquanto aberto.
+- A UI deve informar quando a sala esta atualizando ou quando o ultimo snapshot foi recebido.
+
+Comportamento atual:
+- PWA salva `roomId`, `roomCode`, `activePlayerId` e `activePlayerToken` em storage local e tenta restaurar antes do guard de rota.
+- Lobby faz polling leve de `pe_get_room_snapshot`, atualiza ao voltar para foco, debounca eventos Realtime e coalesce chamadas concorrentes.
+- Backend throttla `last_seen_at` para reduzir ciclo de snapshot/realtime.
+
+Decisao:
+- Validar novamente em APK Android e PWA com dois aparelhos reais.
+- Se ainda houver duplicacao apos sair explicitamente e entrar de novo, revisar idempotencia de `pe_join_room`/`pe_leave_room`.
+
+Link para test run:
+- `docs/qa/test-runs/2026-05-10-pwa-session-lobby-sync.md`
+
+## KI-013 - Reconexao com mesmo apelido bloqueada se sessao local for perdida
+
+Status: Aceito no MVP
+Severidade: Media
+Area: Lobby / Entrada / Unicidade de apelido
+Detectado em: 2026-05-11
+Commit/versao: a385a30
+
+Descricao:
+- Com a constraint de apelido unico por sala (migration `202605110001`), se um jogador esta na sala como "Ana" e perde a sessao local (storage limpo, troca de browser, modo privado), nao consegue entrar novamente com o mesmo apelido enquanto seu registro ainda existir na sala.
+- A RPC `pe_join_room` retorna "Nickname already in use" porque o `nickname_key` ja existe para outro registro da mesma sala.
+
+Impacto:
+- Jogador vira prisioneiro do proprio nome se a sessao local sumir.
+- Em ambiente normal (refresh simples, queda de rede), a sessao e restaurada pelo storage e o jogador volta sem chamar `pe_join_room` — nao ha conflito.
+- O problema so ocorre quando o storage e perdido de vez (modo privado, limpeza manual, troca de dispositivo).
+
+Comportamento esperado:
+- Jogador que perde sessao consegue reentrar na sala com o mesmo apelido se seu registro ainda estiver ativo.
+
+Comportamento atual:
+- Bloqueado com mensagem de erro de nome duplicado.
+
+Decisao:
+- Aceito no MVP. A reconexao por session token (caminho normal) funciona corretamente.
+- Para corrigir definitivamente: `pe_join_room` poderia detectar registro existente inativo com mesmo `nickname_key` e reutilizar/substituir o token. Avaliar pos-piloto.
+
+Link para test run:
+- `docs/qa/test-runs/2026-05-11-nickname-dedup-lobby.md` (TC-NIC-REJ na secao de riscos)

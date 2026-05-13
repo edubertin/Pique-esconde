@@ -1,6 +1,9 @@
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { AppState, Platform } from 'react-native';
 
+import { t } from '@/src/i18n';
 import { roomService } from '@/src/services/room-service';
+import { clearStoredRoomSession, loadStoredRoomSession, saveStoredRoomSession } from '@/src/utils/room-session-storage';
 import { disableDevGps, isDevGpsEnabled } from '@/src/utils/dev-gps';
 
 export type PlayerStatus = 'Entrou' | 'Preparado' | 'Aguardando' | 'Escondendo' | 'Escondido' | 'Procurando' | 'Capturado';
@@ -169,6 +172,7 @@ type Room = {
 
 type RoomStore = {
   activePlayer?: RoomPlayer;
+  abandonLocalSession: () => void;
   addDemoPlayer: () => Promise<void>;
   addDevTargetPlayer: () => Promise<void>;
   clearDevTestDistance: () => Promise<void>;
@@ -177,12 +181,15 @@ type RoomStore = {
   createRoom: (input: PlayerInput) => Promise<void>;
   error?: string;
   finalResultSnapshot?: FinalResultSnapshot;
+  isRestoringSession: boolean;
   finishRound: (winner?: GameResult['winner']) => Promise<void>;
   getHiderDangerHint: () => Promise<HiderDangerHint | undefined>;
   getRadarHint: () => Promise<RadarHint | undefined>;
   getRoomDebugSnapshot: () => Promise<RoomDebugSnapshot | undefined>;
   isLoading: boolean;
   joinRoom: (input: PlayerInput & { code: string }) => Promise<boolean>;
+  isRoomSyncing: boolean;
+  lastRoomSyncedAt?: number;
   leaveRoom: () => Promise<void>;
   markHidden: () => Promise<void>;
   promoteLeader: (playerId: string) => Promise<void>;
@@ -209,24 +216,60 @@ type PlayerInput = {
 const RoomContext = createContext<RoomStore | undefined>(undefined);
 const connectionUnstableMessage = 'Conexao instavel. Tente novamente em alguns segundos.';
 
+type PendingRoomRefresh = {
+  promise?: Promise<void>;
+  roomId: string;
+};
+
+type ErrorLike = {
+  code?: unknown;
+  details?: unknown;
+  hint?: unknown;
+  message?: unknown;
+};
+
+function getErrorText(error: unknown) {
+  if (error instanceof Error) return error.message;
+
+  if (typeof error !== 'object' || !error) return '';
+
+  const supabaseError = error as ErrorLike;
+  return [supabaseError.message, supabaseError.details, supabaseError.hint, supabaseError.code]
+    .filter((value): value is string => typeof value === 'string' && value.trim().length > 0)
+    .join(' ');
+}
+
+function isExpectedLeavingRoomError(error: unknown) {
+  const message = getErrorText(error).toLowerCase();
+  return message.includes('room not found') || message.includes('invalid room session');
+}
+
 function getErrorMessage(error: unknown) {
   const cleanMessage = (message: string) => message.split('\n')[0]?.trim() || 'Nao foi possivel sincronizar a sala agora.';
   const isFetchFailure = (message: string) => message.toLowerCase().includes('failed to fetch');
+  const normalizeMessage = (message: string) => message.toLowerCase();
+  const toFriendlyMessage = (message: string) => {
+    if (normalizeMessage(message).includes('nickname already in use')) {
+      return t('join.duplicateName');
+    }
+
+    return cleanMessage(message);
+  };
 
   if (error instanceof Error) {
     if (isFetchFailure(error.message)) return connectionUnstableMessage;
-    return cleanMessage(error.message);
+    return toFriendlyMessage(error.message);
   }
 
   if (typeof error === 'object' && error) {
-    const supabaseError = error as { code?: unknown; details?: unknown; hint?: unknown; message?: unknown };
+    const supabaseError = error as ErrorLike;
     const parts = [supabaseError.message, supabaseError.details, supabaseError.hint]
       .filter((value): value is string => typeof value === 'string' && value.trim().length > 0);
 
     if (parts.length > 0) {
       const message = parts.join(' ');
       if (isFetchFailure(message)) return connectionUnstableMessage;
-      return cleanMessage(message);
+      return toFriendlyMessage(message);
     }
     if (typeof supabaseError.code === 'string') return `Erro Supabase: ${supabaseError.code}`;
   }
@@ -239,13 +282,20 @@ export function RoomProvider({ children }: { children: ReactNode }) {
   const [activePlayerToken, setActivePlayerToken] = useState<string>();
   const [error, setError] = useState<string>();
   const [isLoading, setIsLoading] = useState(false);
+  const [isRestoringSession, setIsRestoringSession] = useState(true);
+  const [isRoomSyncing, setIsRoomSyncing] = useState(false);
+  const [lastRoomSyncedAt, setLastRoomSyncedAt] = useState<number>();
   const [finalResultSnapshot, setFinalResultSnapshot] = useState<FinalResultSnapshot>();
   const [room, setRoom] = useState<Room>();
   const [roomNotice, setRoomNotice] = useState<RoomStore['roomNotice']>();
   const finalResultSnapshotRef = useRef<FinalResultSnapshot | undefined>(undefined);
   const ignoredRoomIdsRef = useRef(new Set<string>());
+  const leavingRoomIdRef = useRef<string | undefined>(undefined);
   const leavingRoomRef = useRef(false);
   const refreshSeqRef = useRef(0);
+  const refreshPromiseRef = useRef<PendingRoomRefresh | null>(null);
+  const realtimeRefreshTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const restoreAttemptedRef = useRef(false);
   const suppressRemovalNoticeRef = useRef(false);
 
   const clearFinalResultSnapshot = useCallback(() => {
@@ -338,18 +388,141 @@ export function RoomProvider({ children }: { children: ReactNode }) {
       setRoom(snapshot.room);
       setActivePlayerId(snapshot.activePlayer?.id ?? activePlayerId);
       setActivePlayerToken(snapshot.activePlayerToken ?? activePlayerToken);
+
+      const nextActivePlayerId = snapshot.activePlayer?.id ?? activePlayerId;
+      const nextActivePlayerToken = snapshot.activePlayerToken ?? activePlayerToken;
+      if (nextActivePlayerId && nextActivePlayerToken) {
+        saveStoredRoomSession({
+          activePlayerId: nextActivePlayerId,
+          activePlayerToken: nextActivePlayerToken,
+          roomCode: snapshot.room.code,
+          roomId: snapshot.room.id,
+        });
+      }
     },
     [activePlayerId, activePlayerToken, clearFinalResultSnapshot],
   );
 
+  const cancelScheduledRefresh = useCallback(() => {
+    if (!realtimeRefreshTimeoutRef.current) return;
+
+    clearTimeout(realtimeRefreshTimeoutRef.current);
+    realtimeRefreshTimeoutRef.current = null;
+  }, []);
+
+  const ignoreRoomRefreshes = useCallback(
+    (roomId: string) => {
+      ignoredRoomIdsRef.current.add(roomId);
+      leavingRoomRef.current = true;
+      suppressRemovalNoticeRef.current = true;
+      refreshSeqRef.current += 1;
+      cancelScheduledRefresh();
+      setIsRoomSyncing(false);
+
+      if (refreshPromiseRef.current?.roomId === roomId) {
+        refreshPromiseRef.current = null;
+      }
+    },
+    [cancelScheduledRefresh],
+  );
+
+  const completeLocalLeave = useCallback(
+    (notice?: RoomStore['roomNotice']) => {
+      disableDevGps();
+      setActivePlayerId(undefined);
+      setActivePlayerToken(undefined);
+      setError(undefined);
+      setRoomNotice(notice);
+      setRoom(undefined);
+      setIsRoomSyncing(false);
+      clearStoredRoomSession();
+      clearFinalResultSnapshot();
+    },
+    [clearFinalResultSnapshot],
+  );
+
+  useEffect(() => {
+    if (restoreAttemptedRef.current) return undefined;
+
+    restoreAttemptedRef.current = true;
+    let cancelled = false;
+    const storedSession = loadStoredRoomSession();
+
+    if (!storedSession) {
+      setIsRestoringSession(false);
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    roomService
+      .fetchSnapshot(storedSession.roomId, storedSession.activePlayerId, storedSession.activePlayerToken)
+      .then((snapshot) => {
+        if (cancelled) return;
+
+        if (!snapshot.activePlayer) {
+          clearStoredRoomSession();
+          return;
+        }
+
+        setActivePlayerId(storedSession.activePlayerId);
+        setActivePlayerToken(storedSession.activePlayerToken);
+        applySnapshot(snapshot);
+      })
+      .catch((restoreError: unknown) => {
+        if (cancelled) return;
+
+        console.warn('Room session restore failed', restoreError);
+        clearStoredRoomSession();
+      })
+      .finally(() => {
+        if (!cancelled) setIsRestoringSession(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [applySnapshot]);
+
   const refreshRoom = useCallback(async () => {
-    if (!room?.id) return;
+    const targetRoomId = room?.id;
+    if (!targetRoomId || ignoredRoomIdsRef.current.has(targetRoomId)) return;
 
-    const refreshSeq = ++refreshSeqRef.current;
-    const snapshot = await roomService.fetchSnapshot(room.id, activePlayerId, activePlayerToken);
-    if (refreshSeq !== refreshSeqRef.current) return;
+    const pendingRefresh = refreshPromiseRef.current;
+    if (pendingRefresh?.roomId === targetRoomId && pendingRefresh.promise) {
+      return pendingRefresh.promise;
+    }
 
-    applySnapshot(snapshot);
+    const refreshTask: PendingRoomRefresh = { roomId: targetRoomId };
+    const refreshPromise = (async () => {
+      const refreshSeq = ++refreshSeqRef.current;
+      setIsRoomSyncing(true);
+
+      try {
+        const snapshot = await roomService.fetchSnapshot(targetRoomId, activePlayerId, activePlayerToken);
+        if (refreshSeq !== refreshSeqRef.current || ignoredRoomIdsRef.current.has(targetRoomId)) return;
+
+        applySnapshot(snapshot);
+        setLastRoomSyncedAt(Date.now());
+      } catch (refreshError) {
+        const isLeavingRoom = leavingRoomRef.current || ignoredRoomIdsRef.current.has(targetRoomId);
+        if (isLeavingRoom && isExpectedLeavingRoomError(refreshError)) return;
+
+        throw refreshError;
+      } finally {
+        if (refreshSeq === refreshSeqRef.current) {
+          setIsRoomSyncing(false);
+        }
+
+        if (refreshPromiseRef.current === refreshTask) {
+          refreshPromiseRef.current = null;
+        }
+      }
+    })();
+
+    refreshTask.promise = refreshPromise;
+    refreshPromiseRef.current = refreshTask;
+    return refreshPromise;
   }, [activePlayerId, activePlayerToken, applySnapshot, room?.id]);
 
   const refreshRoomSoft = useCallback(async () => {
@@ -383,16 +556,60 @@ export function RoomProvider({ children }: { children: ReactNode }) {
     if (!room?.id) return undefined;
 
     const subscription = roomService.subscribeToRoom(room.id, () => {
-      refreshRoom().catch((subscriptionError: unknown) => {
-        const message = getErrorMessage(subscriptionError);
-        if (message !== connectionUnstableMessage) setError(message);
-      });
+      if (realtimeRefreshTimeoutRef.current) clearTimeout(realtimeRefreshTimeoutRef.current);
+
+      realtimeRefreshTimeoutRef.current = setTimeout(() => {
+        refreshRoom().catch((subscriptionError: unknown) => {
+          const message = getErrorMessage(subscriptionError);
+          if (message !== connectionUnstableMessage) setError(message);
+        });
+      }, 250);
     });
 
     return () => {
+      if (realtimeRefreshTimeoutRef.current) clearTimeout(realtimeRefreshTimeoutRef.current);
       subscription.unsubscribe().catch(() => undefined);
     };
   }, [refreshRoom, room?.id]);
+
+  useEffect(() => {
+    if (room?.phase !== 'lobby') return undefined;
+
+    const interval = setInterval(() => {
+      refreshRoomSoft();
+    }, 2500);
+
+    return () => clearInterval(interval);
+  }, [refreshRoomSoft, room?.phase]);
+
+  useEffect(() => {
+    if (!room?.id || Platform.OS !== 'web' || typeof window === 'undefined' || typeof document === 'undefined') return undefined;
+
+    const refreshIfVisible = () => {
+      if (typeof document === 'undefined' || document.visibilityState === 'hidden') return;
+      refreshRoomSoft();
+    };
+
+    window.addEventListener('focus', refreshIfVisible);
+    document.addEventListener('visibilitychange', refreshIfVisible);
+
+    return () => {
+      window.removeEventListener('focus', refreshIfVisible);
+      document.removeEventListener('visibilitychange', refreshIfVisible);
+    };
+  }, [refreshRoomSoft, room?.id]);
+
+  useEffect(() => {
+    if (!room?.id) return undefined;
+
+    const subscription = AppState.addEventListener('change', (nextState) => {
+      if (nextState === 'active') {
+        refreshRoomSoft();
+      }
+    });
+
+    return () => subscription.remove();
+  }, [refreshRoomSoft, room?.id]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -403,6 +620,7 @@ export function RoomProvider({ children }: { children: ReactNode }) {
 
         setActivePlayerId(undefined);
         setActivePlayerToken(undefined);
+        clearStoredRoomSession();
         if (!finalResultSnapshotRef.current || currentRoom.phase !== 'finished') {
           clearFinalResultSnapshot();
         }
@@ -425,6 +643,18 @@ export function RoomProvider({ children }: { children: ReactNode }) {
 
     return {
       activePlayer,
+      abandonLocalSession() {
+        if (room?.id) ignoreRoomRefreshes(room.id);
+        disableDevGps();
+        leavingRoomRef.current = false;
+        suppressRemovalNoticeRef.current = true;
+        setActivePlayerId(undefined);
+        setActivePlayerToken(undefined);
+        setError(undefined);
+        setIsRoomSyncing(false);
+        setRoom(undefined);
+        clearFinalResultSnapshot();
+      },
       clearError() {
         setError(undefined);
       },
@@ -433,7 +663,10 @@ export function RoomProvider({ children }: { children: ReactNode }) {
       },
       error,
       finalResultSnapshot,
+      isRestoringSession,
       isLoading,
+      isRoomSyncing,
+      lastRoomSyncedAt,
       room,
       roomNotice,
       async addDemoPlayer() {
@@ -452,6 +685,7 @@ export function RoomProvider({ children }: { children: ReactNode }) {
       },
       async createRoom(input) {
         await runAction(async () => {
+          leavingRoomIdRef.current = undefined;
           leavingRoomRef.current = false;
           suppressRemovalNoticeRef.current = false;
           clearFinalResultSnapshot();
@@ -470,7 +704,15 @@ export function RoomProvider({ children }: { children: ReactNode }) {
       },
       async getRadarHint() {
         const session = requireSession();
-        return roomService.getRadarHint(session.roomId, session.activePlayerId, session.activePlayerToken);
+        const environmentPreset = room?.gameSession?.status === 'seeking'
+          ? room.rules.environmentPreset
+          : 'medium';
+        return roomService.getRadarHint(
+          session.roomId,
+          session.activePlayerId,
+          session.activePlayerToken,
+          environmentPreset,
+        );
       },
       async getRoomDebugSnapshot() {
         if (!__DEV__) return undefined;
@@ -488,6 +730,7 @@ export function RoomProvider({ children }: { children: ReactNode }) {
       },
       async joinRoom(input) {
         await runAction(async () => {
+          leavingRoomIdRef.current = undefined;
           leavingRoomRef.current = false;
           suppressRemovalNoticeRef.current = false;
           clearFinalResultSnapshot();
@@ -500,15 +743,15 @@ export function RoomProvider({ children }: { children: ReactNode }) {
       },
       async leaveRoom() {
         if (!room?.id || !activePlayerId || !activePlayerToken) {
-          disableDevGps();
+          if (room?.id) ignoreRoomRefreshes(room.id);
+          completeLocalLeave();
           leavingRoomRef.current = false;
           suppressRemovalNoticeRef.current = false;
-          setActivePlayerId(undefined);
-          setActivePlayerToken(undefined);
-          setRoom(undefined);
-          clearFinalResultSnapshot();
           return;
         }
+
+        if (leavingRoomIdRef.current === room.id) return;
+        leavingRoomIdRef.current = room.id;
 
         await runAction(async () => {
           const notice =
@@ -517,21 +760,28 @@ export function RoomProvider({ children }: { children: ReactNode }) {
               : undefined;
 
           const previousRoom = room;
-          ignoredRoomIdsRef.current.add(previousRoom.id);
-          leavingRoomRef.current = true;
-          suppressRemovalNoticeRef.current = true;
-          setActivePlayerId(undefined);
-          setActivePlayerToken(undefined);
-          setRoomNotice(notice);
-          setRoom(undefined);
-          clearFinalResultSnapshot();
+          ignoreRoomRefreshes(previousRoom.id);
 
           if (isDevGpsEnabled()) {
             await roomService.clearDevTestDistance(previousRoom.id, activePlayerId, activePlayerToken).catch(() => undefined);
-            disableDevGps();
           }
 
-          await roomService.leaveRoom(previousRoom.id, activePlayerId, activePlayerToken);
+          try {
+            await roomService.leaveRoom(previousRoom.id, activePlayerId, activePlayerToken);
+          } catch (leaveError) {
+            if (isExpectedLeavingRoomError(leaveError)) {
+              completeLocalLeave(notice);
+              return;
+            }
+
+            ignoredRoomIdsRef.current.delete(previousRoom.id);
+            leavingRoomIdRef.current = undefined;
+            leavingRoomRef.current = false;
+            suppressRemovalNoticeRef.current = false;
+            throw leaveError;
+          }
+
+          completeLocalLeave(notice);
         });
       },
       async markHidden() {
@@ -647,7 +897,7 @@ export function RoomProvider({ children }: { children: ReactNode }) {
         await roomService.updatePlayerLocation(session.roomId, session.activePlayerId, session.activePlayerToken, input);
       },
     };
-  }, [activePlayerId, activePlayerToken, applyFinalResultSnapshot, applySnapshot, clearFinalResultSnapshot, error, finalResultSnapshot, isLoading, refreshRoom, refreshRoomSoft, room, roomNotice, runAction]);
+  }, [activePlayerId, activePlayerToken, applyFinalResultSnapshot, applySnapshot, clearFinalResultSnapshot, completeLocalLeave, error, finalResultSnapshot, ignoreRoomRefreshes, isLoading, isRestoringSession, isRoomSyncing, lastRoomSyncedAt, refreshRoom, refreshRoomSoft, room, roomNotice, runAction]);
 
   return <RoomContext.Provider value={store}>{children}</RoomContext.Provider>;
 }

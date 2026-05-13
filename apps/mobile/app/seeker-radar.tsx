@@ -130,7 +130,7 @@ export default function SeekerRadarScreen() {
             if (payload.finalSnapshot || payload.remainingHiders === 0) {
               router.replace('/result');
             } else {
-              router.push('/capture');
+              router.push({ pathname: '/capture', params: { capturedPlayerId: payload.capturedPlayerId } });
             }
             return;
           }
